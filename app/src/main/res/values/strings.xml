@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">DislexiaTesterApp</string>
+
+    <string name="bisection_question_text_audio">Il secondo suono era più vicino al primo o al terzo?</string>
+    <string name="bisection_question_text_video">La luce gialla era più vicina alla verde o alla rossa?</string>
+    <string name="bisection_question_text_tactile">La seconda vibrazione era più vicina alla prima o alla terza?</string>
+    <string name="bisection_question_text_mixed">Il secondo stimolo era più vicino al primo o al terzo?</string>
+
+    <string name="bisection_rb1_text">Più vicino al primo</string>
+    <string name="bisection_rb2_text">Uguale</string>
+    <string name="bisection_rb3_text">Più vicino al terzo</string>
+
+    <string name="mmeters_question_text">Le due sequenze sono uguali?</string>
+
+    <string name="mmeters_rb1_text">SI, sono uguali</string>
+    <string name="mmeters_rb2_text">Uguale</string>
+    <string name="mmeters_rb3_text">NO, sono diverse</string>
+
+    <string name="test_ended">Il Test è terminato</string>
+
+</resources>
