@@ -5,19 +5,10 @@ import android.os.Handler
 
 import java.util.*
 import com.jakewharton.rxrelay2.PublishRelay
-import iit.uvip.twoafctemporalquestapp.deleteFile
-import iit.uvip.twoafctemporalquestapp.saveData
+import iit.uvip.twoafctemporalquestapp.utility.deleteFile
+import iit.uvip.twoafctemporalquestapp.utility.saveText
 
-
-abstract class Test(protected val ctx: Context, val mType:Int, val mSubjLabel: String="result") {
-
-    // they are just proxy for properties (implemented / edited) in each subclass
-    abstract fun show(trialid:Int, isRepeat:Boolean=false)
-    val testEvent:PublishRelay<Int> = PublishRelay.create()
-    var mQuestion:String            = ""
-    var nTrials:Int                 = 0
-
-    protected abstract fun initTest()
+abstract class Test(protected val ctx: Context, protected val data: TestData) {
 
     companion object {
 
@@ -27,6 +18,14 @@ abstract class Test(protected val ctx: Context, val mType:Int, val mSubjLabel: S
         @JvmStatic val TEST_BISECTION_AUDIO_VIDEO       = 103
         @JvmStatic val TEST_MUSICAL_METERS              = 110
 
+        @JvmStatic val TEST_TID_SHORT_AUDIO             = 120
+        @JvmStatic val TEST_TID_SHORT_TACTILE           = 121
+        @JvmStatic val TEST_TID_LONG_AUDIO              = 122
+        @JvmStatic val TEST_TID_LONG_TACTILE            = 123
+
+        @JvmStatic val TEST_PRE                         = 130
+        @JvmStatic val TEST_POST                        = 131
+        @JvmStatic val TEST_TRAINING                    = 132
 
         @JvmStatic val EVENT_STIMULI_START              = 200
         @JvmStatic val EVENT_STIMULI_END                = 201
@@ -37,16 +36,25 @@ abstract class Test(protected val ctx: Context, val mType:Int, val mSubjLabel: S
         @JvmStatic val EVENT_TEST_END                   = 205
     }
 
+    // they are just proxy for properties (implemented / edited) in each subclass
+
+    val testEvent:PublishRelay<Int> = PublishRelay.create()
+    var mQuestion:String            = ""
+
     var mAnswer1:String = ""
     var mAnswer2:String = ""
     var mAnswer3:String = ""
 
-    protected var mTrials:MutableList<Trial>          = mutableListOf()
-
+    protected var mTrials:MutableList<Trial>    = mutableListOf()
+    var nTrials:Int                             = 0
+    protected var currTrial:Int                 = 0
     protected lateinit var mTrial:Trial
-    protected var currTrial:Int             = 0
+
     protected var mResultFile: String       = ""
     protected var mStimuliHandler: Handler  = Handler()
+
+    protected abstract fun initTest()
+    abstract fun show(trialid:Int, isRepeat:Boolean=false)
 
     // ===============================================================================================================
     protected fun createResultFile(subj_label:String, header:String){
@@ -61,7 +69,7 @@ abstract class Test(protected val ctx: Context, val mType:Int, val mSubjLabel: S
                 c.get(Calendar.SECOND).toString()
         mResultFile += ".txt"
 
-        saveData(ctx, mResultFile, header)
+        saveText(ctx, mResultFile, header)
     }
 
     open fun nextTrial(prev_result:Int, elapsed:Int):Int{
@@ -86,7 +94,7 @@ abstract class Test(protected val ctx: Context, val mType:Int, val mSubjLabel: S
         mTrial.setResponse(result, elapsed)
 
         if(writeit)
-            saveData(ctx, mResultFile, mTrial.Log(), notifyDM)
+            saveText(ctx, mResultFile, mTrial.Log(), notifyDm = notifyDM)
     }
 
     open fun abortTest(){

@@ -4,10 +4,9 @@ import android.content.Context
 import iit.uvip.twoafctemporalquestapp.R
 import android.media.MediaPlayer
 
-
-class MusicalMeterTest(ctx: Context, mType:Int) : Test(ctx, mType)
+class MusicalMeterTest(ctx: Context, data: TestData) : Test(ctx, data)
 {
-    var LOG_TAG = MusicalMeterTest::class.java.simpleName
+    var LOG_TAG:String = MusicalMeterTest::class.java.simpleName
 
     companion object {
         @JvmStatic val NUM_TRIALS = 18
@@ -32,7 +31,7 @@ class MusicalMeterTest(ctx: Context, mType:Int) : Test(ctx, mType)
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(mSubjLabel, MusicMetersTrial.LOG_HEADER)
+        createResultFile(data.subject_id, MusicMetersTrial.LOG_HEADER)
     }
 
     override fun show(trialid:Int, isRepeat:Boolean){

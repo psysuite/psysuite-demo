@@ -11,8 +11,8 @@ import iit.uvip.twoafctemporalquestapp.R
 import iit.uvip.twoafctemporalquestapp.tests.Test
 import kotlinx.android.synthetic.main.fragment_answer.*
 import android.widget.RadioButton
-import iit.uvip.twoafctemporalquestapp.getTimeDifference
-import iit.uvip.twoafctemporalquestapp.showToast
+import iit.uvip.twoafctemporalquestapp.utility.getTimeDifference
+import iit.uvip.twoafctemporalquestapp.utility.showToast
 import java.util.*
 
 
@@ -74,11 +74,11 @@ class AnswerDialogFragment: DialogFragment()
         bt_confirm.setOnClickListener{
 
             val elapsedms = getTimeDifference(onsetDate)
-            when(radioGroup.checkedRadioButtonId != -1) {
+            when(radioGroupIntervals.checkedRadioButtonId != -1) {
                 true -> {
-                    val id                      = radioGroup.checkedRadioButtonId
-                    val radioButton:RadioButton = radioGroup.findViewById(id)
-                    val radioId                 = radioGroup.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
+                    val id                      = radioGroupIntervals.checkedRadioButtonId
+                    val radioButton:RadioButton = radioGroupIntervals.findViewById(id)
+                    val radioId                 = radioGroupIntervals.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
 
                     sendResult(Test.EVENT_ANSWER_GIVEN, elapsedms, radioId)
                 }
@@ -86,7 +86,7 @@ class AnswerDialogFragment: DialogFragment()
             }
         }
 
-        bt_repeat.setOnClickListener{
+        bt_clear.setOnClickListener{
             sendResult(Test.EVENT_TRIAL_REPEAT, 0, null)
         }
 
