@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.tests
+package iit.uvip.audiotactilebindingapp.tests
 
 import android.content.Context
 import android.media.AudioManager
@@ -7,13 +7,12 @@ import android.os.VibrationEffect
 import android.os.VibrationEffect.DEFAULT_AMPLITUDE
 import android.os.Vibrator
 import android.widget.ImageView
-import iit.uvip.twoafctemporalquestapp.MainApplication
-import iit.uvip.twoafctemporalquestapp.R
+import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.R
 
-
-class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:ImageView) : Test(ctx, mType, mSubjLabel)
+class BisectionTest(ctx: Context, data: TestData, private val mImageView:ImageView) : Test(ctx, data)
 {
-    var LOG_TAG = BisectionTest::class.java.simpleName
+    var LOG_TAG:String = BisectionTest::class.java.simpleName
 
     companion object {
 
@@ -85,7 +84,7 @@ class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:I
 
     override fun initTest(){
         // set question & create mTrials list
-        when(mType)
+        when(data.type)
         {
             TEST_BISECTION_AUDIO            -> initBisectionAudio()
             TEST_BISECTION_TACTILE          -> initBisectionTactile()
@@ -95,7 +94,7 @@ class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:I
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(mSubjLabel, BisectionTrial.LOG_HEADER)
+        createResultFile(data.subject_id, BisectionTrial.LOG_HEADER)
     }
 
     // a trial has this temporal line:
@@ -181,13 +180,10 @@ class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:I
                 mImageView.setImageResource(mBackgroundColours[stage])
             }, delay)
         }
-
         mStimuliHandler.postDelayed({
             mImageView.setImageResource(mBackgroundColours[0])
         }, delay + resetTime)
-
     }
-
     // -----------------------------------------------------------------------------------------------------------------
     // set question and create trials list
     // Trial is : (var id:Int=-1, val type:Int, val label:String, val position:Int, val conflict_type:String, val duration:Int, val duration2:Int=0, var correct_answer:Int=-1, var user_answer:Int=-1, var success:Boolean=false, var elapsed:Int=-1) {
@@ -196,7 +192,7 @@ class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:I
 
         for(section in trialsDefaultSchema)
             for(i in 0 until section.first)
-                mTrials.add(BisectionTrial(-1, mType, stim_type_label, section.second, section.third, duration, duration2))
+                mTrials.add(BisectionTrial(-1, data.type, stim_type_label, section.second, section.third, duration, duration2))
         mTrials.shuffle()
 
         // set trial id according to its order in the list
@@ -209,8 +205,8 @@ class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:I
         for(section in trialsAudioVideoSchema)
             for(i in 0 until section.first)
                 when(section.third == CONFLICT_TYPE_AV){
-                    true    -> mTrials.add(BisectionTrial(-1, mType, STIMULUS_TYPE_AUDIO_VIDEO, section.second, section.third, durationAudio, durationVideo))
-                    false   -> mTrials.add(BisectionTrial(-1, mType, STIMULUS_TYPE_AUDIO_VIDEO, section.second, section.third, durationVideo, durationAudio))
+                    true    -> mTrials.add(BisectionTrial(-1, data.type, STIMULUS_TYPE_AUDIO_VIDEO, section.second, section.third, durationAudio, durationVideo))
+                    false   -> mTrials.add(BisectionTrial(-1, data.type, STIMULUS_TYPE_AUDIO_VIDEO, section.second, section.third, durationVideo, durationAudio))
                 }
         mTrials.shuffle()
 
@@ -251,15 +247,12 @@ class BisectionTest(ctx: Context, mType:Int, mSubjLabel:String, val mImageView:I
         nTrials = trialsDefaultSchema_debug.size
         for(section in trialsDefaultSchema)
             for(i in 0 until 1)
-                mTrials.add(BisectionTrial(-1, mType, stim_type_label, section.second, section.third, duration, duration2))
+                mTrials.add(BisectionTrial(-1, data.type, stim_type_label, section.second, section.third, duration, duration2))
         mTrials.shuffle()
 
         // set trial id according to its order in the list
         for(i in 0 until mTrials.size)
             mTrials[i].id = (i + 1)
     }
-
-
-
     // =====================================================================================
 }

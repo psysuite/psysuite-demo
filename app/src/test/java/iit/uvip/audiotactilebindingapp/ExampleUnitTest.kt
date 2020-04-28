@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp
+package iit.uvip.audiotactilebindingapp
 
 import org.junit.Test
 

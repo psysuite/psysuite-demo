@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.fragments
+package iit.uvip.audiotactilebindingapp.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.app.Activity
-import iit.uvip.twoafctemporalquestapp.R
-import iit.uvip.twoafctemporalquestapp.tests.Test
+import iit.uvip.audiotactilebindingapp.R
+import iit.uvip.audiotactilebindingapp.tests.Test
 import kotlinx.android.synthetic.main.fragment_answer.*
 import android.widget.RadioButton
-import iit.uvip.twoafctemporalquestapp.getTimeDifference
-import iit.uvip.twoafctemporalquestapp.showToast
+import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
+import iit.uvip.audiotactilebindingapp.utility.showToast
 import java.util.*
 
 
@@ -44,12 +44,12 @@ class AnswerDialogFragment: DialogFragment()
         super.onViewCreated(view, savedInstanceState)
 
         // Fetch arguments from bundle and set title
-        val title       = arguments!!.getString("title", "Enter Name")
-        val str_trial   = "trial " +  (arguments!!.getInt("trial_id", 0) + 1).toString() + " di " + arguments!!.getInt("tot_trials", 0)
-        val question    = arguments!!.getString("question", "Enter Name")
-        val answ1    = arguments!!.getString("answer1", "")
+        val title       = requireArguments().getString("title", "Enter Name")
+        val str_trial   = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + arguments!!.getInt("tot_trials", 0)
+        val question    = requireArguments().getString("question", "Enter Name")
+        val answ1       = requireArguments().getString("answer1", "")
 //        val answ2    = arguments!!.getString("answer2", "")
-        val answ3    = arguments!!.getString("answer3", "")
+        val answ3       = requireArguments().getString("answer3", "")
 
         dialog?.setTitle(title)
 
@@ -67,26 +67,26 @@ class AnswerDialogFragment: DialogFragment()
         // Assign window properties to fill the parent
         params.width = WindowManager.LayoutParams.MATCH_PARENT
         params.height = WindowManager.LayoutParams.MATCH_PARENT
-        dialog?.window!!.attributes = params as android.view.WindowManager.LayoutParams
+        dialog?.window!!.attributes = params as WindowManager.LayoutParams
 
         super.onResume()
 
         bt_confirm.setOnClickListener{
 
             val elapsedms = getTimeDifference(onsetDate)
-            when(radioGroup.checkedRadioButtonId != -1) {
+            when(radioGroupIntervals.checkedRadioButtonId != -1) {
                 true -> {
-                    val id                      = radioGroup.checkedRadioButtonId
-                    val radioButton:RadioButton = radioGroup.findViewById(id)
-                    val radioId                 = radioGroup.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
+                    val id                      = radioGroupIntervals.checkedRadioButtonId
+                    val radioButton:RadioButton = radioGroupIntervals.findViewById(id)
+                    val radioId                 = radioGroupIntervals.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
 
                     sendResult(Test.EVENT_ANSWER_GIVEN, elapsedms, radioId)
                 }
-                false -> showToast("Seleziona un'opzione", context!!)
+                false -> showToast("Seleziona un'opzione", requireContext())
             }
         }
 
-        bt_repeat.setOnClickListener{
+        bt_clear.setOnClickListener{
             sendResult(Test.EVENT_TRIAL_REPEAT, 0, null)
         }
 

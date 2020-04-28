@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp
+package iit.uvip.audiotactilebindingapp
 
 import android.Manifest
 import android.content.DialogInterface
@@ -13,13 +13,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
-import iit.uvip.twoafctemporalquestapp.fragments.BaseFragment
+import iit.uvip.audiotactilebindingapp.fragments.BaseFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-// NavController.OnNavigatedListener does not resolve with android.arch.navigation:navigation-ui-ktx:1.0.0-alpha09
-// must use : android.arch.navigation:navigation-ui-ktx:1.0.0-alpha07
-
-class MainActivity : AppCompatActivity(), NavController.OnNavigatedListener, DialogInterface.OnDismissListener  {
+class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, DialogInterface.OnDismissListener  {
 
     private val TEST_PERMISSIONS_REQUEST_WRITE = 1
     private val TEST_PERMISSIONS_REQUEST_INTERNET = 2
@@ -31,7 +28,7 @@ class MainActivity : AppCompatActivity(), NavController.OnNavigatedListener, Dia
         setContentView(R.layout.activity_main)
 
         setupActionBarWithNavController(findNavController(R.id.my_nav_host_fragment))
-        findNavController(R.id.my_nav_host_fragment).addOnNavigatedListener(this)
+        findNavController(R.id.my_nav_host_fragment).addOnDestinationChangedListener(this)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),TEST_PERMISSIONS_REQUEST_WRITE)
@@ -42,7 +39,7 @@ class MainActivity : AppCompatActivity(), NavController.OnNavigatedListener, Dia
 
     override fun onSupportNavigateUp() = findNavController(R.id.my_nav_host_fragment).navigateUp()
 
-    override fun onNavigated(controller: NavController, destination: NavDestination){}
+    override fun onDestinationChanged(controller: NavController, destination: NavDestination,arguments: Bundle?) {}
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -77,7 +74,7 @@ class MainActivity : AppCompatActivity(), NavController.OnNavigatedListener, Dia
                                     .setTitle("Chiudi ?")
                                     .setMessage("Vuoi uscire dall'applicazione ??")
                                     .setCancelable(false)
-                                    .setPositiveButton("SI", { dialog, i -> finish() })
+                                    .setPositiveButton("SI"){ _, _ -> finish() }
                                     .setNegativeButton("NO", null)
                                     .show()
             }
@@ -94,7 +91,7 @@ class MainActivity : AppCompatActivity(), NavController.OnNavigatedListener, Dia
         application.tts?.shutdown()
 
         dialog?.dismiss()
-        findNavController(R.id.my_nav_host_fragment).removeOnNavigatedListener(this)
+        findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
         super.onDestroy()
     }
 }

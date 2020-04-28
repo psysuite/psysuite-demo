@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.fragments
+package iit.uvip.audiotactilebindingapp.fragments
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import iit.uvip.twoafctemporalquestapp.MainActivity
+import iit.uvip.audiotactilebindingapp.MainActivity
 
 //--------------------------------------------------------------------------------------------------
 // abstract layer containing behaviour common to all fragments:
@@ -33,8 +33,8 @@ abstract class BaseFragment(
     override fun onStart() {
         super.onStart()
 
-        if (landscape != (activity!!.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)) {
-            activity!!.requestedOrientation = if (landscape) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        if (landscape != (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)) {
+            requireActivity().requestedOrientation = if (landscape) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             return
         }
     }

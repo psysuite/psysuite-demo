@@ -1,5 +1,36 @@
 <resources>
-    <string name="app_name">DislexiaTesterApp</string>
+    <string name="app_name">ATBindingTesterApp</string>
+
+
+    <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
+    <string name="tid_question_text_tactile">L\'intervallo tra la prima coppia di vibrazione era maggiore o minore dell\'intervallo tra la seconda coppia</string>
+
+    <string name="tid_rb1_text">Più corto il primo</string>
+    <string name="tid_rb3_text">Piu corto il secondo</string>
+
+    <string name="tid_rb_male_text">M</string>
+    <string name="tid_rb_female_text">F</string>
+
+    <string name="tid_rb_short_text">corti</string>
+    <string name="tid_rb_long_text">lunghi</string>
+
+    <string name="tid_rb_audio_text">audio</string>
+    <string name="tid_rb_vibro_text">vibro</string>
+
+
+    <string name="tid_name_text">nome</string>
+    <string name="tid_gender_text">sesso</string>
+    <string name="tid_age_text">età</string>
+
+    <string name="tid_group_interval_text">gruppo intervallo</string>
+    <string name="tid_group_modality_text">gruppo modalità</string>
+    <string name="tid_group_first_modality_text">prima modalità</string>
+
+    <string name="tid_insert_subjectdata_button_text">INSERISCI SOGGETTO</string>
+    <string name="tid_start_pre_text">INIZIA PRE-TESTS</string>
+    <string name="tid_start_post_text">INIZIA POST-TESTS</string>
+    <string name="tid_start_training_text">INIZIA TRAINING</string>
+
 
     <string name="bisection_question_text_audio">Il secondo suono era più vicino al primo o al terzo?</string>
     <string name="bisection_question_text_video">La luce gialla era più vicina alla verde o alla rossa?</string>

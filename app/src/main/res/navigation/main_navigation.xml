@@ -6,71 +6,20 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.MainFragment"
+        android:name="iit.uvip.audiotactilebindingapp.fragments.MainFragment"
         android:label="Home"
         tools:layout="@layout/fragment_main">
-
         <action
-            android:id="@+id/action_mainFragment_to_testInfoDialogFragment"
-            app:destination="@id/testInfoDialogFragment"
-            app:popUpTo="@+id/mainFragment" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_bisectionSelectFragment"
-            app:destination="@id/bisectionSelectFragment"
-            app:popUpTo="@+id/mainFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/testInfoDialogFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.TestInfoFragment"
-        android:label="Inserisci Dati del test"
-        tools:layout="@layout/fragment_test_info">
-
-        <action
-            android:id="@+id/action_testInfoDialogFragment_to_testFragment"
-            app:destination="@id/testFragment"
-            app:popUpTo="@+id/testInfoDialogFragment" />
-
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/bisectionSelectFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.BisectionSelectFragment"
-        android:label="Seleziona il test di bisezione"
-        tools:layout="@layout/fragment_bisection_select">
-
-        <action
-            android:id="@+id/action_bisectionSelectFragment_to_testInfoDialogFragment"
-            app:destination="@id/testInfoDialogFragment"
-            app:popUpTo="@+id/bisectionSelectFragment" />
-
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/answerDialogFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.AnswerDialogFragment"
-        android:label="fragment_answer"
-        tools:layout="@layout/fragment_answer">
-
-        <action
-            android:id="@+id/action_answerDialogFragment_to_testFragment"
-            app:destination="@id/testFragment"/>
-
+                android:id="@+id/action_mainFragment_to_testFragment"
+                app:destination="@id/testFragment" />
     </fragment>
 
 
     <fragment
         android:id="@+id/testFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.TestFragment"
+        android:name="iit.uvip.audiotactilebindingapp.fragments.TestFragment"
         android:label="TestFragment">
 
-        <action
-            android:id="@+id/action_testFragment_to_answerDialogFragment"
-            app:destination="@id/answerDialogFragment"/>
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>
 
     </fragment>

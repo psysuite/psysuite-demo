@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp
+package iit.uvip.audiotactilebindingapp
 
 
 import android.app.Application
@@ -18,6 +18,12 @@ class MainApplication : Application(), TextToSpeech.OnInitListener  {
 
     lateinit var vibrator: Vibrator
     var tts: TextToSpeech? = null
+
+    companion object {
+
+        @JvmStatic val FILE_EXTENSION: String = ".json"
+        @JvmStatic val RES_EXTENSION: String = ".txt"
+    }
 
     override fun onCreate() {
         super.onCreate()
