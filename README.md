@@ -1,13 +1,48 @@
-This App perform a Temporal Interval Discrimination (TID) longitudinal test:
+This App perform an Audio-Tactile Binding (ATB) test:
 
-It follows the 2-AFC scheme, two pairs (T-R) of stimuli are delivered according to two different modalities (acoustic or tactile). user must determine in which of the two pairs the temporal interval that separated each stimulus is lower.
+It has one single experimental condition composed by 36 trials (with fixed scheme!). 
+Each trial consists in a pair of stimulation modalities (audio and tactle) each composed by two consecutive trains of respectively 5 and 3 either audio and/or tactile stimuli (stim duration 1sec, isi=1sec). ITI=2sec.
 
-T1..........T2......one-second.....R1....R2
+single trial:
+                1st train               2nd train
+        __    __    __    __    __  |  __    __    __
+A    __|  |__|  |__|  |__|  |__|  |_|_|  |__|  |__|  |____
+                                    |
+        __    __    __    __    __  |  __    __    __
+T    __|  |__|  |__|  |__|  |__|  |_|_|  |__|  |__|  |____
+                                    |
+                                    |
 
-Reference interval can be short or long.
-subject do a pre-test with both modalities and one kind of reference interval, than 5 sessions with a given modality and then a post-test with both modalities.
+in the second train, one of the two modalities can be in synch with other, delayed/anticipated by 200-500-800 ms or absent
+
+6 x A, T
+3 x A + 200, T
+3 x A, T + 200
+6 x A
+3 x A + 500, T
+3 x A, T + 500
+6 x T
+3 x A + 800, T
+3 x A, T + 800
+
+The order is fixed, 3 repetitions of the following 12 trials:
+
+A,T
+A,T+200
+A
+A+800,T
+T
+A,T+500
+A
+A+200,T
+A,T
+A,T+800
+T
+A+500,T
+
+
 
 
 Exported Data:
 
-id, block, session, type (short/long), modality (acoustic/tactile), delta1, delta2, ref_first, user_answer, correct_answer, elapsed time
+trial_id, type
