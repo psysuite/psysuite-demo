@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DislexiaTesterApp</string>
+    <string name="app_name">ATBindingTesterApp</string>
 
 
     <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>

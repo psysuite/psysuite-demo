@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.fragments
+package iit.uvip.audiotactilebindingapp.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.Navigation
-import iit.uvip.twoafctemporalquestapp.R
-import iit.uvip.twoafctemporalquestapp.subjects.SubjectData
-import iit.uvip.twoafctemporalquestapp.subjects.Subjects
-import iit.uvip.twoafctemporalquestapp.tests.TestData
-import iit.uvip.twoafctemporalquestapp.tests.TIDTest
-import iit.uvip.twoafctemporalquestapp.tests.Test
+import iit.uvip.audiotactilebindingapp.R
+import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDData
+import iit.uvip.audiotactilebindingapp.subjects.SubjectsTID
+import iit.uvip.audiotactilebindingapp.tests.TestData
+import iit.uvip.audiotactilebindingapp.tests.TIDTest
+import iit.uvip.audiotactilebindingapp.tests.Test
 import kotlinx.android.synthetic.main.fragment_main.*
 
 
@@ -21,8 +21,8 @@ class MainFragment : BaseFragment(
     hideAndroidControls = false
 )
 {
-    private lateinit var mSubjects: Subjects
-    private var subject: SubjectData? = null
+    private lateinit var mSubjectsTID: SubjectsTID
+    private var subject: SubjectTIDData? = null
 
     override val LOG_TAG:String = MainFragment::class.java.simpleName
 
@@ -35,17 +35,17 @@ class MainFragment : BaseFragment(
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mSubjects = Subjects(context!!)
+        mSubjectsTID = SubjectsTID(requireContext())
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onResume() {
         super.onResume()
 
-        subject = mSubjects.loadSubject()
+        subject = mSubjectsTID.loadSubject()
         onSubjectUpdated()
 
-        activity!!.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
         bt_insert_subject.setOnClickListener{
             showSubjectDialog()
@@ -90,7 +90,7 @@ class MainFragment : BaseFragment(
         editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
-        editNameDialogFragment.show(fragmentManager!!, "Modifica Soggetto")
+        editNameDialogFragment.show(requireFragmentManager(), "Modifica Soggetto")
     }
 
     // subject info !
@@ -99,7 +99,7 @@ class MainFragment : BaseFragment(
         if(requestCode == TARGET_FRAGMENT_REQUEST_CODE)
             subject = data?.getParcelableExtra(EVENT_SUBJECT) ?: subject
 
-        if(subject != null) mSubjects.writeJson(subj=subject)
+        if(subject != null) mSubjectsTID.writeJson(subj=subject)
         onSubjectUpdated()
     }
 

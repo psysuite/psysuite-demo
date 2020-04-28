@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.tests
+package iit.uvip.audiotactilebindingapp.tests
 
 import android.content.Context
 import android.media.AudioManager
@@ -7,8 +7,8 @@ import android.os.VibrationEffect
 import android.os.VibrationEffect.DEFAULT_AMPLITUDE
 import android.os.Vibrator
 import android.widget.ImageView
-import iit.uvip.twoafctemporalquestapp.MainApplication
-import iit.uvip.twoafctemporalquestapp.R
+import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.R
 
 class BisectionTest(ctx: Context, data: TestData, private val mImageView:ImageView) : Test(ctx, data)
 {

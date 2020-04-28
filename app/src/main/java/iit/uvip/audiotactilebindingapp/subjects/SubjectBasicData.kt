@@ -1,29 +1,25 @@
-package iit.uvip.twoafctemporalquestapp.subjects
+package iit.uvip.audiotactilebindingapp.subjects
 
 import android.os.Parcel
 import android.os.Parcelable
-import iit.uvip.twoafctemporalquestapp.tests.Test
 import java.lang.NumberFormatException
 
-class SubjectData(var label:String, var age:Int, var gender:Int, var modality:Int, var interval_type:Int, var first_modality:Int) : Parcelable{
+open class SubjectBasicData(var label:String, var age:Int, var gender:Int) : Parcelable{
 
     private constructor(parcel: Parcel) : this(
         label           = parcel.readString()!!,
         age             = parcel.readInt(),
-        gender          = parcel.readInt(),
-        modality        = parcel.readInt(),
-        interval_type   = parcel.readInt(),
-        first_modality  = parcel.readInt()
+        gender          = parcel.readInt()
     )
 
 
     companion object {
 
         @JvmField
-        val CREATOR = object : Parcelable.Creator<SubjectData> {
+        val CREATOR = object : Parcelable.Creator<SubjectBasicData> {
             override fun createFromParcel(parcel: Parcel) =
-                SubjectData(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<SubjectData>(size)
+                SubjectBasicData(parcel)
+            override fun newArray(size: Int) = arrayOfNulls<SubjectBasicData>(size)
         }
 
         fun validate(lab:String, ag:String):String{
@@ -45,13 +41,10 @@ class SubjectData(var label:String, var age:Int, var gender:Int, var modality:In
         dest.writeString(label)
         dest.writeInt(age)
         dest.writeInt(gender)
-        dest.writeInt(modality)
-        dest.writeInt(interval_type)
-        dest.writeInt(first_modality)
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other is SubjectData) {
+        if (other is SubjectBasicData) {
             return label.equals(other.label, ignoreCase = true)
         }
         return false
@@ -65,16 +58,6 @@ class SubjectData(var label:String, var age:Int, var gender:Int, var modality:In
         return label.hashCode()
     }
 
-    fun getType():Int{
-        return if(interval_type == 0) {
-                    if(modality == 0)  Test.TEST_TID_SHORT_AUDIO
-                    else               Test.TEST_TID_SHORT_TACTILE
-                }
-                else {
-                    if(modality == 0)  Test.TEST_TID_LONG_AUDIO
-                    else               Test.TEST_TID_LONG_TACTILE
-                }
-    }
 }
 
 

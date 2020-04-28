@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.utility
+package iit.uvip.audiotactilebindingapp.utility
 
 import android.app.DownloadManager
 import android.content.Context

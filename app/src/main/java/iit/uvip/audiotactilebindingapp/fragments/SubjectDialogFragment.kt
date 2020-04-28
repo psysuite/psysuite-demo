@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.fragments
+package iit.uvip.audiotactilebindingapp.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,16 +8,17 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.app.Activity
 import android.content.Intent
-import iit.uvip.twoafctemporalquestapp.R
-import kotlinx.android.synthetic.main.fragment_subject_info.*
+import iit.uvip.audiotactilebindingapp.R
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.*
 import android.widget.RadioButton
-import iit.uvip.twoafctemporalquestapp.subjects.SubjectData
-import iit.uvip.twoafctemporalquestapp.utility.showToast
+import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicData
+import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDData
+import iit.uvip.audiotactilebindingapp.utility.showToast
 
 class SubjectDialogFragment: DialogFragment()
 {
     val LOG_TAG:String = SubjectDialogFragment::class.java.simpleName
-    private var subject: SubjectData? = null
+    private var subjectTID: SubjectTIDData? = null
 
     companion object {
         fun newInstance(title: String): SubjectDialogFragment {
@@ -32,20 +33,20 @@ class SubjectDialogFragment: DialogFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_subject_info, container)
+        return inflater.inflate(R.layout.fragment_tid_subject_info, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subject = arguments?.getParcelable("subject")
+        subjectTID = arguments?.getParcelable("subject")
 
         // Fetch arguments from bundle and set title
-        val title       = arguments!!.getString("title", "Enter Name")
+        val title       = requireArguments().getString("title", "Enter Name")
 
         dialog?.setTitle(title)
 
-        if(subject != null) updateGUI(subject!!)
+        if(subjectTID != null) updateGUI(subjectTID!!)
         else                clear()
     }
 
@@ -64,7 +65,7 @@ class SubjectDialogFragment: DialogFragment()
 
             val subj = updateSubject()
             if(subj != null) {
-                subject = subj
+                subjectTID = subj
                 sendResult()
             }
         }
@@ -74,13 +75,13 @@ class SubjectDialogFragment: DialogFragment()
         }
 
         bt_cancel.setOnClickListener{
-            subject = null
+            subjectTID = null
             sendResult()
         }
 
     }
 
-    private fun updateGUI(subj: SubjectData){
+    private fun updateGUI(subj: SubjectTIDData){
 
         txtName.setText(subj.label)
         txtAge.setText(subj.age.toString())
@@ -100,13 +101,13 @@ class SubjectDialogFragment: DialogFragment()
         radioGroupFirstModality.clearCheck()
     }
 
-    private fun updateSubject(): SubjectData?{
+    private fun updateSubject(): SubjectTIDData?{
 
         val name            = txtName.text.toString()
         val age             = txtAge.text.toString()
 
-        if(SubjectData.validate(name, age).isNotBlank()){
-            showToast("Seleziona un'opzione per la durata dell'intervallo", context!!)
+        if(SubjectBasicData.validate(name, age).isNotBlank()){
+            showToast("Seleziona un'opzione per la durata dell'intervallo", requireContext())
             return null
         }
 
@@ -122,7 +123,7 @@ class SubjectDialogFragment: DialogFragment()
                 interval                    = radioGroupIntervals.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
             }
             false -> {
-                showToast("Seleziona un'opzione per la durata dell'intervallo", context!!)
+                showToast("Seleziona un'opzione per la durata dell'intervallo", requireContext())
                 return null
             }
         }
@@ -134,7 +135,7 @@ class SubjectDialogFragment: DialogFragment()
                 modality                    = radioGroupModality.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
             }
             false -> {
-                showToast("Seleziona un'opzione per la modalità di training", context!!)
+                showToast("Seleziona un'opzione per la modalità di training", requireContext())
                 return null
             }
         }
@@ -146,7 +147,7 @@ class SubjectDialogFragment: DialogFragment()
                 first_modality              = radioGroupFirstModality.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
             }
             false -> {
-                showToast("Seleziona un'opzione per la modalità di training", context!!)
+                showToast("Seleziona un'opzione per la modalità di training", requireContext())
                 return null
             }
         }
@@ -158,18 +159,11 @@ class SubjectDialogFragment: DialogFragment()
                 gender                      = radioGroupGender.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
             }
             false -> {
-                showToast("Seleziona un'opzione per il sesso", context!!)
+                showToast("Seleziona un'opzione per il sesso", requireContext())
                 return null
             }
         }
-        return SubjectData(
-            name,
-            age.toInt(),
-            gender,
-            modality,
-            interval,
-            first_modality
-        )
+        return SubjectTIDData(name, age.toInt(), gender, modality, interval, first_modality)
     }
 
     private fun sendResult() {
@@ -177,7 +171,7 @@ class SubjectDialogFragment: DialogFragment()
             return
         }
         val intent = Intent()
-        intent.putExtra(MainFragment.EVENT_SUBJECT, subject)
+        intent.putExtra(MainFragment.EVENT_SUBJECT, subjectTID)
         targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
         dismiss()
     }

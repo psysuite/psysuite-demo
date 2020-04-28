@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.MainFragment"
+        android:name="iit.uvip.audiotactilebindingapp.fragments.MainFragment"
         android:label="Home"
         tools:layout="@layout/fragment_main">
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/testFragment"
-        android:name="iit.uvip.twoafctemporalquestapp.fragments.TestFragment"
+        android:name="iit.uvip.audiotactilebindingapp.fragments.TestFragment"
         android:label="TestFragment">
 
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>

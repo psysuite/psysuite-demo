@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp
+package iit.uvip.audiotactilebindingapp
 
 import android.Manifest
 import android.content.DialogInterface
@@ -13,7 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
-import iit.uvip.twoafctemporalquestapp.fragments.BaseFragment
+import iit.uvip.audiotactilebindingapp.fragments.BaseFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, DialogInterface.OnDismissListener  {

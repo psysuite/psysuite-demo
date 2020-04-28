@@ -1,7 +1,7 @@
-package iit.uvip.twoafctemporalquestapp.tests
+package iit.uvip.audiotactilebindingapp.tests
 
 import android.content.Context
-import iit.uvip.twoafctemporalquestapp.R
+import iit.uvip.audiotactilebindingapp.R
 import android.media.MediaPlayer
 
 class MusicalMeterTest(ctx: Context, data: TestData) : Test(ctx, data)

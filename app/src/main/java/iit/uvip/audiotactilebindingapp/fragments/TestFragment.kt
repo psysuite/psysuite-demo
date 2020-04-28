@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.fragments
+package iit.uvip.audiotactilebindingapp.fragments
 
 
 import android.content.Intent
@@ -7,9 +7,9 @@ import androidx.navigation.Navigation
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
-import iit.uvip.twoafctemporalquestapp.R
-import iit.uvip.twoafctemporalquestapp.tests.*
-import iit.uvip.twoafctemporalquestapp.utility.showToast
+import iit.uvip.audiotactilebindingapp.R
+import iit.uvip.audiotactilebindingapp.tests.*
+import iit.uvip.audiotactilebindingapp.utility.showToast
 import kotlinx.android.synthetic.main.fragment_test.*
 
 
@@ -53,14 +53,14 @@ class TestFragment : BaseFragment(
             Test.TEST_BISECTION_AUDIO,
             Test.TEST_BISECTION_TACTILE,
             Test.TEST_BISECTION_AUDIO_TACTILE,
-            Test.TEST_BISECTION_AUDIO_VIDEO      -> mTest = BisectionTest(context!!, test, circleView)
+            Test.TEST_BISECTION_AUDIO_VIDEO      -> mTest = BisectionTest(requireContext(), test, circleView)
 
-            Test.TEST_MUSICAL_METERS             -> mTest = MusicalMeterTest(context!!, test)
+            Test.TEST_MUSICAL_METERS             -> mTest = MusicalMeterTest(requireContext(), test)
 
             Test.TEST_TID_SHORT_AUDIO,
             Test.TEST_TID_SHORT_TACTILE,
             Test.TEST_TID_LONG_AUDIO,
-            Test.TEST_TID_LONG_TACTILE           -> mTest = TIDTest(context!!, test)
+            Test.TEST_TID_LONG_TACTILE           -> mTest = TIDTest(requireContext(), test)
         }
         currTrial = 0
         mTest.show(currTrial)
@@ -100,7 +100,7 @@ class TestFragment : BaseFragment(
         editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
         editNameDialogFragment.arguments = b
         editNameDialogFragment.setCancelable(false)
-        editNameDialogFragment.show(fragmentManager!!, "Inserisci risposta")
+        editNameDialogFragment.show(requireFragmentManager(), "Inserisci risposta")
         isAnswerDialogOn = true
     }
 
@@ -117,8 +117,8 @@ class TestFragment : BaseFragment(
                     currTrial       = mTest.nextTrial(result, elapsedTime)
                     if(currTrial == Test.EVENT_TEST_END)
                     {
-                        showToast(getText(R.string.test_ended).toString(), context!!)
-                        Navigation.findNavController(view!!).navigate(R.id.action_testFragment_to_mainFragment)
+                        showToast(getText(R.string.test_ended).toString(), requireContext())
+                        Navigation.findNavController(requireView()).navigate(R.id.action_testFragment_to_mainFragment)
                     }
                 }
                 Test.EVENT_TRIAL_REPEAT -> {

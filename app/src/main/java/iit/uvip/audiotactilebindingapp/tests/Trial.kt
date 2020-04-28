@@ -1,4 +1,4 @@
-package iit.uvip.twoafctemporalquestapp.tests
+package iit.uvip.audiotactilebindingapp.tests
 
 // trial is used for psychophysics:
 // - trial_id

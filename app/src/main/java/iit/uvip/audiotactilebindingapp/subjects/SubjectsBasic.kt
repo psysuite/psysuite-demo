@@ -1,31 +1,30 @@
-package iit.uvip.twoafctemporalquestapp.subjects
+package iit.uvip.audiotactilebindingapp.subjects
 
 import android.content.Context
 import com.squareup.moshi.Moshi
-import iit.uvip.twoafctemporalquestapp.MainApplication
-import iit.uvip.twoafctemporalquestapp.utility.existFile
-import iit.uvip.twoafctemporalquestapp.utility.readText
-import iit.uvip.twoafctemporalquestapp.utility.saveText
+import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.utility.existFile
+import iit.uvip.audiotactilebindingapp.utility.readText
+import iit.uvip.audiotactilebindingapp.utility.saveText
 
 
-class Subjects(val context: Context) {
+class SubjectsBasic(val context: Context) {
 
     companion object {
 
         @JvmStatic val CURR_SUBJ_FILE:String = "curr_subject"
     }
 
-    private var subject: SubjectData? = null
+    private var subject: SubjectBasicData? = null
 
     // =============================================================================================================
     // WRITE
     // =============================================================================================================
 
-    fun writeJson(filename:String= CURR_SUBJ_FILE, subj: SubjectData?=null){
+    fun writeJson(filename:String= CURR_SUBJ_FILE, subj: SubjectBasicData?=null){
 
         val moshi       = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter<SubjectData>(
-            SubjectData::class.java)
+        val jsonAdapter = moshi.adapter<SubjectBasicData>(SubjectBasicData::class.java)
 
         return try {
             val json_subject = jsonAdapter.toJson(subj ?: subject)
@@ -43,7 +42,7 @@ class Subjects(val context: Context) {
     // LOAD
     // =============================================================================================================
 
-    fun loadSubject(): SubjectData?{
+    fun loadSubject(): SubjectBasicData?{
         val subj = existFile(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
         if(subj.first){
             val jsontext = readText(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
@@ -57,12 +56,10 @@ class Subjects(val context: Context) {
         return null
     }
 
-    fun loadJsonText(jsontext:String): SubjectData {
+    fun loadJsonText(jsontext:String): SubjectBasicData {
 
         val moshi           = Moshi.Builder().build()
-        val jsonAdapter     = moshi.adapter<SubjectData>(
-            SubjectData::class.java)
-
+        val jsonAdapter     = moshi.adapter<SubjectBasicData>(SubjectBasicData::class.java)
         return jsonAdapter.fromJson(jsontext)!!
     }
 }

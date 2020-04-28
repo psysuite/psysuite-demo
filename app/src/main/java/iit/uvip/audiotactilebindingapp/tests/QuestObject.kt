@@ -1,13 +1,7 @@
 
-package iit.uvip.twoafctemporalquestapp.tests
+package iit.uvip.audiotactilebindingapp.tests
 
-import koma.arange
-import koma.exp
-import koma.extensions.*
 import koma.ndarray.NDArray
-import koma.pow
-import koma.sum
-import kotlin.math.pow
 
 /*Measure threshold using a Weibull psychometric function.
 Threshold 't' is measured on an abstract 'intensity' scale, which usually corresponds to log10 contrast.
@@ -81,7 +75,7 @@ class QuestObject() {
         /* Create an instance of QuestObject with all the information necessary to measure threshold.
         This was converted from the Psychtoolbox's QuestCreate function.*/
         if(range < 0)               throw Exception("argument \"range\" must be greater than zero")
-        else if(range.equals(0))    dim = 500F
+        else if(range.equals(0F))    dim = 500F
         else                        dim = range/grain
     }
 

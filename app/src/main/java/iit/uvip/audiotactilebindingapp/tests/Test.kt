@@ -1,12 +1,12 @@
-package iit.uvip.twoafctemporalquestapp.tests
+package iit.uvip.audiotactilebindingapp.tests
 
 import android.content.Context
 import android.os.Handler
 
 import java.util.*
 import com.jakewharton.rxrelay2.PublishRelay
-import iit.uvip.twoafctemporalquestapp.utility.deleteFile
-import iit.uvip.twoafctemporalquestapp.utility.saveText
+import iit.uvip.audiotactilebindingapp.utility.deleteFile
+import iit.uvip.audiotactilebindingapp.utility.saveText
 
 abstract class Test(protected val ctx: Context, protected val data: TestData) {
 
