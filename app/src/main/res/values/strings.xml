@@ -1,7 +1,22 @@
 <resources>
     <string name="app_name">ATBindingTesterApp</string>
 
+    <!--    parte comune-->
+    <string name="next">CONTINUA</string>
+    <string name="session_text">sessione</string>
+    <string name="trial_id">trial #%1$s</string>
+    <string name="abort">interrompi test</string>
+    <string name="pause">PAUSA</string>
+    <string name="resume">RIPRENDI</string>
+    <string name="test_ended">Il Test è terminato</string>
 
+
+    <!-- ATB -->
+    <string name="start_atb">INIZIA TEST ATB</string>
+    <string name="atb_interactivity">interattivo</string>
+
+    <!-- TID -->
+    <string name="start_tid">INIZIA TEST TID</string>
     <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
     <string name="tid_question_text_tactile">L\'intervallo tra la prima coppia di vibrazione era maggiore o minore dell\'intervallo tra la seconda coppia</string>
 
@@ -17,6 +32,12 @@
     <string name="tid_rb_audio_text">audio</string>
     <string name="tid_rb_vibro_text">vibro</string>
 
+    <string-array name="tid_sessions_array">
+        <item>test iniziale</item>
+        <item>1</item>
+        <item>2</item>
+        <item>seleziona sessione</item>
+    </string-array>
 
     <string name="tid_name_text">nome</string>
     <string name="tid_gender_text">sesso</string>
@@ -31,7 +52,7 @@
     <string name="tid_start_post_text">INIZIA POST-TESTS</string>
     <string name="tid_start_training_text">INIZIA TRAINING</string>
 
-
+    <!-- BISECTION -->
     <string name="bisection_question_text_audio">Il secondo suono era più vicino al primo o al terzo?</string>
     <string name="bisection_question_text_video">La luce gialla era più vicina alla verde o alla rossa?</string>
     <string name="bisection_question_text_tactile">La seconda vibrazione era più vicina alla prima o alla terza?</string>
@@ -41,12 +62,12 @@
     <string name="bisection_rb2_text">Uguale</string>
     <string name="bisection_rb3_text">Più vicino al terzo</string>
 
+    <!-- MUSICAL METERS -->
     <string name="mmeters_question_text">Le due sequenze sono uguali?</string>
 
     <string name="mmeters_rb1_text">SI, sono uguali</string>
     <string name="mmeters_rb2_text">Uguale</string>
     <string name="mmeters_rb3_text">NO, sono diverse</string>
 
-    <string name="test_ended">Il Test è terminato</string>
 
 </resources>

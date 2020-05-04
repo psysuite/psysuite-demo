@@ -8,24 +8,28 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.app.Activity
 import android.content.Intent
+import android.widget.ArrayAdapter
 import iit.uvip.audiotactilebindingapp.R
 import kotlinx.android.synthetic.main.fragment_tid_subject_info.*
 import android.widget.RadioButton
-import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicData
-import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDData
+import android.widget.Spinner
+import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicParcel
+import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDParcel
 import iit.uvip.audiotactilebindingapp.utility.showToast
 
-class SubjectDialogFragment: DialogFragment()
+class SubjectTIDDialogFragment: DialogFragment()
 {
-    val LOG_TAG:String = SubjectDialogFragment::class.java.simpleName
-    private var subjectTID: SubjectTIDData? = null
+    val LOG_TAG:String = SubjectTIDDialogFragment::class.java.simpleName
+    private var subject: SubjectTIDParcel? = null
+
+    private var nAllowedSessions:Int = 0
 
     companion object {
-        fun newInstance(title: String): SubjectDialogFragment {
-            val frag = SubjectDialogFragment()
-            val args = Bundle()
+        fun newInstance(title: String): SubjectTIDDialogFragment {
+            val frag        = SubjectTIDDialogFragment()
+            val args        = Bundle()
             args.putString("title", title)
-            frag.setArguments(args)
+            frag.arguments = args
 
             return frag
         }
@@ -39,24 +43,30 @@ class SubjectDialogFragment: DialogFragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subjectTID = arguments?.getParcelable("subject")
-
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter.createFromResource(requireContext(), R.array.tid_sessions_array, android.R.layout.simple_spinner_item)
+        .also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spSession.adapter = adapter
+            nAllowedSessions = adapter.count
+        }
+        subject = arguments?.getParcelable("subject")
         // Fetch arguments from bundle and set title
         val title       = requireArguments().getString("title", "Enter Name")
 
         dialog?.setTitle(title)
 
-        if(subjectTID != null) updateGUI(subjectTID!!)
+        if(subject != null) updateGUI(subject!!)
         else                clear()
     }
 
     override fun onResume() {
 
         // Get existing layout params for the window
-        val params = dialog?.window!!.attributes
+        val params      = dialog?.window!!.attributes
         // Assign window properties to fill the parent
-        params.width = WindowManager.LayoutParams.MATCH_PARENT
-        params.height = WindowManager.LayoutParams.MATCH_PARENT
+        params.width    = WindowManager.LayoutParams.MATCH_PARENT
+        params.height   = WindowManager.LayoutParams.MATCH_PARENT
         dialog?.window!!.attributes = params as WindowManager.LayoutParams
 
         super.onResume()
@@ -65,7 +75,7 @@ class SubjectDialogFragment: DialogFragment()
 
             val subj = updateSubject()
             if(subj != null) {
-                subjectTID = subj
+                subject = subj
                 sendResult()
             }
         }
@@ -75,21 +85,22 @@ class SubjectDialogFragment: DialogFragment()
         }
 
         bt_cancel.setOnClickListener{
-            subjectTID = null
+            subject = null
             sendResult()
         }
 
     }
 
-    private fun updateGUI(subj: SubjectTIDData){
+    private fun updateGUI(subj: SubjectTIDParcel){
 
         txtName.setText(subj.label)
         txtAge.setText(subj.age.toString())
 
-        radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).getId())
-        radioGroupIntervals.check(radioGroupIntervals.getChildAt(subj.interval_type).getId())
-        radioGroupModality.check(radioGroupModality.getChildAt(subj.modality).getId())
-        radioGroupFirstModality.check(radioGroupFirstModality.getChildAt(subj.modality).getId())
+        radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
+        radioGroupIntervals.check(radioGroupIntervals.getChildAt(subj.interval_type).id)
+        radioGroupModality.check(radioGroupModality.getChildAt(subj.modality).id)
+        radioGroupFirstModality.check(radioGroupFirstModality.getChildAt(subj.modality).id)
+        spSession.setSelection(subj.session)
     }
 
     private fun clear(){
@@ -99,22 +110,24 @@ class SubjectDialogFragment: DialogFragment()
         radioGroupIntervals.clearCheck()
         radioGroupModality.clearCheck()
         radioGroupFirstModality.clearCheck()
+        spSession.setSelection(nAllowedSessions-1)
     }
 
-    private fun updateSubject(): SubjectTIDData?{
+    private fun updateSubject(): SubjectTIDParcel?{
 
         val name            = txtName.text.toString()
         val age             = txtAge.text.toString()
 
-        if(SubjectBasicData.validate(name, age).isNotBlank()){
+        if(SubjectBasicParcel.validate(name, age).isNotBlank()){
             showToast("Seleziona un'opzione per la durata dell'intervallo", requireContext())
             return null
         }
 
-        var first_modality:Int    = -1
-        var modality:Int    = -1
-        var interval:Int    = -1
-        var gender:Int      = -1
+        val session:Int         = spSession.selectedItemId.toInt()
+        var first_modality:Int  = -1
+        var modality:Int        = -1
+        var interval:Int        = -1
+        var gender:Int          = -1
 
         when(radioGroupIntervals.checkedRadioButtonId != -1) {
             true -> {
@@ -163,7 +176,7 @@ class SubjectDialogFragment: DialogFragment()
                 return null
             }
         }
-        return SubjectTIDData(name, age.toInt(), gender, modality, interval, first_modality)
+        return SubjectTIDParcel(name, age.toInt(), gender, session, modality, interval, first_modality)
     }
 
     private fun sendResult() {
@@ -171,7 +184,7 @@ class SubjectDialogFragment: DialogFragment()
             return
         }
         val intent = Intent()
-        intent.putExtra(MainFragment.EVENT_SUBJECT, subjectTID)
+        intent.putExtra(MainFragment.EVENT_SUBJECT, subject)
         targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
         dismiss()
     }

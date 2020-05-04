@@ -4,9 +4,9 @@ import android.content.Context
 import iit.uvip.audiotactilebindingapp.R
 import android.media.MediaPlayer
 
-class MusicalMeterTest(ctx: Context, data: TestData) : Test(ctx, data)
+class TestMusicalMeter(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
 {
-    var LOG_TAG:String = MusicalMeterTest::class.java.simpleName
+    var LOG_TAG:String = TestMusicalMeter::class.java.simpleName
 
     companion object {
         @JvmStatic val NUM_TRIALS = 18
@@ -44,6 +44,10 @@ class MusicalMeterTest(ctx: Context, data: TestData) : Test(ctx, data)
             false   -> "mmc" + (mTrial as MusicMetersTrial).audio_id
         }
         deliverStimulus(resname)
+    }
+
+    override fun onTrialEnd(){
+        testEvent.accept(EVENT_GIVE_ANSWER)
     }
 
     private fun deliverStimulus(resname:String){

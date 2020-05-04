@@ -30,7 +30,7 @@ abstract class Trial(var id:Int=-1, val type:Int, val label:String="") {
     }
 }
 
-class BisectionTrial(id:Int=-1, type:Int, label:String, val position:Int, val conflict_type:String, val duration:Int, val duration2:Int=0): Trial(id,type,label){
+class BisectionTrial(id:Int=-1, type:Int, label:String, val position:Int, val conflict_type:String, val duration:Int, val duration2:Int=0): Trial(id, type, label){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tlabel\tlat\tconflict\tres\tcor_ans\tuser_ans\telapsed\trep\n"
@@ -56,7 +56,7 @@ class BisectionTrial(id:Int=-1, type:Int, label:String, val position:Int, val co
 }
 
 
-class TIDTrial(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:String, var delta1:Int, var delta2:Int, val ref_first:Int, val duration:Int): Trial(id,type,""){
+class TIDTrial(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:String, var delta1:Int, var delta2:Int, val ref_first:Int, val duration:Int): Trial(id, type,""){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tblock\tsession\ttype\tmodality\trt\tuser_ans\tcor_ans\ttestinterv\tref_first\n"
@@ -81,7 +81,7 @@ class TIDTrial(id:Int=-1, val block:Int, val session:Int, type:Int, val modality
 }
 
 //                     trial_id    0/1      same/diff          1-18
-class MusicMetersTrial(id:Int=-1, type:Int, label:String, var audio_id:Int): Trial(id,type,label){
+class MusicMetersTrial(id:Int=-1, type:Int, label:String, var audio_id:Int): Trial(id, type, label){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tlabel\tres\tcor_ans\tuser_ans\telapsed\trep\taudio_id\n"
@@ -102,6 +102,27 @@ class MusicMetersTrial(id:Int=-1, type:Int, label:String, var audio_id:Int): Tri
     // data exported to log file
     override fun Log():String{
         return id.toString() +  "\t" + label + "\t" + success.toString() + "\t" + correct_answer.toString() + "\t" + user_answer.toString() + "\t" + elapsed.toString() + "\t" + repetitions.toString() + "\t" + audio_id.toString() + "\n"
+    }
+}
+
+
+//                     trial_id    0-8      "none"
+class ATBindingTrial(id:Int=-1, type:Int): Trial(id, type, ""){
+
+    companion object {
+        @JvmStatic val LOG_HEADER           = "id\ttype\n"
+    }
+
+    init {}
+
+    // all class exported as string
+    override fun toString():String{
+        return id.toString() + "\t" + type.toString() + "\n"
+    }
+
+    // data exported to log file
+    override fun Log():String{
+        return id.toString() +  "\t" + type.toString() + "\n"
     }
 }
 

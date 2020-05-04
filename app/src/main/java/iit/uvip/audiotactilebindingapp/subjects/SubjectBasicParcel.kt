@@ -4,7 +4,13 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.lang.NumberFormatException
 
-open class SubjectBasicData(var label:String, var age:Int, var gender:Int) : Parcelable{
+/*
+This class manage simple subjects that participate in tests with only one condition.
+in subclasses, user must resolve the condition code according to internal variables
+ */
+
+// base class for all tests
+open class SubjectBasicParcel(var label:String, var age:Int, var gender:Int) : Parcelable{
 
     private constructor(parcel: Parcel) : this(
         label           = parcel.readString()!!,
@@ -16,10 +22,10 @@ open class SubjectBasicData(var label:String, var age:Int, var gender:Int) : Par
     companion object {
 
         @JvmField
-        val CREATOR = object : Parcelable.Creator<SubjectBasicData> {
+        val CREATOR = object : Parcelable.Creator<SubjectBasicParcel> {
             override fun createFromParcel(parcel: Parcel) =
-                SubjectBasicData(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<SubjectBasicData>(size)
+                SubjectBasicParcel(parcel)
+            override fun newArray(size: Int) = arrayOfNulls<SubjectBasicParcel>(size)
         }
 
         fun validate(lab:String, ag:String):String{
@@ -43,8 +49,9 @@ open class SubjectBasicData(var label:String, var age:Int, var gender:Int) : Par
         dest.writeInt(gender)
     }
 
+
     override fun equals(other: Any?): Boolean {
-        if (other is SubjectBasicData) {
+        if (other is SubjectBasicParcel) {
             return label.equals(other.label, ignoreCase = true)
         }
         return false

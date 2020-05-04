@@ -2,6 +2,7 @@ package iit.uvip.audiotactilebindingapp.subjects
 
 import android.content.Context
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.utility.existFile
 import iit.uvip.audiotactilebindingapp.utility.readText
@@ -15,16 +16,16 @@ class SubjectsBasic(val context: Context) {
         @JvmStatic val CURR_SUBJ_FILE:String = "curr_subject"
     }
 
-    private var subject: SubjectBasicData? = null
+    private var subject: SubjectBasicParcel? = null
 
     // =============================================================================================================
     // WRITE
     // =============================================================================================================
 
-    fun writeJson(filename:String= CURR_SUBJ_FILE, subj: SubjectBasicData?=null){
+    fun writeJson(filename:String= CURR_SUBJ_FILE, subj: SubjectBasicParcel?=null){
 
-        val moshi       = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter<SubjectBasicData>(SubjectBasicData::class.java)
+        val moshi       = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val jsonAdapter = moshi.adapter<SubjectBasicParcel>(SubjectBasicParcel::class.java)
 
         return try {
             val json_subject = jsonAdapter.toJson(subj ?: subject)
@@ -42,7 +43,7 @@ class SubjectsBasic(val context: Context) {
     // LOAD
     // =============================================================================================================
 
-    fun loadSubject(): SubjectBasicData?{
+    fun loadSubject(): SubjectBasicParcel?{
         val subj = existFile(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
         if(subj.first){
             val jsontext = readText(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
@@ -56,10 +57,10 @@ class SubjectsBasic(val context: Context) {
         return null
     }
 
-    fun loadJsonText(jsontext:String): SubjectBasicData {
+    fun loadJsonText(jsontext:String): SubjectBasicParcel {
 
         val moshi           = Moshi.Builder().build()
-        val jsonAdapter     = moshi.adapter<SubjectBasicData>(SubjectBasicData::class.java)
+        val jsonAdapter     = moshi.adapter<SubjectBasicParcel>(SubjectBasicParcel::class.java)
         return jsonAdapter.fromJson(jsontext)!!
     }
 }
