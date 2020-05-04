@@ -21,8 +21,8 @@
             android:id="@+id/radioGroupIntervals"
             android:layout_width="168dp"
             android:layout_height="71dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginTop="76dp"
+            android:layout_marginEnd="8dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroupGender">
@@ -40,12 +40,13 @@
                 android:text="@string/tid_rb_long_text" />
     </RadioGroup>
 
+
     <RadioGroup
             android:id="@+id/radioGroupModality"
             android:layout_width="168dp"
             android:layout_height="71dp"
             android:layout_marginTop="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroupIntervals">
@@ -63,13 +64,12 @@
                 android:text="@string/tid_rb_vibro_text" />
     </RadioGroup>
 
-
     <RadioGroup
             android:id="@+id/radioGroupFirstModality"
             android:layout_width="168dp"
             android:layout_height="71dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroupModality">
@@ -100,6 +100,16 @@
             app:layout_constraintTop_toBottomOf="@+id/labAge" />
 
     <TextView
+            android:id="@+id/labGender2"
+            android:layout_width="120dp"
+            android:layout_height="31dp"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="36dp"
+            android:text="@string/session_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labGender" />
+
+    <TextView
             android:id="@+id/labGroupInterval"
             android:layout_width="120dp"
             android:layout_height="46dp"
@@ -109,7 +119,7 @@
             app:layout_constraintEnd_toStartOf="@+id/radioGroupIntervals"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labGender" />
+            app:layout_constraintTop_toBottomOf="@+id/labGender2" />
 
     <TextView
             android:id="@+id/labGroupModality"
@@ -165,8 +175,8 @@
 
     <EditText
             android:id="@+id/txtAge"
-            android:layout_width="135dp"
-            android:layout_height="47dp"
+            android:layout_width="160dp"
+            android:layout_height="48dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
@@ -176,13 +186,13 @@
 
     <EditText
             android:id="@+id/txtName"
-            android:layout_width="135dp"
-            android:layout_height="46dp"
-            android:layout_marginTop="16dp"
+            android:layout_width="164dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="20dp"
             android:ems="10"
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.862"
+            app:layout_constraintHorizontal_bias="0.816"
             app:layout_constraintStart_toEndOf="@+id/labName"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -216,8 +226,17 @@
             android:layout_marginTop="28dp"
             android:text="Cancel"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.777"
+            app:layout_constraintHorizontal_bias="0.851"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/bt_confirm" />
+
+    <Spinner
+            android:id="@+id/spSession"
+            android:layout_width="167dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

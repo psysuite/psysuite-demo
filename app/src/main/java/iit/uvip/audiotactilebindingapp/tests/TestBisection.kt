@@ -10,9 +10,9 @@ import android.widget.ImageView
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.R
 
-class BisectionTest(ctx: Context, data: TestData, private val mImageView:ImageView) : Test(ctx, data)
+class TestBisection(ctx: Context, data: TestParcel, private val mImageView:ImageView) : TestBasic(ctx, data)
 {
-    var LOG_TAG:String = BisectionTest::class.java.simpleName
+    var LOG_TAG:String = TestBisection::class.java.simpleName
 
     companion object {
 
@@ -125,14 +125,18 @@ class BisectionTest(ctx: Context, data: TestData, private val mImageView:ImageVi
         }, (QUESTION_DELAY + FIRST_STIMULUS_DELAY).toLong())
     }
 
+    override fun onTrialEnd(){
+        testEvent.accept(EVENT_GIVE_ANSWER)
+    }
+
     private fun deliverStimulus(trial:BisectionTrial, stage:Int=0){
 
         when(trial.type) {
             TEST_BISECTION_AUDIO            ->  mToneGen.startTone(mTone, trial.duration)
-            TEST_BISECTION_TACTILE          ->  vibrator.vibrate(VibrationEffect.createOneShot(trial.duration.toLong(),DEFAULT_AMPLITUDE))
+            TEST_BISECTION_TACTILE          ->  application.vibrate(trial.duration.toLong())
             TEST_BISECTION_AUDIO_TACTILE    -> {
                                                 mToneGen.startTone(mTone, trial.duration)
-                                                vibrator.vibrate(VibrationEffect.createOneShot(trial.duration.toLong(),DEFAULT_AMPLITUDE))
+                                                application.vibrate(trial.duration.toLong())
             }
             TEST_BISECTION_AUDIO_VIDEO      ->  deliverAVStimuli(trial, stage)
         }

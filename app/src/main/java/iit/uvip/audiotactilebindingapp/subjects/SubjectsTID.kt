@@ -15,16 +15,16 @@ class SubjectsTID(val context: Context) {
         @JvmStatic val CURR_SUBJ_FILE:String = "curr_subject"
     }
 
-    private var subject: SubjectTIDData? = null
+    private var subject: SubjectTIDParcel? = null
 
     // =============================================================================================================
     // WRITE
     // =============================================================================================================
 
-    fun writeJson(filename:String= CURR_SUBJ_FILE, subj: SubjectTIDData?=null){
+    fun writeJson(filename:String= CURR_SUBJ_FILE, subj: SubjectTIDParcel?=null){
 
         val moshi       = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter<SubjectTIDData>(SubjectTIDData::class.java)
+        val jsonAdapter = moshi.adapter<SubjectTIDParcel>(SubjectTIDParcel::class.java)
 
         return try {
             val json_subject = jsonAdapter.toJson(subj ?: subject)
@@ -42,7 +42,7 @@ class SubjectsTID(val context: Context) {
     // LOAD
     // =============================================================================================================
 
-    fun loadSubject(): SubjectTIDData?{
+    fun loadSubject(): SubjectTIDParcel?{
         val subj = existFile(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
         if(subj.first){
             val jsontext = readText(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
@@ -56,11 +56,11 @@ class SubjectsTID(val context: Context) {
         return null
     }
 
-    fun loadJsonText(jsontext:String): SubjectTIDData {
+    fun loadJsonText(jsontext:String): SubjectTIDParcel {
 
         val moshi           = Moshi.Builder().build()
-        val jsonAdapter     = moshi.adapter<SubjectTIDData>(
-            SubjectTIDData::class.java)
+        val jsonAdapter     = moshi.adapter<SubjectTIDParcel>(
+            SubjectTIDParcel::class.java)
 
         return jsonAdapter.fromJson(jsontext)!!
     }

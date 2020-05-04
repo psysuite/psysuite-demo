@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.app.Activity
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.tests.Test
+import iit.uvip.audiotactilebindingapp.tests.TestBasic
 import kotlinx.android.synthetic.main.fragment_answer.*
 import android.widget.RadioButton
 import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
@@ -45,7 +45,7 @@ class AnswerDialogFragment: DialogFragment()
 
         // Fetch arguments from bundle and set title
         val title       = requireArguments().getString("title", "Enter Name")
-        val str_trial   = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + arguments!!.getInt("tot_trials", 0)
+        val str_trial   = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + requireArguments().getInt("tot_trials", 0)
         val question    = requireArguments().getString("question", "Enter Name")
         val answ1       = requireArguments().getString("answer1", "")
 //        val answ2    = arguments!!.getString("answer2", "")
@@ -80,18 +80,18 @@ class AnswerDialogFragment: DialogFragment()
                     val radioButton:RadioButton = radioGroupIntervals.findViewById(id)
                     val radioId                 = radioGroupIntervals.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
 
-                    sendResult(Test.EVENT_ANSWER_GIVEN, elapsedms, radioId)
+                    sendResult(TestBasic.EVENT_ANSWER_GIVEN, elapsedms, radioId)
                 }
                 false -> showToast("Seleziona un'opzione", requireContext())
             }
         }
 
         bt_clear.setOnClickListener{
-            sendResult(Test.EVENT_TRIAL_REPEAT, 0, null)
+            sendResult(TestBasic.EVENT_TRIAL_REPEAT, 0, null)
         }
 
         bt_abort_test.setOnClickListener{
-            sendResult(Test.EVENT_TRIAL_ABORT, 0, null)
+            sendResult(TestBasic.EVENT_TRIAL_ABORT, 0, null)
             dismiss()
         }
     }

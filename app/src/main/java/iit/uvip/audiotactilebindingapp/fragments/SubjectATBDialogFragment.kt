@@ -11,17 +11,26 @@ import android.content.Intent
 import iit.uvip.audiotactilebindingapp.R
 import kotlinx.android.synthetic.main.fragment_tid_subject_info.*
 import android.widget.RadioButton
+import iit.uvip.audiotactilebindingapp.subjects.SubjectATBParcel
 import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicParcel
+import iit.uvip.audiotactilebindingapp.tests.TestBasic
 import iit.uvip.audiotactilebindingapp.utility.showToast
+import kotlinx.android.synthetic.main.fragment_atb_subject_info.*
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.bt_cancel
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.bt_clear
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.bt_confirm
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.radioGroupGender
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.txtAge
+import kotlinx.android.synthetic.main.fragment_tid_subject_info.txtName
 
-class SubjectBasicDialogFragment: DialogFragment()
+class SubjectATBDialogFragment: DialogFragment()
 {
-    val LOG_TAG:String = SubjectBasicDialogFragment::class.java.simpleName
-    private var subject: SubjectBasicParcel? = null
+    val LOG_TAG:String = SubjectATBDialogFragment::class.java.simpleName
+    private var subject: SubjectATBParcel? = null
 
     companion object {
-        fun newInstance(title: String): SubjectBasicDialogFragment {
-            val frag = SubjectBasicDialogFragment()
+        fun newInstance(title: String): SubjectATBDialogFragment {
+            val frag = SubjectATBDialogFragment()
             val args = Bundle()
             args.putString("title", title)
             frag.setArguments(args)
@@ -32,7 +41,7 @@ class SubjectBasicDialogFragment: DialogFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_basic_subject_info, container)
+        return inflater.inflate(R.layout.fragment_atb_subject_info, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,9 +99,10 @@ class SubjectBasicDialogFragment: DialogFragment()
         txtName.setText("")
         txtAge.setText("")
         radioGroupGender.clearCheck()
+        swInteractive.isChecked = false
     }
 
-    private fun updateSubject(): SubjectBasicParcel?{
+    private fun updateSubject(): SubjectATBParcel?{
 
         val name            = txtName.text.toString()
         val age             = txtAge.text.toString()
@@ -114,7 +124,10 @@ class SubjectBasicDialogFragment: DialogFragment()
                 return null
             }
         }
-        return SubjectBasicParcel(name, age.toInt(), gender)
+        val chk =   if(swInteractive.isChecked) TestBasic.TEST_NEXTTRIAL_BUTTON
+                    else                        TestBasic.TEST_NEXTTRIAL_AUTO
+
+        return SubjectATBParcel(name, age.toInt(), gender, chk)
     }
 
     private fun sendResult() {

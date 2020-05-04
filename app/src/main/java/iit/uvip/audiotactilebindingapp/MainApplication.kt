@@ -2,6 +2,8 @@ package iit.uvip.audiotactilebindingapp
 
 
 import android.app.Application
+import android.os.Build
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -48,5 +50,13 @@ class MainApplication : Application(), TextToSpeech.OnInitListener  {
             Log.e("TTS", "Initialization Failed!")
             tts = null
         }
+    }
+
+    fun vibrate(duration:Long, ampl:Int=-1){   // ampl -1 corresponds to VibrationEffect.DEFAULT_AMPLITUDE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            vibrator.vibrate(VibrationEffect.createOneShot(duration/2, ampl))
+        else
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(duration/2)
     }
 }

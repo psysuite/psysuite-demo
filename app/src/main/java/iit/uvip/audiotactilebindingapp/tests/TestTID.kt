@@ -9,6 +9,7 @@ import android.os.Vibrator
 import android.util.Log
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.R
+import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDParcel
 import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
 import java.util.*
 
@@ -20,9 +21,9 @@ import java.util.*
 //    FIRST_STIMULUS_DELAY=1500--------s1------delta1------s2-----ISI=1000ms-----s3------delta2-------s4-----QUESTION_DELAY=1500ms------domanda
 
 //class TIDTest(ctx: Context, mType:Int, mSubjLabel:String, private val test_time:Int, private val session:Int) : Test(ctx, mType, mSubjLabel)
-class TIDTest(ctx: Context, data:TestData) : Test(ctx, data)
+class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
 {
-    var LOG_TAG:String = TIDTest::class.java.simpleName
+    var LOG_TAG:String = TestTID::class.java.simpleName
 
     private lateinit var mQuest:QuestObject
 
@@ -54,7 +55,7 @@ class TIDTest(ctx: Context, data:TestData) : Test(ctx, data)
         @JvmStatic val STIMULUS_DURATION_SHORT      = "short"
         @JvmStatic val STIMULUS_DURATION_LONG       = "long"
 
-        fun getTestName(type:Int):String{
+        private fun getTestName(type:Int):String{
             return when(type){
                 TEST_TID_SHORT_AUDIO    -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
                 TEST_TID_SHORT_TACTILE  -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_TACTILE
@@ -62,6 +63,20 @@ class TIDTest(ctx: Context, data:TestData) : Test(ctx, data)
                 TEST_TID_LONG_TACTILE   -> STIMULUS_DURATION_LONG  + "_" + STIMULUS_TYPE_TACTILE
                 else -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
             }
+        }
+
+        fun getExpFactorsType(subject_data:SubjectTIDParcel):Pair<Int, String>{
+            val type  =  if(subject_data.interval_type == 0) {
+                if(subject_data.modality == 0)  TEST_TID_SHORT_AUDIO
+                else                            TEST_TID_SHORT_TACTILE
+            }
+            else {
+                if(subject_data.modality == 0)  TEST_TID_LONG_AUDIO
+                else                            TEST_TID_LONG_TACTILE
+            }
+            val name = getTestName(type)
+
+            return Pair(type, name)
         }
     }
 
@@ -137,6 +152,9 @@ class TIDTest(ctx: Context, data:TestData) : Test(ctx, data)
         }, ((mTrial as TIDTrial).delta1 + FIRST_STIMULUS_DELAY + ISI + (mTrial as TIDTrial).delta2 + (mTrial as TIDTrial).duration + QUESTION_DELAY).toLong())
     }
 
+    override fun onTrialEnd(){
+        testEvent.accept(EVENT_GIVE_ANSWER)
+    }
 
     private fun deliverStimulus(trial:TIDTrial, id:Int=0){
 
@@ -144,7 +162,7 @@ class TIDTest(ctx: Context, data:TestData) : Test(ctx, data)
         Log.d(LOG_TAG,"stim num $id, elapsed: $elapsedms")
         when(trial.type) {
             TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO       ->  mToneGen.startTone(mTone, trial.duration)
-            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE   ->  vibrator.vibrate(VibrationEffect.createOneShot(trial.duration.toLong(),DEFAULT_AMPLITUDE))
+            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE   ->  application.vibrate(trial.duration.toLong())
         }
     }
 
