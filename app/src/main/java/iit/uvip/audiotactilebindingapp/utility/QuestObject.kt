@@ -1,5 +1,5 @@
 
-package iit.uvip.audiotactilebindingapp.tests
+package iit.uvip.audiotactilebindingapp.utility
 
 import koma.ndarray.NDArray
 
@@ -245,7 +245,8 @@ class QuestObject() {
 
 fun QuestObject.clone(beta:Float, dim:Float, grain:Float): QuestObject {
 
-    val outqo           = QuestObject()
+    val outqo           =
+        QuestObject()
     outqo.tGuess        = this.tGuess
     outqo.tGuessSd      = this.tGuessSd
     outqo.pThreshold    = this.pThreshold

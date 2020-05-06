@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.fragments
+package iit.uvip.audiotactilebindingapp.tests.common.subjects_dialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,20 +8,24 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.app.Activity
 import android.content.Intent
+import android.widget.CompoundButton
 import iit.uvip.audiotactilebindingapp.R
-import kotlinx.android.synthetic.main.fragment_tid_subject_info.*
 import android.widget.RadioButton
-import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicParcel
+import iit.uvip.audiotactilebindingapp.fragments.MainFragment
+import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.audiotactilebindingapp.utility.showToast
+import kotlinx.android.synthetic.main.fragment_subject_info_basic.*
 
-class SubjectBasicDialogFragment: DialogFragment()
+open class SubjectBasicDialogFragment: DialogFragment()
 {
-    val LOG_TAG:String = SubjectBasicDialogFragment::class.java.simpleName
+    open val LOG_TAG:String = SubjectBasicDialogFragment::class.java.simpleName
     private var subject: SubjectBasicParcel? = null
 
     companion object {
         fun newInstance(title: String): SubjectBasicDialogFragment {
-            val frag = SubjectBasicDialogFragment()
+            val frag =
+                SubjectBasicDialogFragment()
             val args = Bundle()
             args.putString("title", title)
             frag.setArguments(args)
@@ -32,7 +36,7 @@ class SubjectBasicDialogFragment: DialogFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_basic_subject_info, container)
+        return inflater.inflate(R.layout.fragment_subject_info_basic, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,6 +44,8 @@ class SubjectBasicDialogFragment: DialogFragment()
 
         subject = arguments?.getParcelable("subject")
 
+        if(subject == null)
+            return
         // Fetch arguments from bundle and set title
         val title       = requireArguments().getString("title", "Enter Name")
 
@@ -47,6 +53,10 @@ class SubjectBasicDialogFragment: DialogFragment()
 
         if(subject != null) updateGUI(subject!!)
         else                clear()
+
+        if(subject!!.nextTrailModality == TestBasic.TEST_NEXTTRIAL_NOCHOOSE || subject!!.nextTrailModality == TestBasic.TEST_NEXTTRIAL_ANSWER)
+            swInteractive.visibility    = View.INVISIBLE
+            labInteractive.visibility   = View.INVISIBLE
     }
 
     override fun onResume() {
@@ -78,21 +88,41 @@ class SubjectBasicDialogFragment: DialogFragment()
             sendResult()
         }
 
+        swInteractive.setOnCheckedChangeListener { _, b ->
+            subject!!.nextTrailModality = when(b){
+                true    -> TestBasic.TEST_NEXTTRIAL_BUTTON
+                false   -> TestBasic.TEST_NEXTTRIAL_AUTO
+            }
+        }
     }
 
-    private fun updateGUI(subj: SubjectBasicParcel){
+    protected open fun updateGUI(subj: SubjectBasicParcel){
         txtName.setText(subj.label)
-        txtAge.setText(subj.age.toString())
-        radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
+
+        if(subj.age != -1)
+            txtAge.setText(subj.age.toString())
+
+        if(subj.gender != -1)
+            radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
+
+        when(subject!!.nextTrailModality){
+          TestBasic.TEST_NEXTTRIAL_BUTTON   -> swInteractive.isChecked = true
+          TestBasic.TEST_NEXTTRIAL_AUTO     -> swInteractive.isChecked = false
+        }
     }
 
-    private fun clear(){
+    protected open fun clear(){
         txtName.setText("")
         txtAge.setText("")
         radioGroupGender.clearCheck()
+
+        if(subject!!.nextTrailModality != TestBasic.TEST_NEXTTRIAL_NOCHOOSE && subject!!.nextTrailModality != TestBasic.TEST_NEXTTRIAL_ANSWER) {
+            swInteractive.isChecked     = false
+            subject!!.nextTrailModality = TestBasic.TEST_NEXTTRIAL_AUTO
+        }
     }
 
-    private fun updateSubject(): SubjectBasicParcel?{
+    protected open fun updateSubject(): SubjectBasicParcel?{
 
         val name            = txtName.text.toString()
         val age             = txtAge.text.toString()
@@ -114,7 +144,10 @@ class SubjectBasicDialogFragment: DialogFragment()
                 return null
             }
         }
-        return SubjectBasicParcel(name, age.toInt(), gender)
+        subject!!.label = name
+        subject!!.age = age.toInt()
+        subject!!.gender = gender
+        return subject
     }
 
     private fun sendResult() {

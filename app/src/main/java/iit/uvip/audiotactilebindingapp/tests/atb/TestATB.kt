@@ -1,19 +1,17 @@
-package iit.uvip.audiotactilebindingapp.tests
+package iit.uvip.audiotactilebindingapp.tests.atb
 
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
+import iit.uvip.audiotactilebindingapp.tests.common.TestParcel
 
 /*
 onTrialEnd()
 */
-class TestATBinding(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
+class TestATB(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
 {
-    var LOG_TAG:String = TestATBinding::class.java.simpleName
+    var LOG_TAG:String = TestATB::class.java.simpleName
 
 
 //    var vibrator:Vibrator   // lateinit not necessary as initialized in construtor
@@ -47,7 +45,10 @@ class TestATBinding(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         @JvmStatic val NUM_REPETITIONS = 3
 
         fun getExpFactorsType():Pair<Int, String>{
-            return Pair(TEST_ATB, TEST_BASIC_LABEL)
+            return Pair(
+                TEST_ATB,
+                TEST_BASIC_LABEL
+            )
         }
     }
 
@@ -56,8 +57,10 @@ class TestATBinding(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
     init{
 
         nextTrailModality   = data.nextTrailModality
-        abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
-        showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
+        abortMode           =
+            TEST_ABORT_TRIALEND       // abort @ trial end
+        showTrialsID        =
+            TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
 //        val application     = ctx.applicationContext as MainApplication
 //        vibrator            = application.vibrator
@@ -71,7 +74,9 @@ class TestATBinding(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(data.subject_id, ATBindingTrial.LOG_HEADER)
+        createResultFile(data.subject_id,
+            TrialATB.LOG_HEADER
+        )
     }
 
     override fun show(trialid:Int, isRepeat:Boolean){
@@ -137,19 +142,19 @@ class TestATBinding(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
     private fun createTrials()
     {
         var cnt     = -1
-        for(i in 0 until NUM_REPETITIONS ) {
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A_T))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A_T200))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A800_T))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_T))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A_T500))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A200_T))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A_T))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A_T800))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_T))
-            mTrials.add(ATBindingTrial(++cnt, TYPE_A500_T))
+        for(i in 0 until NUM_REPETITIONS) {
+            mTrials.add(TrialATB(++cnt, TYPE_A_T))
+            mTrials.add(TrialATB(++cnt, TYPE_A_T200))
+            mTrials.add(TrialATB(++cnt, TYPE_A))
+            mTrials.add(TrialATB(++cnt, TYPE_A800_T))
+            mTrials.add(TrialATB(++cnt, TYPE_T))
+            mTrials.add(TrialATB(++cnt, TYPE_A_T500))
+            mTrials.add(TrialATB(++cnt, TYPE_A))
+            mTrials.add(TrialATB(++cnt, TYPE_A200_T))
+            mTrials.add(TrialATB(++cnt, TYPE_A_T))
+            mTrials.add(TrialATB(++cnt, TYPE_A_T800))
+            mTrials.add(TrialATB(++cnt, TYPE_T))
+            mTrials.add(TrialATB(++cnt, TYPE_A500_T))
         }
     }
 

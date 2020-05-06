@@ -8,46 +8,54 @@
 
 
     <TextView
-            android:id="@+id/labGender"
+            android:id="@+id/labInteractive"
             android:layout_width="120dp"
             android:layout_height="31dp"
             android:layout_marginStart="40dp"
             android:layout_marginTop="36dp"
-            android:text="@string/tid_gender_text"
-            app:layout_constraintEnd_toStartOf="@+id/radioGroupGender"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:text="@string/atb_interactivity"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labAge" />
+            app:layout_constraintTop_toBottomOf="@+id/labSpinner" />
+
+    <TextView
+            android:id="@+id/labSpinner"
+            android:layout_width="120dp"
+            android:layout_height="31dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="40dp"
+            android:text="TESTO"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labGender" />
 
     <ImageButton
             android:id="@+id/bt_clear"
-            android:layout_width="109dp"
-            android:layout_height="65dp"
+            android:layout_width="121dp"
+            android:layout_height="63dp"
             android:layout_marginStart="40dp"
-            android:layout_marginTop="184dp"
+            android:layout_marginTop="36dp"
             android:background="@android:color/transparent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labGender"
+            app:layout_constraintTop_toBottomOf="@+id/labInteractive"
             app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <ImageButton
             android:id="@+id/bt_confirm"
-            android:layout_width="112dp"
+            android:layout_width="130dp"
             android:layout_height="62dp"
-            android:layout_marginTop="164dp"
-            android:layout_marginEnd="24dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroupGender"
+            app:layout_constraintTop_toBottomOf="@+id/swInteractive"
             app:srcCompat="@drawable/green_tick" />
 
     <TextView
             android:id="@+id/labAge"
-            android:layout_width="120dp"
-            android:layout_height="28dp"
+            android:layout_width="119dp"
+            android:layout_height="31dp"
             android:layout_marginStart="40dp"
             android:layout_marginTop="36dp"
-            android:text="@string/tid_age_text"
+            android:text="@string/age"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/labName" />
 
@@ -57,7 +65,7 @@
             android:layout_height="36dp"
             android:layout_marginStart="40dp"
             android:layout_marginTop="28dp"
-            android:text="@string/tid_name_text"
+            android:text="@string/name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -86,8 +94,8 @@
 
     <RadioGroup
             android:id="@+id/radioGroupGender"
-            android:layout_width="137dp"
-            android:layout_height="60dp"
+            android:layout_width="135dp"
+            android:layout_height="42dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="12dp"
             android:orientation="horizontal"
@@ -102,7 +110,7 @@
 
         <RadioButton
                 android:id="@+id/rb_female"
-                android:layout_width="59dp"
+                android:layout_width="67dp"
                 android:layout_height="45dp"
                 android:text="@string/tid_rb_female_text" />
     </RadioGroup>
@@ -117,5 +125,33 @@
             app:layout_constraintHorizontal_bias="0.777"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/bt_confirm" />
+
+    <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="135dp"
+            android:layout_height="33dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
+
+    <TextView
+            android:id="@+id/labGender"
+            android:layout_width="120dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="32dp"
+            android:text="@string/gender"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labAge" />
+
+    <Switch
+            android:id="@+id/swInteractive"
+            android:layout_width="131dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

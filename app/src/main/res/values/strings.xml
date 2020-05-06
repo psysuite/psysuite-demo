@@ -10,13 +10,18 @@
     <string name="resume">RIPRENDI</string>
     <string name="test_ended">Il Test è terminato</string>
 
+    <string name="name">nome</string>
+    <string name="gender">sesso</string>
+    <string name="age">età</string>
+    <string name="test_type">tipologia di test</string>
+
 
     <!-- ATB -->
-    <string name="start_atb">INIZIA TEST ATB</string>
+    <string name="start_atb">Audio-Tactile Binding</string>
     <string name="atb_interactivity">interattivo</string>
 
     <!-- TID -->
-    <string name="start_tid">INIZIA TEST TID</string>
+    <string name="start_tid">Temporal Interval Discrimination</string>
     <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
     <string name="tid_question_text_tactile">L\'intervallo tra la prima coppia di vibrazione era maggiore o minore dell\'intervallo tra la seconda coppia</string>
 
@@ -39,9 +44,7 @@
         <item>seleziona sessione</item>
     </string-array>
 
-    <string name="tid_name_text">nome</string>
-    <string name="tid_gender_text">sesso</string>
-    <string name="tid_age_text">età</string>
+
 
     <string name="tid_group_interval_text">gruppo intervallo</string>
     <string name="tid_group_modality_text">gruppo modalità</string>
@@ -53,6 +56,15 @@
     <string name="tid_start_training_text">INIZIA TRAINING</string>
 
     <!-- BISECTION -->
+    <string name="start_bisection">BISECTION</string>
+
+    <string-array name="bis_tests_array">
+        <item>audio</item>
+        <item>tattile</item>
+        <item>audio tattile</item>
+        <item>audio visivo</item>
+    </string-array>
+
     <string name="bisection_question_text_audio">Il secondo suono era più vicino al primo o al terzo?</string>
     <string name="bisection_question_text_video">La luce gialla era più vicina alla verde o alla rossa?</string>
     <string name="bisection_question_text_tactile">La seconda vibrazione era più vicina alla prima o alla terza?</string>
@@ -63,6 +75,8 @@
     <string name="bisection_rb3_text">Più vicino al terzo</string>
 
     <!-- MUSICAL METERS -->
+    <string name="start_musicalmeter">MUSICAL METER</string>
+
     <string name="mmeters_question_text">Le due sequenze sono uguali?</string>
 
     <string name="mmeters_rb1_text">SI, sono uguali</string>

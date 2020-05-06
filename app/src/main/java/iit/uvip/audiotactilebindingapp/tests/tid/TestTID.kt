@@ -1,15 +1,14 @@
-package iit.uvip.audiotactilebindingapp.tests
+package iit.uvip.audiotactilebindingapp.tests.tid
 
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.VibrationEffect
-import android.os.VibrationEffect.DEFAULT_AMPLITUDE
 import android.os.Vibrator
 import android.util.Log
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDParcel
+import iit.uvip.audiotactilebindingapp.tests.common.*
+import iit.uvip.audiotactilebindingapp.utility.QuestObject
 import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
 import java.util.*
 
@@ -21,11 +20,11 @@ import java.util.*
 //    FIRST_STIMULUS_DELAY=1500--------s1------delta1------s2-----ISI=1000ms-----s3------delta2-------s4-----QUESTION_DELAY=1500ms------domanda
 
 //class TIDTest(ctx: Context, mType:Int, mSubjLabel:String, private val test_time:Int, private val session:Int) : Test(ctx, mType, mSubjLabel)
-class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
+class TestTID(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
 {
     var LOG_TAG:String = TestTID::class.java.simpleName
 
-    private lateinit var mQuest:QuestObject
+    private lateinit var mQuest: QuestObject
 
     lateinit var onsetDate: Date
 
@@ -57,22 +56,22 @@ class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
 
         private fun getTestName(type:Int):String{
             return when(type){
-                TEST_TID_SHORT_AUDIO    -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
-                TEST_TID_SHORT_TACTILE  -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_TACTILE
-                TEST_TID_LONG_AUDIO     -> STIMULUS_DURATION_LONG  + "_" + STIMULUS_TYPE_AUDIO
-                TEST_TID_LONG_TACTILE   -> STIMULUS_DURATION_LONG  + "_" + STIMULUS_TYPE_TACTILE
+                TEST_TID_SHORT_AUDIO -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
+                TEST_TID_SHORT_TACTILE -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_TACTILE
+                TEST_TID_LONG_AUDIO -> STIMULUS_DURATION_LONG + "_" + STIMULUS_TYPE_AUDIO
+                TEST_TID_LONG_TACTILE -> STIMULUS_DURATION_LONG + "_" + STIMULUS_TYPE_TACTILE
                 else -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
             }
         }
 
-        fun getExpFactorsType(subject_data:SubjectTIDParcel):Pair<Int, String>{
+        fun getExpFactorsType(subject_data: SubjectTIDParcel):Pair<Int, String>{
             val type  =  if(subject_data.interval_type == 0) {
-                if(subject_data.modality == 0)  TEST_TID_SHORT_AUDIO
-                else                            TEST_TID_SHORT_TACTILE
+                if(subject_data.modality == 0) TEST_TID_SHORT_AUDIO
+                else TEST_TID_SHORT_TACTILE
             }
             else {
-                if(subject_data.modality == 0)  TEST_TID_LONG_AUDIO
-                else                            TEST_TID_LONG_TACTILE
+                if(subject_data.modality == 0) TEST_TID_LONG_AUDIO
+                else TEST_TID_LONG_TACTILE
             }
             val name = getTestName(type)
 
@@ -105,12 +104,14 @@ class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
         // set question & create mTrials list
         when(data.type)
         {
-            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO       -> initAudio()
-            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE   -> initTactile()
+            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO -> initAudio()
+            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE -> initTactile()
         }
         setFirstDelta()
         nTrials     = mTrials.size
-        createResultFile(data.subject_id, TIDTrial.LOG_HEADER)
+        createResultFile(data.subject_id,
+            TrialTID.LOG_HEADER
+        )
     }
 
     // a trial has this temporal line:
@@ -127,42 +128,42 @@ class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
 
         // S1
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TIDTrial, 1)
+            deliverStimulus(mTrial as TrialTID, 1)
             testEvent.accept(EVENT_STIMULI_START)
         }, FIRST_STIMULUS_DELAY.toLong())
 
         // S2
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TIDTrial, 2)
-        }, ((mTrial as TIDTrial).delta1 + FIRST_STIMULUS_DELAY).toLong())
+            deliverStimulus(mTrial as TrialTID, 2)
+        }, ((mTrial as TrialTID).delta1 + FIRST_STIMULUS_DELAY).toLong())
 
         // S3
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TIDTrial, 3)
-        }, ((mTrial as TIDTrial).delta1 + FIRST_STIMULUS_DELAY + ISI).toLong())
+            deliverStimulus(mTrial as TrialTID, 3)
+        }, ((mTrial as TrialTID).delta1 + FIRST_STIMULUS_DELAY + ISI).toLong())
 
         // S4
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TIDTrial, 4)
-        }, ((mTrial as TIDTrial).delta1 + FIRST_STIMULUS_DELAY + ISI + (mTrial as TIDTrial).delta2).toLong())
+            deliverStimulus(mTrial as TrialTID, 4)
+        }, ((mTrial as TrialTID).delta1 + FIRST_STIMULUS_DELAY + ISI + (mTrial as TrialTID).delta2).toLong())
 
         // send stimuli-end event
         mStimuliHandler.postDelayed({
             testEvent.accept(EVENT_STIMULI_END)
-        }, ((mTrial as TIDTrial).delta1 + FIRST_STIMULUS_DELAY + ISI + (mTrial as TIDTrial).delta2 + (mTrial as TIDTrial).duration + QUESTION_DELAY).toLong())
+        }, ((mTrial as TrialTID).delta1 + FIRST_STIMULUS_DELAY + ISI + (mTrial as TrialTID).delta2 + (mTrial as TrialTID).duration + QUESTION_DELAY).toLong())
     }
 
     override fun onTrialEnd(){
         testEvent.accept(EVENT_GIVE_ANSWER)
     }
 
-    private fun deliverStimulus(trial:TIDTrial, id:Int=0){
+    private fun deliverStimulus(trial: TrialTID, id:Int=0){
 
         val elapsedms = getTimeDifference(onsetDate)
         Log.d(LOG_TAG,"stim num $id, elapsed: $elapsedms")
         when(trial.type) {
-            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO       ->  mToneGen.startTone(mTone, trial.duration)
-            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE   ->  application.vibrate(trial.duration.toLong())
+            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO ->  mToneGen.startTone(mTone, trial.duration)
+            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE ->  application.vibrate(trial.duration.toLong())
         }
     }
 
@@ -180,12 +181,12 @@ class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
 
         for(b in 0 until NUM_BLOCKS){
 
-            val block_trials:MutableList<Trial> = mutableListOf()
+            val block_trials:MutableList<TrialBasic> = mutableListOf()
 
-            for(t in 0 until NUM_TRIALS/2){
-                // TIDTrial(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:Int, val delta1:Int, val delta2:Int, val ref_first:Int, val duration:Int)
-                block_trials.add(TIDTrial(-1, b, session, data.type, modality, ref_delta, -1, 1, duration))
-                block_trials.add(TIDTrial(-1, b, session, data.type, modality, -1, ref_delta, 0, duration))
+            for(t in 0 until NUM_TRIALS /2){
+                // TrialTID(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:Int, val delta1:Int, val delta2:Int, val ref_first:Int, val duration:Int)
+                block_trials.add(TrialTID(-1, b, session, data.type, modality, ref_delta, -1, 1, duration))
+                block_trials.add(TrialTID(-1, b, session, data.type, modality, -1, ref_delta,0, duration))
             }
             block_trials.shuffle()
             mTrials.addAll(block_trials)
@@ -198,18 +199,18 @@ class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
     private fun setFirstDelta(){
         // set first trial's test delta
         val firstdelta:Float = mQuest.getFirstValue()
-        when((mTrials[0] as TIDTrial).ref_first == 0) {
-            true ->     (mTrials[0] as TIDTrial).delta2 = firstdelta.toInt()
-            else ->     (mTrials[0] as TIDTrial).delta1 = firstdelta.toInt()
+        when((mTrials[0] as TrialTID).ref_first == 0) {
+            true ->     (mTrials[0] as TrialTID).delta2 = firstdelta.toInt()
+            else ->     (mTrials[0] as TrialTID).delta1 = firstdelta.toInt()
         }
     }
 
     override fun nextTrial(prev_result:Int, elapsed:Int):Int {
 
         val newdelta:Float = mQuest.getNewValue((prev_result > 0))
-        when((mTrials[currTrial+1] as TIDTrial).ref_first == 1) {
-            true ->     (mTrials[currTrial+1] as TIDTrial).delta2 = newdelta.toInt()
-            else ->     (mTrials[currTrial+1] as TIDTrial).delta1 = newdelta.toInt()
+        when((mTrials[currTrial+1] as TrialTID).ref_first == 1) {
+            true ->     (mTrials[currTrial+1] as TrialTID).delta2 = newdelta.toInt()
+            else ->     (mTrials[currTrial+1] as TrialTID).delta1 = newdelta.toInt()
         }
         return super.nextTrial(prev_result, elapsed)
     }
@@ -217,12 +218,18 @@ class TestTID(ctx: Context, data:TestParcel) : TestBasic(ctx, data)
     // ----------------------------------
     private fun initAudio(){
         mQuestion = ctx.resources.getString(R.string.tid_question_text_audio)
-        createDefaultTrials(STIMULUS_TYPE_AUDIO, data.session, STIMULUS_DURATION_AUDIO)
+        createDefaultTrials(
+            STIMULUS_TYPE_AUDIO, data.session,
+            STIMULUS_DURATION_AUDIO
+        )
     }
 
     private fun initTactile(){
         mQuestion = ctx.resources.getString(R.string.tid_question_text_tactile)
-        createDefaultTrials(STIMULUS_TYPE_TACTILE, data.session, STIMULUS_DURATION_TACTILE)
+        createDefaultTrials(
+            STIMULUS_TYPE_TACTILE, data.session,
+            STIMULUS_DURATION_TACTILE
+        )
     }
     // =====================================================================================
 }

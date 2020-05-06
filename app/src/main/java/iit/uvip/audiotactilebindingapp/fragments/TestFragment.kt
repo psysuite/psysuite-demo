@@ -10,7 +10,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.tests.*
+import iit.uvip.audiotactilebindingapp.tests.atb.TestATB
+import iit.uvip.audiotactilebindingapp.tests.bis.TestBIS
+import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
+import iit.uvip.audiotactilebindingapp.tests.common.TestParcel
+import iit.uvip.audiotactilebindingapp.tests.musmet.TestMusMet
+import iit.uvip.audiotactilebindingapp.tests.tid.TestTID
 import iit.uvip.audiotactilebindingapp.utility.showToast
 import kotlinx.android.synthetic.main.fragment_test.*
 
@@ -29,7 +34,7 @@ class TestFragment : BaseFragment(
     hideAndroidControls = true
 ){
 
-    private lateinit var mTest:TestBasic
+    private lateinit var mTest: TestBasic
     override val LOG_TAG                            = TestFragment::class.java.simpleName
     private val disposable                          = CompositeDisposable()
     private val TARGET_FRAGMENT_REQUEST_CODE:Int    = 1
@@ -59,22 +64,22 @@ class TestFragment : BaseFragment(
 
         super.onActivityCreated(savedInstanceState)
 
-        val test:TestParcel? = arguments?.getParcelable("test") ?: return
+        val test: TestParcel? = arguments?.getParcelable("test") ?: return
         when(test!!.type)
         {
             TestBasic.TEST_BISECTION_AUDIO,
             TestBasic.TEST_BISECTION_TACTILE,
             TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-            TestBasic.TEST_BISECTION_AUDIO_VIDEO        -> mTest = TestBisection(requireContext(), test, circleView)
+            TestBasic.TEST_BISECTION_AUDIO_VIDEO        -> mTest = TestBIS(requireContext(), test, circleView)
 
-            TestBasic.TEST_MUSICAL_METERS               -> mTest = TestMusicalMeter(requireContext(), test)
+            TestBasic.TEST_MUSICAL_METERS               -> mTest = TestMusMet(requireContext(), test)
 
             TestBasic.TEST_TID_SHORT_AUDIO,
             TestBasic.TEST_TID_SHORT_TACTILE,
             TestBasic.TEST_TID_LONG_AUDIO,
             TestBasic.TEST_TID_LONG_TACTILE             -> mTest = TestTID(requireContext(), test)
 
-            TestBasic.TEST_ATB                          -> mTest = TestATBinding(requireContext(), test)
+            TestBasic.TEST_ATB                          -> mTest = TestATB(requireContext(), test)
 
         }
         bt_next.visibility  = View.INVISIBLE

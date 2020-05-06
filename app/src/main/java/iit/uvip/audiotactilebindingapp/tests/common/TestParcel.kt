@@ -1,23 +1,22 @@
-package iit.uvip.audiotactilebindingapp.tests
+package iit.uvip.audiotactilebindingapp.tests.common
 
 import android.os.Parcel
 import android.os.Parcelable
 //                                                                                                             if==1: press next to run next trials
-class TestParcel(var type:Int, var name:String, var subject_id:String="", var time:Int=-1, var session:Int=-1, var nextTrailModality:Int=0) : Parcelable{
+class TestParcel(var type:Int, var name:String, var subject_id:String="", var nextTrailModality:Int=0, var time:Int=-1, var session:Int=-1) : Parcelable{
 
     private constructor(parcel: Parcel) : this(
         type                = parcel.readInt(),
         name                = parcel.readString()!!,
         subject_id          = parcel.readString()!!,
+        nextTrailModality   = parcel.readInt(),
         time                = parcel.readInt(),
-        session             = parcel.readInt(),
-        nextTrailModality   = parcel.readInt()
+        session             = parcel.readInt()
     )
 
     companion object {
 
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<TestParcel> {
+        @JvmField val CREATOR = object : Parcelable.Creator<TestParcel> {
             override fun createFromParcel(parcel: Parcel)   = TestParcel(parcel)
             override fun newArray(size: Int)                = arrayOfNulls<TestParcel>(size)
         }
@@ -27,9 +26,9 @@ class TestParcel(var type:Int, var name:String, var subject_id:String="", var ti
         dest.writeInt(type)
         dest.writeString(name)
         dest.writeString(subject_id)
+        dest.writeInt(nextTrailModality)
         dest.writeInt(time)
         dest.writeInt(session)
-        dest.writeInt(nextTrailModality)
     }
 
     override fun equals(other: Any?): Boolean {

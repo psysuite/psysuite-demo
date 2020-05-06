@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import android.app.Activity
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.tests.TestBasic
+import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
 import kotlinx.android.synthetic.main.fragment_answer.*
 import android.widget.RadioButton
 import iit.uvip.audiotactilebindingapp.utility.getTimeDifference

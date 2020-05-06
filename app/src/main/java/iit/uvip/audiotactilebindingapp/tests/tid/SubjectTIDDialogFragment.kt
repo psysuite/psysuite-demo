@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.fragments
+package iit.uvip.audiotactilebindingapp.tests.tid
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,11 +10,10 @@ import android.app.Activity
 import android.content.Intent
 import android.widget.ArrayAdapter
 import iit.uvip.audiotactilebindingapp.R
-import kotlinx.android.synthetic.main.fragment_tid_subject_info.*
+import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
 import android.widget.RadioButton
-import android.widget.Spinner
-import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDParcel
+import iit.uvip.audiotactilebindingapp.fragments.MainFragment
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.audiotactilebindingapp.utility.showToast
 
 class SubjectTIDDialogFragment: DialogFragment()
@@ -26,7 +25,8 @@ class SubjectTIDDialogFragment: DialogFragment()
 
     companion object {
         fun newInstance(title: String): SubjectTIDDialogFragment {
-            val frag        = SubjectTIDDialogFragment()
+            val frag        =
+                SubjectTIDDialogFragment()
             val args        = Bundle()
             args.putString("title", title)
             frag.arguments = args
@@ -37,7 +37,7 @@ class SubjectTIDDialogFragment: DialogFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_tid_subject_info, container)
+        return inflater.inflate(R.layout.fragment_subject_info_tid, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -176,7 +176,15 @@ class SubjectTIDDialogFragment: DialogFragment()
                 return null
             }
         }
-        return SubjectTIDParcel(name, age.toInt(), gender, session, modality, interval, first_modality)
+        return SubjectTIDParcel(
+            name,
+            age.toInt(),
+            gender,
+            session,
+            modality,
+            interval,
+            first_modality
+        )
     }
 
     private fun sendResult() {

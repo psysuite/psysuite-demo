@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.tests
+package iit.uvip.audiotactilebindingapp.tests.common
 
 import android.content.Context
 import android.os.Handler
@@ -6,7 +6,6 @@ import android.os.Handler
 import java.util.*
 import com.jakewharton.rxrelay2.PublishRelay
 import iit.uvip.audiotactilebindingapp.MainApplication
-import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicParcel
 import iit.uvip.audiotactilebindingapp.utility.deleteFile
 import iit.uvip.audiotactilebindingapp.utility.saveText
 
@@ -31,6 +30,7 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
         @JvmStatic val TEST_ABORT_TRIALEND              = 1         //  SHOWTRIALS_TRIALEND
         @JvmStatic val TEST_ABORT_ALWAYS                = 2         //  SHOWTRIALS_ALWAYS
 
+        @JvmStatic val TEST_NEXTTRIAL_NOCHOOSE          = -1        //  goes directly to next trial
         @JvmStatic val TEST_NEXTTRIAL_AUTO              = 0         //  goes directly to next trial
         @JvmStatic val TEST_NEXTTRIAL_BUTTON            = 1         //  wait for NEXT press
         @JvmStatic val TEST_NEXTTRIAL_ANSWER            = 2         //  wait for ANSWER dialog
@@ -40,6 +40,7 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
         @JvmStatic val TEST_BISECTION_TACTILE           = 101
         @JvmStatic val TEST_BISECTION_AUDIO_TACTILE     = 102
         @JvmStatic val TEST_BISECTION_AUDIO_VIDEO       = 103
+
         @JvmStatic val TEST_MUSICAL_METERS              = 110
 
         @JvmStatic val TEST_TID_SHORT_AUDIO             = 120
@@ -80,10 +81,10 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
     var abortMode:Int           = 0     // define abort modality (0:in answer dialog @ trial end, 1:button @ trial end, 2:always)
     var nextTrailModality:Int   = 0     // define how trials are displayed. 0: automatically, 1: after a next button, 2: after answer
 
-    protected var mTrials:MutableList<Trial>    = mutableListOf()
+    protected var mTrials:MutableList<TrialBasic>    = mutableListOf()
     var nTrials:Int                             = 0
     var currTrial:Int                           = 0
-    protected lateinit var mTrial:Trial
+    protected lateinit var mTrial: TrialBasic
 
     protected var mResultFile: String       = ""
     protected var mStimuliHandler: Handler  = Handler()
