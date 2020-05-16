@@ -2,19 +2,22 @@ package iit.uvip.audiotactilebindingapp.tests.common
 
 import android.content.Context
 import android.os.Handler
-
-import java.util.*
+import android.os.Parcel
+import android.os.Parcelable
 import com.jakewharton.rxrelay2.PublishRelay
 import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.audiotactilebindingapp.utility.deleteFile
 import iit.uvip.audiotactilebindingapp.utility.saveText
+import java.util.*
+
 
 /*
 must contain all the possible codes
 
  */
 
-abstract class TestBasic(protected val ctx: Context, protected val data: TestParcel) {
+abstract class TestBasic(protected val ctx: Context, protected open val data: SubjectBasicParcel) {
 
     val application:MainApplication = ctx.applicationContext as MainApplication
 
@@ -22,6 +25,9 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
 
         @JvmStatic val TEST_BASIC_LABEL                 = "test"    // used by tests that have only one type
 
+        // --------------------------------------------------------------------------------------------
+        // trial-by-trial management
+        //-----------------------------------------------------------------------------------------
         @JvmStatic val TEST_SHOWTRIALS_NEVER            = 0         //  SHOWTRIALS_NEVER
         @JvmStatic val TEST_SHOWTRIALS_TRIALEND         = 1         //  SHOWTRIALS_TRIALEND
         @JvmStatic val TEST_SHOWTRIALS_ALWAYS           = 2         //  SHOWTRIALS_ALWAYS
@@ -30,26 +36,18 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
         @JvmStatic val TEST_ABORT_TRIALEND              = 1         //  SHOWTRIALS_TRIALEND
         @JvmStatic val TEST_ABORT_ALWAYS                = 2         //  SHOWTRIALS_ALWAYS
 
-        @JvmStatic val TEST_NEXTTRIAL_NOCHOOSE          = -1        //  goes directly to next trial
-        @JvmStatic val TEST_NEXTTRIAL_AUTO              = 0         //  goes directly to next trial
+        @JvmStatic
+        val TEST_NEXTTRIAL_NOCHOOSE =
+            -1        //  goes directly to next trial, does not allow user to modify it
+        @JvmStatic
+        val TEST_NEXTTRIAL_AUTO =
+            0         //  goes directly to next trial, allow user to choose between AUTO or BUTTON
         @JvmStatic val TEST_NEXTTRIAL_BUTTON            = 1         //  wait for NEXT press
         @JvmStatic val TEST_NEXTTRIAL_ANSWER            = 2         //  wait for ANSWER dialog
 
-
-        @JvmStatic val TEST_BISECTION_AUDIO             = 100
-        @JvmStatic val TEST_BISECTION_TACTILE           = 101
-        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE     = 102
-        @JvmStatic val TEST_BISECTION_AUDIO_VIDEO       = 103
-
-        @JvmStatic val TEST_MUSICAL_METERS              = 110
-
-        @JvmStatic val TEST_TID_SHORT_AUDIO             = 120
-        @JvmStatic val TEST_TID_SHORT_TACTILE           = 121
-        @JvmStatic val TEST_TID_LONG_AUDIO              = 122
-        @JvmStatic val TEST_TID_LONG_TACTILE            = 123
-
-        @JvmStatic val TEST_ATB                         = 130
-
+        //-----------------------------------------------------------------------------------------
+        //
+        //-----------------------------------------------------------------------------------------
         @JvmStatic val EVENT_STIMULI_START              = 200
         @JvmStatic val EVENT_STIMULI_END                = 201
         @JvmStatic val EVENT_GIVE_ANSWER                = 202
@@ -61,6 +59,42 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
         @JvmStatic val EVENT_UPDATE_TRIAL_ID            = 208
         @JvmStatic val EVENT_UPDATE_TRIAL_ID_REMOVE     = 209   // update trial id and remove it after 1 sec
         @JvmStatic val EVENT_SHOW_1SECABORT             = 210   // show abort button for 1 sec
+
+        //-----------------------------------------------------------------------------------------
+        // TESTS UNIQUE CODES
+        //-----------------------------------------------------------------------------------------
+        @JvmStatic
+        val TEST_BISECTION_AUDIO = 100
+        @JvmStatic
+        val TEST_BISECTION_TACTILE = 101
+        @JvmStatic
+        val TEST_BISECTION_AUDIO_TACTILE = 102
+        @JvmStatic
+        val TEST_BISECTION_AUDIO_VIDEO = 103
+
+        @JvmStatic
+        val TEST_MUSICAL_METERS = 110
+
+        @JvmStatic
+        val TEST_TID_SHORT_AUDIO = 120
+        @JvmStatic
+        val TEST_TID_SHORT_TACTILE = 121
+        @JvmStatic
+        val TEST_TID_LONG_AUDIO = 122
+        @JvmStatic
+        val TEST_TID_LONG_TACTILE = 123
+
+        @JvmStatic
+        val TEST_ATB_TIME = 130
+        @JvmStatic
+        val TEST_ATB_FREQUENCY = 131
+        @JvmStatic
+        val TEST_ATB_TIME_INF = 132
+        @JvmStatic
+        val TEST_ATB_FREQUENCY_INF = 133
+        //-----------------------------------------------------------------------------------------
+
+
 
 
         @JvmStatic val TEST_PRE                         = 230
@@ -140,5 +174,36 @@ abstract class TestBasic(protected val ctx: Context, protected val data: TestPar
     open fun abortTest(){
         mStimuliHandler.removeCallbacksAndMessages(null)
         deleteFile(mResultFile)
+    }
+}
+
+data class TaskCode(val label: String, val id: Int) : Parcelable {
+
+    private constructor(parcel: Parcel) : this(
+        label = parcel.readString()!!,
+        id = parcel.readInt()
+    )
+
+    companion object {
+
+        @JvmField
+        val CREATOR = object : Parcelable.Creator<TaskCode> {
+            override fun createFromParcel(parcel: Parcel) = TaskCode(parcel)
+            override fun newArray(size: Int) = arrayOfNulls<TaskCode>(size)
+        }
+    }
+
+    override fun toString(): String {
+        return label
+    }
+
+    override fun describeContents(): Int {
+        // TODO Auto-generated method stub
+        return 0
+    }
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(label)
+        dest.writeInt(id)
     }
 }

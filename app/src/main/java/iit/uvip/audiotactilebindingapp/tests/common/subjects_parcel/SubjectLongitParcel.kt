@@ -1,31 +1,86 @@
 package iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel
 
 import android.content.Context
+import android.os.Build
 import android.os.Parcel
-import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.utility.existFile
 import iit.uvip.audiotactilebindingapp.utility.readText
 import iit.uvip.audiotactilebindingapp.utility.saveText
+import kotlinx.android.parcel.Parceler
+import kotlinx.android.parcel.Parcelize
 
 // base class for all longitudinal tests
-open class SubjectLongitParcel(label:String="", age:Int=-1, gender:Int=-1, var session:Int=1) : SubjectBasicParcel(label, age, gender){
+@Parcelize
+open class SubjectLongitParcel(
+    override var type: Int = -1,
+    override var label: String = "",
+    override var age: Int = -1,
+    override var gender: Int = -1,
+    override var nextTrailModality: Int = -1,
+    override var taskcodes: List<TaskCode> = listOf(),
+    override var spinner_sel: Int = -1,
+    override var spinner_data_resource: Int = -1
+) : SubjectBasicListParcel(
+    type,
+    label,
+    age,
+    gender,
+    nextTrailModality,
+    taskcodes,
+    spinner_sel,
+    "session",
+    spinner_data_resource
+) {
+
+    var session: Int
+        get() = spinner_sel
+        set(value) {
+            spinner_sel = value
+        }
+
+    var test_sessions_array: Int
+        get() = spinner_data_resource
+        set(value) {
+            spinner_data_resource = value
+        }
 
     private constructor(parcel: Parcel) : this(
-        label           = parcel.readString()!!,
-        age             = parcel.readInt(),
-        gender          = parcel.readInt(),
-        session         = parcel.readInt()
+        parcel.readInt(),
+        parcel.readString()!!,
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        listOf<TaskCode>().apply {
+            if (Build.VERSION.SDK_INT >= 29) parcel.readParcelableList(
+                this,
+                TaskCode::class.java.classLoader
+            )
+            else parcel.readList(this, TaskCode::class.java.classLoader)
+        },
+        parcel.readInt(),
+        parcel.readInt()
     )
 
-    companion object {
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<SubjectLongitParcel> {
-            override fun createFromParcel(parcel: Parcel)   = SubjectLongitParcel(parcel)
-            override fun newArray(size: Int)                = arrayOfNulls<SubjectLongitParcel>(size)
+
+    companion object : Parceler<SubjectLongitParcel> {
+
+        override fun SubjectLongitParcel.write(parcel: Parcel, flags: Int) {
+            parcel.writeInt(type)
+            parcel.writeString(label)
+            parcel.writeInt(age)
+            parcel.writeInt(gender)
+            parcel.writeInt(nextTrailModality)
+            if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
+            else parcel.writeList(taskcodes)
+            parcel.writeInt(spinner_sel)
+            parcel.writeInt(spinner_data_resource)
         }
+
+        override fun create(parcel: Parcel) = SubjectLongitParcel(parcel)
 
         private fun loadJsonText(jsontext:String): SubjectLongitParcel {
             val moshi           = Moshi.Builder().build()
@@ -46,12 +101,6 @@ open class SubjectLongitParcel(label:String="", age:Int=-1, gender:Int=-1, var s
             }
             return SubjectLongitParcel()
         }
-
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        super.writeToParcel(dest, flags)
-        dest.writeInt(session)
     }
 
     // =============================================================================================================

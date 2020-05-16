@@ -10,16 +10,28 @@
     <string name="resume">RIPRENDI</string>
     <string name="test_ended">Il Test è terminato</string>
 
-    <string name="name">nome</string>
-    <string name="gender">sesso</string>
-    <string name="age">età</string>
-    <string name="test_type">tipologia di test</string>
+    <string name="name">NOME</string>
+    <string name="gender">SESSO</string>
+    <string name="age">ETA\'</string>
 
+    <string name="time">tempo</string>
+    <string name="frequency">frequenza</string>
+    <string name="session">sessione</string>
+    <string name="condition">condizione sperimentale</string>
 
     <!-- ATB -->
     <string name="start_atb">Audio-Tactile Binding</string>
     <string name="atb_interactivity">interattivo</string>
 
+    <string-array name="atb_tests_array">
+        <item>normale</item>
+        <item>infanti latenze</item>
+        <item>infanti frequenze</item>
+    </string-array>
+    <string name="whitenoise">aggiungi rumore bianco</string>
+
+    <string name="time_infants">tempo infanti</string>
+    <string name="frequency_infants">frequenza infanti</string>
     <!-- TID -->
     <string name="start_tid">Temporal Interval Discrimination</string>
     <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
@@ -58,11 +70,12 @@
     <!-- BISECTION -->
     <string name="start_bisection">BISECTION</string>
 
-    <string-array name="bis_tests_array">
-        <item>audio</item>
-        <item>tattile</item>
-        <item>audio tattile</item>
-        <item>audio visivo</item>
+    <string-array name="bis_sessions_array">
+        <item>pre test</item>
+        <item>session 1</item>
+        <item>session 2</item>
+        <item>session 3</item>
+        <item>post test</item>
     </string-array>
 
     <string name="bisection_question_text_audio">Il secondo suono era più vicino al primo o al terzo?</string>

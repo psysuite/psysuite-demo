@@ -1,22 +1,23 @@
 package iit.uvip.audiotactilebindingapp.fragments
 
-
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import androidx.navigation.Navigation
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.addTo
 import iit.uvip.audiotactilebindingapp.R
+import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBParcel
 import iit.uvip.audiotactilebindingapp.tests.atb.TestATB
 import iit.uvip.audiotactilebindingapp.tests.bis.TestBIS
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.tests.common.TestParcel
-import iit.uvip.audiotactilebindingapp.tests.musmet.TestMusMet
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.audiotactilebindingapp.tests.mmd.TestMMD
+import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDParcel
 import iit.uvip.audiotactilebindingapp.tests.tid.TestTID
 import iit.uvip.audiotactilebindingapp.utility.showToast
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_test.*
 
 /*
@@ -64,7 +65,7 @@ class TestFragment : BaseFragment(
 
         super.onActivityCreated(savedInstanceState)
 
-        val test: TestParcel? = arguments?.getParcelable("test") ?: return
+        val test: SubjectBasicParcel? = arguments?.getParcelable("test") ?: return
         when(test!!.type)
         {
             TestBasic.TEST_BISECTION_AUDIO,
@@ -72,14 +73,19 @@ class TestFragment : BaseFragment(
             TestBasic.TEST_BISECTION_AUDIO_TACTILE,
             TestBasic.TEST_BISECTION_AUDIO_VIDEO        -> mTest = TestBIS(requireContext(), test, circleView)
 
-            TestBasic.TEST_MUSICAL_METERS               -> mTest = TestMusMet(requireContext(), test)
+            TestBasic.TEST_MUSICAL_METERS -> mTest = TestMMD(requireContext(), test)
 
             TestBasic.TEST_TID_SHORT_AUDIO,
             TestBasic.TEST_TID_SHORT_TACTILE,
             TestBasic.TEST_TID_LONG_AUDIO,
-            TestBasic.TEST_TID_LONG_TACTILE             -> mTest = TestTID(requireContext(), test)
+            TestBasic.TEST_TID_LONG_TACTILE -> mTest =
+                TestTID(requireContext(), test as SubjectTIDParcel)
 
-            TestBasic.TEST_ATB                          -> mTest = TestATB(requireContext(), test)
+            TestBasic.TEST_ATB_TIME,
+            TestBasic.TEST_ATB_FREQUENCY,
+            TestBasic.TEST_ATB_TIME_INF,
+            TestBasic.TEST_ATB_FREQUENCY_INF -> mTest =
+                TestATB(requireContext(), test as SubjectATBParcel)
 
         }
         bt_next.visibility  = View.INVISIBLE
@@ -93,7 +99,9 @@ class TestFragment : BaseFragment(
             bt_pause.visibility = View.VISIBLE
         }
 
-        mTest.show(currTrial)
+        mHandler.postDelayed({
+            mTest.show(currTrial)
+        }, 1000L)
     }
 
     override fun onResume() {
@@ -174,7 +182,7 @@ class TestFragment : BaseFragment(
         }
     }
     //---------------------------------------------------------------------------------------------------------------------------------------
-    private fun showNext(remove:Boolean=false){
+    private fun showNext() {
         bt_next.visibility = View.VISIBLE
 
         if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS || mTest.abortMode == TestBasic.TEST_ABORT_TRIALEND)
@@ -217,7 +225,7 @@ class TestFragment : BaseFragment(
         editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
         editNameDialogFragment.arguments = b
         editNameDialogFragment.setCancelable(false)
-        editNameDialogFragment.show(requireFragmentManager(), "Inserisci risposta")
+        editNameDialogFragment.show(parentFragmentManager, "Inserisci risposta")
         isAnswerDialogOn = true
     }
 

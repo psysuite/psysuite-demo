@@ -8,37 +8,30 @@ import android.widget.ArrayAdapter
 import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicListParcel
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_list.*
+import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
 
-class SubjectBasicSpinnerDialogFragment: SubjectBasicDialogFragment()
+open class SubjectBasicSpinnerDialogFragment : SubjectBasicDialogFragment()
 {
     override val LOG_TAG:String                 = SubjectBasicSpinnerDialogFragment::class.java.simpleName
-    private var subject:SubjectBasicListParcel? = null
-    private var nSpinnerElements:Int            = 0
+    protected var nSpinnerElements: Int = 0
 
     companion object {
         fun newInstance(title: String): SubjectBasicSpinnerDialogFragment {
-            val frag =
-                SubjectBasicSpinnerDialogFragment()
+            val frag = SubjectBasicSpinnerDialogFragment()
             val args = Bundle()
             args.putString("title", title)
-            frag.setArguments(args)
-
+            frag.arguments = args
             return frag
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_subject_info_basic_list, container)
+        return inflater.inflate(R.layout.fragment_subject_info_basic, container)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initData() {
 
-        subject = arguments?.getParcelable("subject")
-
-        if(subject == null)
-            return
+        super.initData()
 
         ArrayAdapter.createFromResource(requireContext(), (subject as SubjectBasicListParcel).spinner_data_resource, android.R.layout.simple_spinner_item)
         .also { adapter ->
@@ -46,16 +39,8 @@ class SubjectBasicSpinnerDialogFragment: SubjectBasicDialogFragment()
             spinner.adapter = adapter
             nSpinnerElements = adapter.count
         }
-
-        labSpinner.text = subject!!.spinner_label
-
-        val title       = requireArguments().getString("title", "Enter Name")
-        dialog?.setTitle(title)
-
-        if(subject != null) updateGUI(subject!!)
-        else                clear()
+        labSpinner.text = (subject as SubjectBasicListParcel).spinner_label
     }
-
 
     override fun updateGUI(subj: SubjectBasicParcel){
         super.updateGUI(subj)
@@ -64,15 +49,12 @@ class SubjectBasicSpinnerDialogFragment: SubjectBasicDialogFragment()
 
     override fun clear(){
         super.clear()
-        if(nSpinnerElements > 0)
-            spinner.setSelection(0)
+        spinner.setSelection(-1)
     }
 
     override fun updateSubject(): SubjectBasicListParcel?{
-
         subject = super.updateSubject() as SubjectBasicListParcel
-        subject!!.spinner_sel = spinner.selectedItemId.toInt()
-        return subject
+        (subject as SubjectBasicListParcel).spinner_sel = spinner.selectedItemPosition
+        return subject as SubjectBasicListParcel
     }
-
 }

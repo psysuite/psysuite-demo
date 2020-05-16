@@ -2,13 +2,10 @@ package iit.uvip.audiotactilebindingapp
 
 
 import android.app.Application
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 import java.util.*
 
 // HERE SHOULD GO ONLY IMMUTABLE DATA !!!! (since system may re-create this instance silently)
@@ -18,8 +15,9 @@ import java.util.*
 
 class MainApplication : Application(), TextToSpeech.OnInitListener  {
 
-    lateinit var vibrator: Vibrator
     var tts: TextToSpeech? = null
+
+    var vibrator: VibrationManager? = null
 
     companion object {
 
@@ -32,7 +30,7 @@ class MainApplication : Application(), TextToSpeech.OnInitListener  {
 
         Log.d("ME", "${NavHostFragment::class.java}")
 
-        vibrator    = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
+        vibrator = VibrationManager(this).init()
         tts         = TextToSpeech(applicationContext, this)
     }
 
@@ -52,11 +50,5 @@ class MainApplication : Application(), TextToSpeech.OnInitListener  {
         }
     }
 
-    fun vibrate(duration:Long, ampl:Int=-1){   // ampl -1 corresponds to VibrationEffect.DEFAULT_AMPLITUDE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            vibrator.vibrate(VibrationEffect.createOneShot(duration/2, ampl))
-        else
-            @Suppress("DEPRECATION")
-            vibrator.vibrate(duration/2)
-    }
+
 }

@@ -1,9 +1,10 @@
-package iit.uvip.audiotactilebindingapp.tests.musmet
+package iit.uvip.audiotactilebindingapp.tests.mmd
 
 import iit.uvip.audiotactilebindingapp.tests.common.TrialBasic
 
 //                     trial_id    0/1      same/diff          1-18
-class TrialMusMet(id:Int=-1, type:Int, label:String, var audio_id:Int): TrialBasic(id, type, label){
+class TrialMMD(id: Int = -1, type: Int, label: String, var audio_id: Int) :
+    TrialBasic(id, type, label) {
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tlabel\tres\tcor_ans\tuser_ans\telapsed\trep\taudio_id\n"

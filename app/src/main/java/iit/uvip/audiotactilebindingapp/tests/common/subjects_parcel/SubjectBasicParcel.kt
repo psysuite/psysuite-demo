@@ -1,15 +1,18 @@
 package iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel
 
 import android.content.Context
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.utility.existFile
 import iit.uvip.audiotactilebindingapp.utility.readText
 import iit.uvip.audiotactilebindingapp.utility.saveText
-import java.lang.NumberFormatException
+import kotlinx.android.parcel.Parceler
+import kotlinx.android.parcel.Parcelize
 
 /*
 This class manage simple subjects that participate in tests with only one condition.
@@ -19,23 +22,46 @@ in subclasses, user must resolve the condition code according to internal variab
 // base class for all tests
 // nextTrailModality = -1 => do not show switch button in the gui
 
-open class SubjectBasicParcel(var label:String="", var age:Int=-1, var gender:Int=-1, var nextTrailModality:Int=-1) : Parcelable{
+@Parcelize
+open class SubjectBasicParcel(
+    open var type: Int = -1,
+    open var label: String = "",
+    open var age: Int = -1,
+    open var gender: Int = -1,
+    open var nextTrailModality: Int = -1,
+    open var taskcodes: List<TaskCode> = listOf()
+) : Parcelable {
 
     private constructor(parcel: Parcel) : this(
-        label               = parcel.readString()!!,
-        age                 = parcel.readInt(),
-        gender              = parcel.readInt(),
-        nextTrailModality   = parcel.readInt()
+        parcel.readInt(),
+        parcel.readString()!!,
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        listOf<TaskCode>().apply {
+            if (Build.VERSION.SDK_INT >= 29) parcel.readParcelableList(
+                this,
+                TaskCode::class.java.classLoader
+            )
+            else parcel.readList(this, TaskCode::class.java.classLoader)
+        }
     )
 
-    companion object {
+    companion object : Parceler<SubjectBasicParcel> {
+
+        override fun SubjectBasicParcel.write(parcel: Parcel, flags: Int) {
+            parcel.writeInt(type)
+            parcel.writeString(label)
+            parcel.writeInt(age)
+            parcel.writeInt(gender)
+            parcel.writeInt(nextTrailModality)
+            if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
+            else parcel.writeList(taskcodes)
+        }
+
+        override fun create(parcel: Parcel) = SubjectBasicParcel(parcel)
 
         @JvmStatic val CURR_SUBJ_FILE:String = "curr_subject"
-
-        @JvmField  val CREATOR = object : Parcelable.Creator<SubjectBasicParcel> {
-            override fun createFromParcel(parcel: Parcel)   = SubjectBasicParcel(parcel)
-            override fun newArray(size: Int)                = arrayOfNulls<SubjectBasicParcel>(size)
-        }
 
         private fun loadJsonText(jsontext:String): SubjectBasicParcel {
 
@@ -61,7 +87,7 @@ open class SubjectBasicParcel(var label:String="", var age:Int=-1, var gender:In
         fun validate(lab:String, ag:String):String{
             var res = ""
 
-            if(lab.isBlank())   res = "il nome è vuoto"
+            if (lab.isBlank()) res = res + "\n" + "il nome è vuoto"
 
             try {
                 ag.toInt()
@@ -73,22 +99,11 @@ open class SubjectBasicParcel(var label:String="", var age:Int=-1, var gender:In
         }
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(label)
-        dest.writeInt(age)
-        dest.writeInt(gender)
-        dest.writeInt(nextTrailModality)
-    }
-
     override fun equals(other: Any?): Boolean {
         if (other is SubjectBasicParcel) {
             return label.equals(other.label, ignoreCase = true)
         }
         return false
-    }
-
-    override fun describeContents(): Int {
-        return 0
     }
 
     override fun hashCode(): Int {

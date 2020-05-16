@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel
+package iit.uvip.audiotactilebindingapp.tests.atb
 
 import android.content.Context
 import android.os.Build
@@ -7,6 +7,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.audiotactilebindingapp.utility.existFile
 import iit.uvip.audiotactilebindingapp.utility.readText
 import iit.uvip.audiotactilebindingapp.utility.saveText
@@ -20,16 +21,14 @@ in subclasses, user must resolve the condition code according to internal variab
 
 // base class for all tests
 @Parcelize
-open class SubjectBasicListParcel(
+open class SubjectATBParcel(
     override var type: Int = -1,
     override var label: String = "",
     override var age: Int = -1,
     override var gender: Int = -1,
     override var nextTrailModality: Int = -1,
     override var taskcodes: List<TaskCode> = listOf(),
-    open var spinner_sel: Int = -1,
-    open var spinner_label: String = "",
-    open var spinner_data_resource: Int = -1
+    var whitenoise: Boolean = true
 ) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, taskcodes) {
 
     private constructor(parcel: Parcel) : this(
@@ -45,15 +44,13 @@ open class SubjectBasicListParcel(
             )
             else parcel.readList(this, TaskCode::class.java.classLoader)
         },
-
-        parcel.readInt(),
-        parcel.readString()!!,
-        parcel.readInt()
+        parcel.readInt() > 0
     )
 
-    companion object : Parceler<SubjectBasicListParcel> {
+    companion object : Parceler<SubjectATBParcel> {
 
-        override fun SubjectBasicListParcel.write(parcel: Parcel, flags: Int) {
+
+        override fun SubjectATBParcel.write(parcel: Parcel, flags: Int) {
             parcel.writeInt(type)
             parcel.writeString(label)
             parcel.writeInt(age)
@@ -61,48 +58,48 @@ open class SubjectBasicListParcel(
             parcel.writeInt(nextTrailModality)
             if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
             else parcel.writeList(taskcodes)
-            parcel.writeInt(spinner_sel)
-            parcel.writeString(spinner_label)
-            parcel.writeInt(spinner_data_resource)
+            if (whitenoise) parcel.writeInt(1)
+            else parcel.writeInt(0)
         }
 
-        override fun create(parcel: Parcel) = SubjectBasicListParcel(parcel)
-
-        private fun loadJsonText(jsontext:String): SubjectBasicListParcel {
-            val moshi           = Moshi.Builder().build()
-            val jsonAdapter     = moshi.adapter(SubjectBasicListParcel::class.java)
+        override fun create(parcel: Parcel) = SubjectATBParcel(parcel)
+        private fun loadJsonText(jsontext: String): SubjectATBParcel {
+            val moshi = Moshi.Builder().build()
+            val jsonAdapter = moshi.adapter(SubjectATBParcel::class.java)
             return jsonAdapter.fromJson(jsontext)!!
         }
 
-        fun loadSubject(): SubjectBasicListParcel{
+        fun loadSubject(): SubjectATBParcel {
             val subj = existFile(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
-            if(subj.first){
+            if (subj.first) {
                 val jsontext = readText(CURR_SUBJ_FILE + MainApplication.FILE_EXTENSION)
                 return try {
                     loadJsonText(jsontext)
-                }
-                catch (e:Exception){
-                    SubjectBasicListParcel()
+                } catch (e: Exception) {
+                    SubjectATBParcel()
                 }
             }
-            return SubjectBasicListParcel()
+            return SubjectATBParcel()
         }
+
     }
 
     // =============================================================================================================
     // WRITE
     // =============================================================================================================
-    override fun writeJson(context: Context, filename:String){
+    override fun writeJson(context: Context, filename: String) {
 
-        val moshi       = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        val jsonAdapter = moshi.adapter(SubjectBasicListParcel::class.java)
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val jsonAdapter = moshi.adapter(SubjectATBParcel::class.java)
 
         return try {
             val json_subject = jsonAdapter.toJson(this)
-            saveText(context, filename + MainApplication.FILE_EXTENSION, json_subject)        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
-        }
-        catch (e: Exception)
-        {
+            saveText(
+                context,
+                filename + MainApplication.FILE_EXTENSION,
+                json_subject
+            )        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+        } catch (e: Exception) {
             e.printStackTrace()
             return
         }

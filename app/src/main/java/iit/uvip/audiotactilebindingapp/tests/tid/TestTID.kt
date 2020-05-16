@@ -3,12 +3,14 @@ package iit.uvip.audiotactilebindingapp.tests.tid
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.Vibrator
 import android.util.Log
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.tests.common.*
+import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
+import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
+import iit.uvip.audiotactilebindingapp.tests.common.TrialBasic
 import iit.uvip.audiotactilebindingapp.utility.QuestObject
+import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
 import java.util.*
 
@@ -20,7 +22,7 @@ import java.util.*
 //    FIRST_STIMULUS_DELAY=1500--------s1------delta1------s2-----ISI=1000ms-----s3------delta2-------s4-----QUESTION_DELAY=1500ms------domanda
 
 //class TIDTest(ctx: Context, mType:Int, mSubjLabel:String, private val test_time:Int, private val session:Int) : Test(ctx, mType, mSubjLabel)
-class TestTID(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
+class TestTID(ctx: Context, override val data: SubjectTIDParcel) : TestBasic(ctx, data)
 {
     var LOG_TAG:String = TestTID::class.java.simpleName
 
@@ -29,6 +31,9 @@ class TestTID(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
     lateinit var onsetDate: Date
 
     companion object {
+
+        @JvmStatic
+        val TEST_BASIC_LABEL = "TID"
 
         @JvmStatic var NUM_BLOCKS                   = 6
         @JvmStatic var NUM_TRIALS                   = 50
@@ -54,32 +59,29 @@ class TestTID(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         @JvmStatic val STIMULUS_DURATION_SHORT      = "short"
         @JvmStatic val STIMULUS_DURATION_LONG       = "long"
 
-        private fun getTestName(type:Int):String{
-            return when(type){
-                TEST_TID_SHORT_AUDIO -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
-                TEST_TID_SHORT_TACTILE -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_TACTILE
-                TEST_TID_LONG_AUDIO -> STIMULUS_DURATION_LONG + "_" + STIMULUS_TYPE_AUDIO
-                TEST_TID_LONG_TACTILE -> STIMULUS_DURATION_LONG + "_" + STIMULUS_TYPE_TACTILE
-                else -> STIMULUS_DURATION_SHORT + "_" + STIMULUS_TYPE_AUDIO
-            }
-        }
-
-        fun getExpFactorsType(subject_data: SubjectTIDParcel):Pair<Int, String>{
-            val type  =  if(subject_data.interval_type == 0) {
-                if(subject_data.modality == 0) TEST_TID_SHORT_AUDIO
-                else TEST_TID_SHORT_TACTILE
-            }
-            else {
-                if(subject_data.modality == 0) TEST_TID_LONG_AUDIO
-                else TEST_TID_LONG_TACTILE
-            }
-            val name = getTestName(type)
-
-            return Pair(type, name)
+        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+            return mutableListOf(
+                TaskCode(
+                    TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO + "_" + STIMULUS_DURATION_SHORT,
+                    TEST_TID_SHORT_AUDIO
+                ),
+                TaskCode(
+                    TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE + "_" + STIMULUS_DURATION_SHORT,
+                    TEST_TID_SHORT_TACTILE
+                ),
+                TaskCode(
+                    TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO + "_" + STIMULUS_DURATION_LONG,
+                    TEST_TID_LONG_AUDIO
+                ),
+                TaskCode(
+                    TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE + "_" + STIMULUS_DURATION_LONG,
+                    TEST_TID_LONG_TACTILE
+                )
+            )
         }
     }
 
-    private var vibrator: Vibrator  // lateinit not necessary as initialized in constructor
+    var vibrator: VibrationManager?   // lateinit not necessary as initialized in constructor
     private var mToneGen    = ToneGenerator(AudioManager.STREAM_SYSTEM, ToneGenerator.MAX_VOLUME)
     private var mTone       = ToneGenerator.TONE_CDMA_ALERT_INCALL_LITE
 
@@ -109,9 +111,42 @@ class TestTID(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         }
         setFirstDelta()
         nTrials     = mTrials.size
-        createResultFile(data.subject_id,
-            TrialTID.LOG_HEADER
-        )
+        createResultFile(data.label, TrialTID.LOG_HEADER)
+    }
+
+    private fun vars2code(): Int {
+        return if (data.interval_type == 0) {
+            if (data.modality == 0) TEST_TID_SHORT_AUDIO
+            else TEST_TID_SHORT_TACTILE
+        } else {
+            if (data.modality == 0) TEST_TID_LONG_AUDIO
+            else TEST_TID_LONG_TACTILE
+        }
+    }
+
+    private fun code2vars(): Pair<Int, Int> {
+
+        when (data.type) {
+            TEST_TID_SHORT_AUDIO -> {
+                data.modality = 0
+                data.interval_type = 0
+            }
+            TEST_TID_SHORT_TACTILE -> {
+                data.modality = 1
+                data.interval_type = 0
+
+            }
+            TEST_TID_LONG_AUDIO -> {
+                data.modality = 0
+                data.interval_type = 1
+
+            }
+            TEST_TID_LONG_TACTILE -> {
+                data.modality = 1
+                data.interval_type = 1
+            }
+        }
+        return Pair(data.modality, data.interval_type)
     }
 
     // a trial has this temporal line:
@@ -162,8 +197,8 @@ class TestTID(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         val elapsedms = getTimeDifference(onsetDate)
         Log.d(LOG_TAG,"stim num $id, elapsed: $elapsedms")
         when(trial.type) {
-            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO ->  mToneGen.startTone(mTone, trial.duration)
-            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE ->  application.vibrate(trial.duration.toLong())
+            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO -> mToneGen.startTone(mTone, trial.duration)
+            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE -> vibrator?.vibrateSingle(trial.duration.toLong())
         }
     }
 

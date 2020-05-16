@@ -3,19 +3,26 @@ package iit.uvip.audiotactilebindingapp.tests.bis
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.Vibrator
 import android.widget.ImageView
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicListParcel
+import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.tests.common.TestParcel
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 
-class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) : TestBasic(ctx, data)
+class TestBIS(
+    ctx: Context,
+    override val data: SubjectBasicParcel,
+    private val mImageView: ImageView
+) : TestBasic(ctx, data)
 {
     var LOG_TAG:String = TestBIS::class.java.simpleName
 
     companion object {
+
+        @JvmStatic
+        val TEST_BASIC_LABEL = "BIS"
 
         @JvmStatic var NUM_TRIALS                   = 32
         @JvmStatic val STIMULUS_DURATION_VISUAL     = 150
@@ -30,98 +37,62 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
 
         @JvmStatic val AV_STIMULUS_DELTA            = 200       // ms between the AV stimuli
 
-        @JvmStatic val STIMULUS_TYPE_AUDIO              = "a"
-        @JvmStatic val STIMULUS_TYPE_TACTILE            = "t"
-        @JvmStatic val STIMULUS_TYPE_AUDIO_TACTILE      = "at"
-        @JvmStatic val STIMULUS_TYPE_AUDIO_VIDEO        = "av"
+        @JvmStatic
+        val STIMULUS_TYPE_AUDIO = "AUDIO"
+        @JvmStatic
+        val STIMULUS_TYPE_TACTILE = "TACTILE"
+        @JvmStatic
+        val STIMULUS_TYPE_AUDIO_TACTILE = "AUDIO_TACTILE"
+        @JvmStatic
+        val STIMULUS_TYPE_AUDIO_VIDEO = "AUDIO_VIDEO"
 
         @JvmStatic val CONFLICT_TYPE_NONE               = "none"
         @JvmStatic val CONFLICT_TYPE_AV                 = "av"
         @JvmStatic val CONFLICT_TYPE_VA                 = "va"
 
-
-        private fun getTestName(type:Int):String{
-            return when(type){
-                0   -> STIMULUS_TYPE_AUDIO
-                1   -> STIMULUS_TYPE_TACTILE
-                2   -> STIMULUS_TYPE_AUDIO_TACTILE
-                3   -> STIMULUS_TYPE_AUDIO_VIDEO
-                else-> ""
-            }
-        }
-        fun getExpFactorsType(subject_data:SubjectBasicListParcel):Pair<Int, String>{
-            val type = when(subject_data.spinner_sel){
-                0   -> TEST_BISECTION_AUDIO
-                1   -> TEST_BISECTION_TACTILE
-                2   -> TEST_BISECTION_AUDIO_TACTILE
-                3   -> TEST_BISECTION_AUDIO_VIDEO
-                else-> -1
-            }
-            val name =
-                getTestName(
-                    subject_data.spinner_sel
+        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+            return mutableListOf(
+                TaskCode(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO, TEST_BISECTION_AUDIO),
+                TaskCode(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE, TEST_BISECTION_TACTILE),
+                TaskCode(
+                    TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_TACTILE,
+                    TEST_BISECTION_AUDIO_TACTILE
+                ),
+                TaskCode(
+                    TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VIDEO,
+                    TEST_BISECTION_AUDIO_VIDEO
                 )
-            return Pair(type, name)
+            )
         }
     }
 
     // contains : stimulus type & delay
     private var trialsDefaultSchema:List<Triple<Int,Int,String>> = listOf(
-                                                                    Triple(4,200,
-                                                                        CONFLICT_TYPE_NONE
-                                                                    ),
-                                                                    Triple(6,300,
-                                                                        CONFLICT_TYPE_NONE
-                                                                    ),
-                                                                    Triple(6,400,
-                                                                        CONFLICT_TYPE_NONE
-                                                                    ),
-                                                                    Triple(6,600,
-                                                                        CONFLICT_TYPE_NONE
-                                                                    ),
-                                                                    Triple(6,700,
-                                                                        CONFLICT_TYPE_NONE
-                                                                    ),
-                                                                    Triple(4,800,
-                                                                        CONFLICT_TYPE_NONE
-                                                                    ))
-
+        Triple(4, 200, CONFLICT_TYPE_NONE),
+        Triple(6, 300, CONFLICT_TYPE_NONE),
+        Triple(6, 400, CONFLICT_TYPE_NONE),
+        Triple(6, 600, CONFLICT_TYPE_NONE),
+        Triple(6, 700, CONFLICT_TYPE_NONE),
+        Triple(4, 800, CONFLICT_TYPE_NONE)
+    )
 
     // first stim is delivered at the given latency. the second  AV_STIMULUS_DELTA after
                                                                         // ntrials  latency conflict-type
     private var trialsAudioVideoSchema:List<Triple<Int,Int,String>> = listOf(
-                                                                    Triple(4,200,
-                                                                        CONFLICT_TYPE_VA
-                                                                    ),
-                                                                    Triple(4,300,
-                                                                        CONFLICT_TYPE_VA
-                                                                    ),
-                                                                    Triple(4,400,
-                                                                        CONFLICT_TYPE_VA
-                                                                    ),
-                                                                    Triple(4,500,
-                                                                        CONFLICT_TYPE_VA
-                                                                    ),
-                                                                    Triple(4,600,
-                                                                        CONFLICT_TYPE_VA
-                                                                    ),
-                                                                    Triple(4,200,
-                                                                        CONFLICT_TYPE_AV
-                                                                    ),
-                                                                    Triple(4,300,
-                                                                        CONFLICT_TYPE_AV
-                                                                    ),
-                                                                    Triple(4,400,
-                                                                        CONFLICT_TYPE_AV
-                                                                    ),
-                                                                    Triple(4,500,
-                                                                        CONFLICT_TYPE_AV
-                                                                    ),
-                                                                    Triple(4,600,
-                                                                        CONFLICT_TYPE_AV
-                                                                    ))
+        Triple(4, 200, CONFLICT_TYPE_VA),
+        Triple(4, 300, CONFLICT_TYPE_VA),
+        Triple(4, 400, CONFLICT_TYPE_VA),
+        Triple(4, 500, CONFLICT_TYPE_VA),
+        Triple(4, 600, CONFLICT_TYPE_VA),
+        Triple(4, 200, CONFLICT_TYPE_AV),
+        Triple(4, 300, CONFLICT_TYPE_AV),
+        Triple(4, 400, CONFLICT_TYPE_AV),
+        Triple(4, 500, CONFLICT_TYPE_AV),
+        Triple(4, 600, CONFLICT_TYPE_AV)
+    )
 
-    var vibrator: Vibrator  // lateinit not necessary as initialized in construtor
+
+    var vibrator: VibrationManager?   // lateinit not necessary as initialized in constructor
     private var mToneGen    = ToneGenerator(AudioManager.STREAM_SYSTEM, ToneGenerator.MAX_VOLUME)
     private var mTone       = ToneGenerator.TONE_CDMA_ALERT_INCALL_LITE
 
@@ -129,7 +100,6 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
     // =======================================================================================================================================
 
     init{
-
         val application = ctx.applicationContext as MainApplication
         vibrator        = application.vibrator
 
@@ -152,9 +122,7 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(data.subject_id,
-            TrialBIS.LOG_HEADER
-        )
+        createResultFile(data.label, TrialBIS.LOG_HEADER)
     }
 
     // a trial has this temporal line:
@@ -168,22 +136,16 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
         if(isRepeat)    mTrial.repetitions++
 
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TrialBIS,
-                TRIAL_STAGE_1
-            )
+            deliverStimulus(mTrial as TrialBIS, TRIAL_STAGE_1)
             testEvent.accept(EVENT_STIMULI_START)
         }, FIRST_STIMULUS_DELAY.toLong())
 
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TrialBIS,
-                TRIAL_STAGE_2
-            )
+            deliverStimulus(mTrial as TrialBIS, TRIAL_STAGE_2)
         }, ((mTrial as TrialBIS).position + FIRST_STIMULUS_DELAY).toLong())
 
         mStimuliHandler.postDelayed({
-            deliverStimulus(mTrial as TrialBIS,
-                TRIAL_STAGE_3
-            )
+            deliverStimulus(mTrial as TrialBIS, TRIAL_STAGE_3)
         }, (TrialBIS.LAST_STIMULUS_DELAY + FIRST_STIMULUS_DELAY).toLong())
 
         mStimuliHandler.postDelayed({
@@ -198,13 +160,13 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
     private fun deliverStimulus(trial: TrialBIS, stage:Int=0){
 
         when(trial.type) {
-            TEST_BISECTION_AUDIO ->  mToneGen.startTone(mTone, trial.duration)
-            TEST_BISECTION_TACTILE ->  application.vibrate(trial.duration.toLong())
+            TEST_BISECTION_AUDIO -> mToneGen.startTone(mTone, trial.duration)
+            TEST_BISECTION_TACTILE -> vibrator?.vibrateSingle(trial.duration.toLong())
             TEST_BISECTION_AUDIO_TACTILE -> {
                                                 mToneGen.startTone(mTone, trial.duration)
-                                                application.vibrate(trial.duration.toLong())
+                vibrator?.vibrateSingle(trial.duration.toLong())
             }
-            TEST_BISECTION_AUDIO_VIDEO ->  deliverAVStimuli(trial, stage)
+            TEST_BISECTION_AUDIO_VIDEO -> deliverAVStimuli(trial, stage)
         }
     }
 
@@ -221,16 +183,12 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
 
                         // delayed stimulus
                         mStimuliHandler.postDelayed({
-                            mToneGen.startTone(mTone,
-                                STIMULUS_DURATION_AUDIO
-                            )
+                            mToneGen.startTone(mTone, STIMULUS_DURATION_AUDIO)
                         }, AV_STIMULUS_DELTA.toLong())
                     }
                     false   -> {
                         // first stimulus (and color flash)
-                        mToneGen.startTone(mTone,
-                            STIMULUS_DURATION_AUDIO
-                        )
+                        mToneGen.startTone(mTone, STIMULUS_DURATION_AUDIO)
 
                         // delayed stimulus
                         deliverVideoStimulus(stage, AV_STIMULUS_DELTA.toLong(), STIMULUS_DURATION_VISUAL.toLong())
@@ -239,9 +197,7 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
             }
             false -> {
                 // normal stimulus: audio and video simultaneously
-                mToneGen.startTone(mTone,
-                    STIMULUS_DURATION_AUDIO
-                )
+                mToneGen.startTone(mTone, STIMULUS_DURATION_AUDIO)
                 deliverVideoStimulus(stage, 0, STIMULUS_DURATION_VISUAL.toLong())
             }
         }
@@ -281,7 +237,7 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
         for(section in trialsAudioVideoSchema)
             for(i in 0 until section.first)
                 when(section.third == CONFLICT_TYPE_AV){
-                    true    -> mTrials.add(
+                    true -> mTrials.add(
                         TrialBIS(
                             -1,
                             data.type,
@@ -292,7 +248,7 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
                             durationVideo
                         )
                     )
-                    false   -> mTrials.add(
+                    false -> mTrials.add(
                         TrialBIS(
                             -1,
                             data.type,
@@ -313,18 +269,12 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
     // ----------------------------------
     private fun initBisectionAudio(){
         mQuestion = ctx.resources.getString(R.string.bisection_question_text_audio)
-        createDefaultTrials(
-            STIMULUS_TYPE_AUDIO,
-            STIMULUS_DURATION_AUDIO
-        )
+        createDefaultTrials(STIMULUS_TYPE_AUDIO, STIMULUS_DURATION_AUDIO)
     }
 
     private fun initBisectionTactile(){
         mQuestion = ctx.resources.getString(R.string.bisection_question_text_tactile)
-        createDefaultTrials(
-            STIMULUS_TYPE_TACTILE,
-            STIMULUS_DURATION_TACTILE
-        )
+        createDefaultTrials(STIMULUS_TYPE_TACTILE, STIMULUS_DURATION_TACTILE)
     }
 
     private fun initBisectionAudioTactile(){
@@ -338,10 +288,7 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
 
     private fun initBisectionAudioVideo(){
         mQuestion = ctx.resources.getString(R.string.bisection_question_text_mixed)
-        createAudioVideoTrials(
-            STIMULUS_DURATION_AUDIO,
-            STIMULUS_DURATION_VISUAL
-        )
+        createAudioVideoTrials(STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_VISUAL)
     }
 
     // =====================================================================================
@@ -349,9 +296,8 @@ class TestBIS(ctx: Context, data: TestParcel, private val mImageView:ImageView) 
     // =====================================================================================
     // Trial(val type:Int, val label:String, val conflict_type:String, val position:Int, val duration:Int)
     // just one trial for each latency
-    private var trialsDefaultSchema_debug:List<Triple<Int,Int,String>> = listOf(Triple(2,200,
-        CONFLICT_TYPE_NONE
-    ))
+    private var trialsDefaultSchema_debug: List<Triple<Int, Int, String>> =
+        listOf(Triple(2, 200, CONFLICT_TYPE_NONE))
 
     private fun createDefaultTrials_debug(stim_type_label:String, duration:Int, duration2:Int=0)
     {

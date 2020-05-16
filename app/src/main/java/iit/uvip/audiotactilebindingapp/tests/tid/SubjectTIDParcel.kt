@@ -1,39 +1,85 @@
 package iit.uvip.audiotactilebindingapp.tests.tid
 
 import android.content.Context
+import android.os.Build
 import android.os.Parcel
-import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
+import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectLongitParcel
 import iit.uvip.audiotactilebindingapp.utility.existFile
 import iit.uvip.audiotactilebindingapp.utility.readText
 import iit.uvip.audiotactilebindingapp.utility.saveText
+import kotlinx.android.parcel.Parceler
+import kotlinx.android.parcel.Parcelize
 
 // session
-
-class SubjectTIDParcel(label:String="", age:Int=-1, gender:Int=-1, session:Int=-1, var modality:Int=-1, var interval_type:Int=-1, var first_modality:Int=-1) : SubjectLongitParcel(label, age, gender, session){
+@Parcelize
+class SubjectTIDParcel(
+    override var type: Int = -1,
+    override var label: String = "",
+    override var age: Int = -1,
+    override var gender: Int = -1,
+    override var nextTrailModality: Int = -1,
+    override var taskcodes: List<TaskCode> = listOf(),
+    override var spinner_sel: Int = -1,
+    override var spinner_data_resource: Int = -1,
+    var modality: Int = -1,
+    var interval_type: Int = -1,
+    var first_modality: Int = -1
+) : SubjectLongitParcel(
+    type,
+    label,
+    age,
+    gender,
+    nextTrailModality,
+    taskcodes,
+    spinner_sel,
+    spinner_data_resource
+) {
 
     private constructor(parcel: Parcel) : this(
-        label           = parcel.readString()!!,
-        age             = parcel.readInt(),
-        gender          = parcel.readInt(),
-        session         = parcel.readInt(),
-        modality        = parcel.readInt(),
-        interval_type   = parcel.readInt(),
-        first_modality  = parcel.readInt()
+        parcel.readInt(),
+        parcel.readString()!!,
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        listOf<TaskCode>().apply {
+            if (Build.VERSION.SDK_INT >= 29) parcel.readParcelableList(
+                this,
+                TaskCode::class.java.classLoader
+            )
+            else parcel.readList(this, TaskCode::class.java.classLoader)
+        },
+
+        parcel.readInt(),
+        parcel.readInt(),
+
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt()
     )
 
+    companion object : Parceler<SubjectTIDParcel> {
 
-    companion object {
+        override fun SubjectTIDParcel.write(parcel: Parcel, flags: Int) {
+            parcel.writeInt(type)
+            parcel.writeString(label)
+            parcel.writeInt(age)
+            parcel.writeInt(gender)
+            parcel.writeInt(nextTrailModality)
+            if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
+            else parcel.writeList(taskcodes)
+            parcel.writeInt(spinner_sel)
+            parcel.writeInt(spinner_data_resource)
 
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<SubjectTIDParcel> {
-            override fun createFromParcel(parcel: Parcel) =
-                SubjectTIDParcel(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<SubjectTIDParcel>(size)
+            parcel.writeInt(modality)
+            parcel.writeInt(interval_type)
+            parcel.writeInt(first_modality)
         }
+
+        override fun create(parcel: Parcel) = SubjectTIDParcel(parcel)
 
         private fun loadJsonText(jsontext:String): SubjectTIDParcel {
             val moshi           = Moshi.Builder().build()
@@ -49,20 +95,13 @@ class SubjectTIDParcel(label:String="", age:Int=-1, gender:Int=-1, session:Int=-
                     loadJsonText(
                         jsontext
                     )
-                }
-                catch (e:Exception){
+                } catch (e:Exception){
                     SubjectTIDParcel()
                 }
             }
             return SubjectTIDParcel()
         }
-    }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        super.writeToParcel(dest, flags)
-        dest.writeInt(modality)
-        dest.writeInt(interval_type)
-        dest.writeInt(first_modality)
     }
 
     // =============================================================================================================
@@ -85,12 +124,6 @@ class SubjectTIDParcel(label:String="", age:Int=-1, gender:Int=-1, session:Int=-
             return
         }
     }
-
-    // =============================================================================================================
-    // LOAD
-    // =============================================================================================================
-
-
     // =============================================================================================================
 }
 

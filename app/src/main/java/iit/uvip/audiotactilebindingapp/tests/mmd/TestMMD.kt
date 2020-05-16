@@ -1,26 +1,26 @@
-package iit.uvip.audiotactilebindingapp.tests.musmet
+package iit.uvip.audiotactilebindingapp.tests.mmd
 
 import android.content.Context
-import iit.uvip.audiotactilebindingapp.R
 import android.media.MediaPlayer
+import iit.uvip.audiotactilebindingapp.R
+import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.tests.common.TestParcel
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 
-class TestMusMet(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
-{
-    var LOG_TAG:String = TestMusMet::class.java.simpleName
+class TestMMD(ctx: Context, override val data: SubjectBasicParcel) : TestBasic(ctx, data) {
+    var LOG_TAG: String = TestMMD::class.java.simpleName
 
     companion object {
-        @JvmStatic val NUM_TRIALS = 18
-        @JvmStatic val TEST_BASIC_LABEL                 = "MusMet"
+        @JvmStatic
+        val NUM_TRIALS = 18
+        @JvmStatic
+        val TEST_BASIC_LABEL = "MMD"
 
-        fun getExpFactorsType():Pair<Int, String> {
-            return Pair(
-                TEST_MUSICAL_METERS,
-                TEST_BASIC_LABEL
-            )
+        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+            return mutableListOf(TaskCode(TEST_BASIC_LABEL, TEST_MUSICAL_METERS))
         }
     }
+
 
     // =============================================================================================================================
 
@@ -41,7 +41,7 @@ class TestMusMet(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(data.subject_id, TrialMusMet.LOG_HEADER)
+        createResultFile(data.label, TrialMMD.LOG_HEADER)
     }
 
     override fun show(trialid:Int, isRepeat:Boolean){
@@ -50,8 +50,8 @@ class TestMusMet(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
         if(isRepeat)    mTrial.repetitions++
 
         val resname = when(mTrial.type == 0){
-            true    -> "mmc" + (mTrial as TrialMusMet).audio_id + "_same"
-            false   -> "mmc" + (mTrial as TrialMusMet).audio_id
+            true -> "mmc" + (mTrial as TrialMMD).audio_id + "_same"
+            false -> "mmc" + (mTrial as TrialMMD).audio_id
         }
         deliverStimulus(resname)
     }
@@ -74,22 +74,8 @@ class TestMusMet(ctx: Context, data: TestParcel) : TestBasic(ctx, data)
     private fun createTrials()
     {
         for(i in 1 until (NUM_TRIALS +1) ){
-            mTrials.add(
-                TrialMusMet(
-                    -1,
-                    0,
-                    "same",
-                    i
-                )
-            )
-            mTrials.add(
-                TrialMusMet(
-                    -1,
-                    1,
-                    "diff",
-                    i
-                )
-            )
+            mTrials.add(TrialMMD(-1, 0, "same", i))
+            mTrials.add(TrialMMD(-1, 1, "diff", i))
         }
         mTrials.shuffle()
 
