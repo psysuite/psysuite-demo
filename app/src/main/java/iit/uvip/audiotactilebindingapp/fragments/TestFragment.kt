@@ -3,22 +3,30 @@ package iit.uvip.audiotactilebindingapp.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.View
 import androidx.navigation.Navigation
 import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBParcel
 import iit.uvip.audiotactilebindingapp.tests.atb.TestATB
+import iit.uvip.audiotactilebindingapp.tests.atvb.TestATVB
 import iit.uvip.audiotactilebindingapp.tests.bis.TestBIS
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.audiotactilebindingapp.tests.mmd.TestMMD
 import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDParcel
 import iit.uvip.audiotactilebindingapp.tests.tid.TestTID
+import iit.uvip.audiotactilebindingapp.utility.SpeechRecognitionManager
+import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
 import iit.uvip.audiotactilebindingapp.utility.showToast
+import iit.uvip.k4b.utility.SpeechManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
+import java.util.*
 
 /*
 Three operative modalities:
@@ -39,11 +47,19 @@ class TestFragment : BaseFragment(
     override val LOG_TAG                            = TestFragment::class.java.simpleName
     private val disposable                          = CompositeDisposable()
     private val TARGET_FRAGMENT_REQUEST_CODE:Int    = 1
+
+    private var answerDialogFragment:AnswerDialogFragment?      = null
     private var isAnswerDialogOn:Boolean            = false
-    private var currTrial:Int                       = 0
 
     private var isPaused:Boolean                    = false
     private var mHandler: Handler                   = Handler()
+
+    private lateinit var speechRecognitionManager: SpeechRecognitionManager
+    private lateinit var speechManager: SpeechManager
+
+    lateinit var onsetDate: Date
+
+    private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
     // ==========================================================================================================================
     // ==========================================================================================================================
     companion object {
@@ -52,11 +68,11 @@ class TestFragment : BaseFragment(
         @JvmStatic val EVENT_ANSWER_RESULT:String   = "answer_result"
         @JvmStatic val EVENT_TIME_TO_ANSWER:String  = "answer_time"
 
-        fun newIntent(resp_code: Int, elapsedTime:Int, resp_id:Int?): Intent {
+        fun newIntent(resp: String, elapsedTime: Int, resp_id: Int): Intent {
             val intent = Intent()
-            intent.putExtra(EVENT_ANSWER_CODE, resp_code)
+            intent.putExtra(EVENT_ANSWER_RESULT, resp)
             intent.putExtra(EVENT_TIME_TO_ANSWER, elapsedTime)
-            intent.putExtra(EVENT_ANSWER_RESULT, resp_id)
+            intent.putExtra(EVENT_ANSWER_CODE, resp_id)
             return intent
         }
     }
@@ -65,34 +81,38 @@ class TestFragment : BaseFragment(
 
         super.onActivityCreated(savedInstanceState)
 
+        speechRecognitionManager    = SpeechRecognitionManager(requireContext())
+        speechManager               = SpeechManager(resources, requireContext())
+
         val test: SubjectBasicParcel? = arguments?.getParcelable("test") ?: return
         when(test!!.type)
         {
             TestBasic.TEST_BISECTION_AUDIO,
             TestBasic.TEST_BISECTION_TACTILE,
             TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-            TestBasic.TEST_BISECTION_AUDIO_VIDEO        -> mTest = TestBIS(requireContext(), test, circleView)
+            TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), test, circleView)
 
-            TestBasic.TEST_MUSICAL_METERS -> mTest = TestMMD(requireContext(), test)
+            TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), test)
 
             TestBasic.TEST_TID_SHORT_AUDIO,
             TestBasic.TEST_TID_SHORT_TACTILE,
             TestBasic.TEST_TID_LONG_AUDIO,
-            TestBasic.TEST_TID_LONG_TACTILE -> mTest =
-                TestTID(requireContext(), test as SubjectTIDParcel)
+            TestBasic.TEST_TID_LONG_TACTILE         -> mTest = TestTID(requireContext(), test as SubjectTIDParcel)
 
             TestBasic.TEST_ATB_TIME,
-            TestBasic.TEST_ATB_FREQUENCY,
-            TestBasic.TEST_ATB_TIME_INF,
-            TestBasic.TEST_ATB_FREQUENCY_INF -> mTest =
-                TestATB(requireContext(), test as SubjectATBParcel)
+            TestBasic.TEST_ATB_FREQUENCY,           // to be coded
+            TestBasic.TEST_ATB_FREQUENCY_INF,       // to be coded
+            TestBasic.TEST_ATB_TIME_INF_15s,
+            TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), test as SubjectATBParcel)
+
+            TestBasic.TEST_ATVB_TIME_SINGLESTIM,
+            TestBasic.TEST_ATVB_TIME_DOUBLESTIM     -> mTest = TestATVB(requireContext(), test as SubjectATBParcel, circleView)
 
         }
         bt_next.visibility  = View.INVISIBLE
         bt_abort.visibility = View.INVISIBLE
         bt_pause.visibility = View.INVISIBLE
 
-        currTrial = 0
         if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId(false)
         if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS){
             bt_abort.visibility = View.VISIBLE
@@ -100,7 +120,7 @@ class TestFragment : BaseFragment(
         }
 
         mHandler.postDelayed({
-            mTest.show(currTrial)
+            mTest.show(mTest.currTrial)
         }, 1000L)
     }
 
@@ -153,10 +173,14 @@ class TestFragment : BaseFragment(
                 TestBasic.EVENT_STIMULI_START               -> {}
                 TestBasic.EVENT_STIMULI_END                 -> mTest.onTrialEnd()
                 TestBasic.EVENT_GIVE_ANSWER                 -> showAnswerDialog()
+                TestBasic.EVENT_GIVE_VOCAL_ANSWER           -> {
+                                                                bt_abort.visibility = View.VISIBLE
+                                                                listenForVocalAnswer(mTest.validAnswers)
+                }
                 TestBasic.EVENT_SHOW_NEXT_BUTTON            -> showNext()
                 TestBasic.EVENT_UPDATE_TRIAL_ID             -> showTrialId(false)
                 TestBasic.EVENT_UPDATE_TRIAL_ID_REMOVE      -> showTrialId(true)
-                TestBasic.EVENT_SHOW_1SECABORT             -> showShortAbort()
+                TestBasic.EVENT_SHOW_1SECABORT              -> showShortAbort()
             }
         }
         .addTo(disposable)
@@ -167,9 +191,9 @@ class TestFragment : BaseFragment(
             bt_next.visibility      = View.INVISIBLE
             bt_pause.visibility     = View.INVISIBLE
 
-            currTrial               = mTest.nextTrial()
+            mTest.nextTrial()
 
-            if(currTrial == TestBasic.EVENT_TEST_END) onTestEnded()
+            if(mTest.currTrial == TestBasic.EVENT_TEST_END) onTestEnded()
             else {
                 when(mTest.showTrialsID) {
                     TestBasic.TEST_SHOWTRIALS_ALWAYS    -> showTrialId(false)
@@ -180,6 +204,16 @@ class TestFragment : BaseFragment(
                 }
             }
         }
+    }
+    //---------------------------------------------------------------------------------------------------------------------------------------
+    private fun onNext(prev_result: String = "", elapsed: Int = -1){
+
+        // dont' know whether an answer dialog was present or it was listening for vocal response. stop both!
+        speechRecognitionManager.stop()
+        closeAnswerDialog()
+
+        // call next trial & check whether it was the last => test ended
+        if(mTest.nextTrial(prev_result, elapsed) == TestBasic.EVENT_TEST_END)    onTestEnded()
     }
     //---------------------------------------------------------------------------------------------------------------------------------------
     private fun showNext() {
@@ -214,20 +248,25 @@ class TestFragment : BaseFragment(
     private fun showAnswerDialog(){
 
         val b = Bundle()
-        b.putInt("trial_id",    currTrial)
+        b.putInt("trial_id",    mTest.currTrial)
         b.putInt("tot_trials",  mTest.nTrials)
         b.putString("question", mTest.mQuestion)
-        b.putString("answer1",  mTest.mAnswer1)
-        b.putString("answer2",  mTest.mAnswer2)
-        b.putString("answer3",  mTest.mAnswer3)
+        b.putStringArrayList("answers", mTest.validAnswers as ArrayList<String>)
 
-        val editNameDialogFragment = AnswerDialogFragment.newInstance("Some Title")
-        editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
-        editNameDialogFragment.arguments = b
-        editNameDialogFragment.setCancelable(false)
-        editNameDialogFragment.show(parentFragmentManager, "Inserisci risposta")
+        answerDialogFragment = AnswerDialogFragment.newInstance("Some Title")
+        (answerDialogFragment as AnswerDialogFragment).setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
+        (answerDialogFragment as AnswerDialogFragment).arguments = b
+        (answerDialogFragment as AnswerDialogFragment).setCancelable(false)
+        (answerDialogFragment as AnswerDialogFragment).show(parentFragmentManager, ANSWER_DIALOG_TAG)
         isAnswerDialogOn = true
     }
+
+    private fun closeAnswerDialog(){
+//        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
+        (answerDialogFragment as AnswerDialogFragment).dismiss()
+        isAnswerDialogOn = false
+    }
+
 
     // answer !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent?) {
@@ -237,16 +276,51 @@ class TestFragment : BaseFragment(
             when(data?.getIntExtra(EVENT_ANSWER_CODE, 0))
             {
                 TestBasic.EVENT_ANSWER_GIVEN -> {
-                    val result      = data.getIntExtra(EVENT_ANSWER_RESULT, -1)
+                    val result      = data.getStringExtra(EVENT_ANSWER_RESULT)
                     val elapsedTime = data.getIntExtra(EVENT_TIME_TO_ANSWER, -1)
-
-                    // call next trial & check whether it was the last => test ended
-                    if(mTest.nextTrial(result, elapsedTime) == TestBasic.EVENT_TEST_END)    onTestEnded()
+                    onNext(result, elapsedTime)
                 }
-                TestBasic.EVENT_TRIAL_REPEAT    -> mTest.show(currTrial, true)
+                TestBasic.EVENT_TRIAL_REPEAT    -> mTest.show(mTest.currTrial, true)
                 TestBasic.EVENT_TRIAL_ABORT     -> onAbortTest()
             }
         }
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------------------------
+    // create answer dialog and process response (repeat same trial or show next one
+    private fun listenForVocalAnswer(valid_results:List<String> = listOf()) {
+
+        bt_abort?.visibility = View.VISIBLE
+        onsetDate           = Date()
+        speechRecognitionManager.getSpeechInput()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+
+                    when (it.first) {
+                        SpeechRecognitionManager.REC_SUCCESS -> {
+                            Log.d("", "recognized word $it")
+
+                            // check whether given response is allowed
+                            val res:Boolean =   if(valid_results.isEmpty())     true
+                                                else                            valid_results.contains(it.second)
+
+                            if (res) {
+                                bt_abort.visibility = View.INVISIBLE
+                                val elapsedTime     = getTimeDifference(onsetDate)
+                                onNext(it.second!!, elapsedTime)
+
+                            } else
+                                // text recognized but not allowed
+                                speechManager.speak(resources.getString(R.string.char_recognition_wrong), TextToSpeech.QUEUE_FLUSH, clb={ listenForVocalAnswer(valid_results)})
+                        }
+                        else ->
+                            // RECOGNIZER ERROR
+                            speechManager.speak(it.second!!, TextToSpeech.QUEUE_FLUSH, clb={ listenForVocalAnswer(valid_results) })
+                    }
+                }
+            )
+            .addTo(disposable)
     }
     // ========================================================================================================================================
 }

@@ -58,11 +58,13 @@ open class SubjectATBParcel(
             parcel.writeInt(nextTrailModality)
             if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
             else parcel.writeList(taskcodes)
+
             if (whitenoise) parcel.writeInt(1)
             else parcel.writeInt(0)
         }
 
         override fun create(parcel: Parcel) = SubjectATBParcel(parcel)
+
         private fun loadJsonText(jsontext: String): SubjectATBParcel {
             val moshi = Moshi.Builder().build()
             val jsonAdapter = moshi.adapter(SubjectATBParcel::class.java)

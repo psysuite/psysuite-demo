@@ -92,9 +92,10 @@ class TestTID(ctx: Context, override val data: SubjectTIDParcel) : TestBasic(ctx
         val application = ctx.applicationContext as MainApplication
         vibrator        = application.vibrator
 
-        mAnswer1        = ctx.resources.getString(R.string.tid_rb1_text)
-        mAnswer2        = ""
-        mAnswer3        = ctx.resources.getString(R.string.tid_rb3_text)
+        validAnswers = mutableListOf(
+            ctx.resources.getString(R.string.tid_rb1_text),
+            ctx.resources.getString(R.string.tid_rb3_text)
+        )
 
         initTest()
     }
@@ -240,9 +241,9 @@ class TestTID(ctx: Context, override val data: SubjectTIDParcel) : TestBasic(ctx
         }
     }
 
-    override fun nextTrial(prev_result:Int, elapsed:Int):Int {
+    override fun nextTrial(prev_result: String, elapsed: Int): Int {
 
-        val newdelta:Float = mQuest.getNewValue((prev_result > 0))
+        val newdelta: Float = mQuest.getNewValue((prev_result != ""))
         when((mTrials[currTrial+1] as TrialTID).ref_first == 1) {
             true ->     (mTrials[currTrial+1] as TrialTID).delta2 = newdelta.toInt()
             else ->     (mTrials[currTrial+1] as TrialTID).delta1 = newdelta.toInt()

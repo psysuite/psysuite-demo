@@ -55,4 +55,7 @@ dependencies {
 
     implementation('com.squareup.moshi:moshi:1.9.2')
     implementation('com.squareup.moshi:moshi-kotlin:1.9.2')
+
+    implementation 'com.intentfilter:android-permissions:2.0.49'
+
 }

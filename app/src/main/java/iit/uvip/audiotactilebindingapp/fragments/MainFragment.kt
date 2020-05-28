@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.Navigation
+import iit.uvip.audiotactilebindingapp.MainActivity
 import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBDialogFragment
 import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBParcel
 import iit.uvip.audiotactilebindingapp.tests.atb.TestATB
+import iit.uvip.audiotactilebindingapp.tests.atvb.TestATVB
 import iit.uvip.audiotactilebindingapp.tests.bis.TestBIS
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_dialog.SubjectBasicDialogFragment
@@ -30,10 +32,10 @@ class MainFragment : BaseFragment(
 
     companion object {
         @JvmStatic val TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE: Int    = 1
-        @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 2
-        @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 3
-        @JvmStatic
-        val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int = 4
+        @JvmStatic val TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE: Int   = 2
+        @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 3
+        @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 4
+        @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 5
         @JvmStatic val EVENT_SUBJECT:String                             = "subject"
     }
 
@@ -48,6 +50,10 @@ class MainFragment : BaseFragment(
 
         bt_start_atb_test.setOnClickListener {
             showATBSubjectDialog()
+        }
+
+        bt_start_atvb_test.setOnClickListener {
+            showATVBSubjectDialog()
         }
 
         bt_start_bisection.setOnClickListener {
@@ -76,6 +82,40 @@ class MainFragment : BaseFragment(
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
+    private fun showATVBSubjectDialog() {
+
+        subject = SubjectATBParcel.loadSubject()
+        subject.taskcodes = TestATVB.getConditionsInfo(requireContext())
+
+        subject.nextTrailModality = when ((activity as MainActivity).haveAudioRecordPermission) {
+            true    -> TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER
+            false   -> TestBasic.TEST_NEXTTRIAL_ANSWER
+        }
+
+        debugStart()
+        return
+
+        val bundle = Bundle()
+        bundle.putParcelable("subject", subject)
+
+        val editNameDialogFragment = SubjectATBDialogFragment.newInstance("Some Title")
+        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.arguments = bundle
+        editNameDialogFragment.setCancelable(false)
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
+    private fun debugStart() {
+        subject.label               = "a"
+        subject.age                 = 1
+        subject.gender              = 1
+        subject.type                = TestBasic.TEST_ATVB_TIME_SINGLESTIM
+        subject.nextTrailModality   = TestBasic.EVENT_GIVE_VOCAL_NORMAL_ANSWER
+        val bundle = Bundle()
+        bundle.putParcelable("test", subject)
+        Navigation.findNavController(bt_start_bisection).navigate(R.id.action_mainFragment_to_testFragment, bundle)
     }
 
     private fun showTIDSubjectDialog(){
@@ -140,6 +180,11 @@ class MainFragment : BaseFragment(
 
         when(requestCode){
             TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE -> {
+                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectATBParcel
+                (subject as SubjectATBParcel).writeJson(requireContext())
+            }
+
+            TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE -> {
                 subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectATBParcel
                 (subject as SubjectATBParcel).writeJson(requireContext())
             }

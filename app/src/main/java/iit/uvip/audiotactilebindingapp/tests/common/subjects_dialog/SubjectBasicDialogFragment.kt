@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.RadioButton
 import androidx.fragment.app.DialogFragment
@@ -123,6 +124,31 @@ open class SubjectBasicDialogFragment: DialogFragment()
                 false   -> TestBasic.TEST_NEXTTRIAL_AUTO
             }
         }
+
+        spCondition.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if ((spCondition.selectedItem as TaskCode).id == TestBasic.TEST_ATB_TIME) {
+                    swInteractive.visibility = View.GONE
+                    labInteractive.visibility = View.GONE
+                    subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_ANSWER
+                } else {
+                    swInteractive.visibility = View.VISIBLE
+                    labInteractive.visibility = View.VISIBLE
+                    if (subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_NOCHOOSE && subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_ANSWER) {
+                        swInteractive?.isChecked = false
+                        subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_AUTO
+                    }
+                }
+            }
+        }
+
     }
 
     private fun showInteractive(show: Boolean) {
@@ -147,6 +173,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
                 swInteractive?.isChecked = false
             }
             TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
+            TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER,
             TestBasic.TEST_NEXTTRIAL_ANSWER -> showInteractive(false)
         }
         txtName.setText(subj.label)
@@ -212,7 +239,11 @@ open class SubjectBasicDialogFragment: DialogFragment()
         subject.gender = gender
 
         // only If user can select interaction modality, update his/her selection
-        if (subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_NOCHOOSE && subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_ANSWER) {
+        if (subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_NOCHOOSE &&
+            subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_ANSWER &&
+            subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER
+        ) {
+
             subject.nextTrailModality = when (swInteractive?.isChecked) {
                 true -> TestBasic.TEST_NEXTTRIAL_BUTTON
                 false -> TestBasic.TEST_NEXTTRIAL_AUTO

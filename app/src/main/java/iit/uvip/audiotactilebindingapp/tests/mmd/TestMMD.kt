@@ -26,9 +26,10 @@ class TestMMD(ctx: Context, override val data: SubjectBasicParcel) : TestBasic(c
 
     init{
 
-        mAnswer1        = ctx.resources.getString(R.string.mmeters_rb1_text)
-        mAnswer2        = ""
-        mAnswer3        = ctx.resources.getString(R.string.mmeters_rb3_text)
+        validAnswers = mutableListOf(
+            ctx.resources.getString(R.string.mmeters_rb1_text),
+            ctx.resources.getString(R.string.mmeters_rb3_text)
+        )
 
         initTest()
     }

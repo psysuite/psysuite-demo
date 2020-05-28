@@ -3,20 +3,25 @@ package iit.uvip.audiotactilebindingapp
 import android.Manifest
 import android.content.DialogInterface
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.intentfilter.androidpermissions.PermissionManager
+import com.intentfilter.androidpermissions.models.DeniedPermissions
 import iit.uvip.audiotactilebindingapp.fragments.BaseFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, DialogInterface.OnDismissListener  {
+
+    var haveAudioRecordPermission: Boolean = false
 
     private val TEST_PERMISSIONS_REQUEST_WRITE = 1
     private val TEST_PERMISSIONS_REQUEST_INTERNET = 2
@@ -29,6 +34,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         setupActionBarWithNavController(findNavController(R.id.my_nav_host_fragment))
         findNavController(R.id.my_nav_host_fragment).addOnDestinationChangedListener(this)
+
+        checkPermissions(Manifest.permission.RECORD_AUDIO)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),TEST_PERMISSIONS_REQUEST_WRITE)
@@ -45,6 +52,21 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus)
             refreshNavigationVisibility()
+    }
+
+    private fun checkPermissions(perm: String) {
+        val permissionManager: PermissionManager = PermissionManager.getInstance(applicationContext)
+        permissionManager.checkPermissions(
+            Collections.singleton(perm),
+            object : PermissionManager.PermissionRequestListener {
+                override fun onPermissionGranted() {
+                    haveAudioRecordPermission = true
+                }
+
+                override fun onPermissionDenied(deniedPermissions: DeniedPermissions) {
+                    haveAudioRecordPermission = false
+                }
+            })
     }
 
     fun refreshNavigationVisibility() {

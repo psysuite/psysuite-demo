@@ -8,7 +8,6 @@ import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_atb.*
-import kotlinx.android.synthetic.main.fragment_subject_info_basic.spCondition
 
 // add whitenoise check button
 class SubjectATBDialogFragment : SubjectBasicDialogFragment() {
@@ -46,8 +45,6 @@ class SubjectATBDialogFragment : SubjectBasicDialogFragment() {
     override fun updateSubject(): SubjectATBParcel? {
         subject = super.updateSubject() as SubjectATBParcel
         (subject as SubjectATBParcel).whitenoise = swWhiteNoise.isChecked
-        subject.type =
-            TestATB.getConditionsInfo(requireContext())[spCondition.selectedItemPosition].id
         return subject as SubjectATBParcel
     }
 }

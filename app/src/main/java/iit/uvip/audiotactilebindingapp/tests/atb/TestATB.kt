@@ -40,11 +40,13 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
     private val TYPE_TACTILE        = 1
     private val TYPE_AUDIOTACTILE   = 2
 
-    private val STIM_DURATION_INF = 2000L
-    private val ISI_INF = 4000L
+    private val STIM_DURATION_INF       = 1000L
+    private val ISI_INF                 = 2000L
+    private val STIM_DURATION_INF_15    = 1500L
+    private val ISI_INF_15              = 3000L
 
-    private val STIM_DURATION = 1000L
-    private val ISI = 2000L
+    private val STIM_DURATION           = 1000L
+    private val ISI                     = 2000L
 
     private val EVENT_SECOND_TRAIN  = 1201
 
@@ -60,16 +62,8 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
 
     private val amplitude = 100
     private var vibration_trains_timings: MutableList<LongArray> = mutableListOf(
-        STIM_DUR_AT,
-        STIM_DUR_A200_T,
-        STIM_DUR_A_T200,
-        STIM_DUR_A,
-        STIM_DUR_A500_T,
-        STIM_DUR_A_T500,
-        STIM_DUR_T,
-        STIM_DUR_A800_T,
-        STIM_DUR_A_T800
-    )
+        STIM_DUR_AT, STIM_DUR_A200_T, STIM_DUR_A_T200, STIM_DUR_A, STIM_DUR_A500_T, STIM_DUR_A_T500, STIM_DUR_T, STIM_DUR_A800_T, STIM_DUR_A_T800)
+
     private var vibrator: VibrationManager? = null
 
     private var vibration_trains_amplitudes: MutableList<IntArray> = mutableListOf(
@@ -93,22 +87,8 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
 
         fun getConditionsInfo(ctx: Context): List<TaskCode> {
             return mutableListOf(
-                TaskCode(
-                    TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.time),
-                    TEST_ATB_TIME
-                ),
-                TaskCode(
-                    TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.frequency),
-                    TEST_ATB_FREQUENCY
-                ),
-                TaskCode(
-                    TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.time_infants),
-                    TEST_ATB_TIME_INF
-                ),
-                TaskCode(
-                    TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.frequency_infants),
-                    TEST_ATB_FREQUENCY_INF
-                )
+                TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.time), TEST_ATB_TIME),
+                TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atv_subtask_time_infants), TEST_ATB_TIME_INF)
             )
         }
     }
@@ -116,142 +96,79 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
 
     init{
 
-        vibrator = application.vibrator
+        vibrator            = application.vibrator
         nextTrailModality   = data.nextTrailModality
-        abortMode = TEST_ABORT_TRIALEND       // abort @ trial end
-        showTrialsID = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
+        abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
+        showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
-        if (data.whitenoise) noise = MediaPlayer.create(
-            ctx,
-            ctx.resources.getIdentifier("wnoise_20s", "raw", ctx.packageName)
-        )
+        if (data.whitenoise) noise = MediaPlayer.create(ctx, ctx.resources.getIdentifier("wnoise_20s", "raw", ctx.packageName))
 
-        tone1sec = MediaPlayer.create(
-            ctx,
-            ctx.resources.getIdentifier("tone200hz_1sec", "raw", ctx.packageName)
-        )
-        tone2sec = MediaPlayer.create(
-            ctx,
-            ctx.resources.getIdentifier("tone200hz_2sec", "raw", ctx.packageName)
-        )
+        tone1sec = MediaPlayer.create(ctx, ctx.resources.getIdentifier("tone200hz_1sec", "raw", ctx.packageName))
+        tone2sec = MediaPlayer.create(ctx, ctx.resources.getIdentifier("tone200hz_2sec", "raw", ctx.packageName))
 
-        when (data.type) {
-            TEST_ATB_FREQUENCY_INF,
-            TEST_ATB_TIME_INF -> {
-                curISI = ISI_INF
-                curStimDuration = STIM_DURATION_INF
-            }
-            TEST_ATB_FREQUENCY,
-            TEST_ATB_TIME -> {
-                curISI = ISI
-                curStimDuration = STIM_DURATION
-            }
-        }
-        when (data.type) {
-            TEST_ATB_TIME,
-            TEST_ATB_TIME_INF -> initTimeArrays()
+        mQuestion = ctx.resources.getString(R.string.atb_question)
+        validAnswers = mutableListOf(ctx.resources.getString(R.string.atb_rb1_text), ctx.resources.getString(R.string.atb_rb3_text))
 
-            TEST_ATB_FREQUENCY,
-            TEST_ATB_FREQUENCY_INF -> initFreqArrays()
-        }
         initTest()
     }
 
     private fun initTimeArrays() {
-        STIM_DUR_AT = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration
-        )
-        STIM_DUR_A200_T = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration
-        )
-        STIM_DUR_A_T200 = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration + 200L,
-            curStimDuration,
-            curStimDuration + 200L
-        )
+        STIM_DUR_AT = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration)
+        STIM_DUR_A200_T = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration)
+        STIM_DUR_A_T200 = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration + 200L, curStimDuration, curStimDuration + 200L)
         STIM_DUR_A = longArrayOf(curStimDuration, curStimDuration, curStimDuration)
-        STIM_DUR_A500_T = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration
-        )
-        STIM_DUR_A_T500 = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration + 500L,
-            curStimDuration,
-            curStimDuration + 500L
-        )
-        STIM_DUR_T = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration
-        )
-        STIM_DUR_A800_T = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration
-        )
-        STIM_DUR_A_T800 = longArrayOf(
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration,
-            curStimDuration + 800L,
-            curStimDuration,
-            curStimDuration + 800L
-        )
+        STIM_DUR_A500_T = longArrayOf( curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration)
+        STIM_DUR_A_T500 = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration + 500L, curStimDuration, curStimDuration + 500L)
+        STIM_DUR_T = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration)
+        STIM_DUR_A800_T = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration)
+        STIM_DUR_A_T800 = longArrayOf(curStimDuration, curStimDuration, curStimDuration, curStimDuration, curStimDuration + 800L, curStimDuration, curStimDuration + 800L)
 
-        vibration_trains_timings = mutableListOf(
-            STIM_DUR_AT,
-            STIM_DUR_A200_T,
-            STIM_DUR_A_T200,
-            STIM_DUR_A,
-            STIM_DUR_A500_T,
-            STIM_DUR_A_T500,
-            STIM_DUR_T,
-            STIM_DUR_A800_T,
-            STIM_DUR_A_T800
-        )
+        vibration_trains_timings = mutableListOf(STIM_DUR_AT, STIM_DUR_A200_T, STIM_DUR_A_T200, STIM_DUR_A, STIM_DUR_A500_T, STIM_DUR_A_T500, STIM_DUR_T, STIM_DUR_A800_T, STIM_DUR_A_T800)
     }
 
-    private fun initFreqArrays() {
+    private fun initFreqArrays() {}
 
-    }
+    override fun initTest() {
 
-    override fun initTest(){
+        when (data.type) {
+
+            TEST_ATB_TIME_INF_15s -> {
+                curISI = ISI_INF_15            // 3000L
+                curStimDuration = STIM_DURATION_INF_15  // 1500L
+            }
+            TEST_ATB_FREQUENCY_INF            -> {
+                curISI = ISI_INF               // 4000L
+                curStimDuration = STIM_DURATION_INF     // 2000L
+            }
+            TEST_ATB_FREQUENCY,
+            TEST_ATB_TIME,
+            TEST_ATB_TIME_INF   -> {
+                curISI          = ISI           // 2000L
+                curStimDuration = STIM_DURATION // 1000L
+            }
+        }
+        when (data.type) {
+            TEST_ATB_TIME,
+            TEST_ATB_TIME_INF_15s,
+            TEST_ATB_TIME_INF       -> initTimeArrays()
+
+            TEST_ATB_FREQUENCY,
+            TEST_ATB_FREQUENCY_INF  -> initFreqArrays()
+        }
+
+        when (data.type) {
+            TEST_ATB_TIME -> createTrials_Time()
+
+            TEST_ATB_TIME_INF_15s,
+            TEST_ATB_TIME_INF -> createTrials_Time_Infants()
+
+            TEST_ATB_FREQUENCY,
+            TEST_ATB_FREQUENCY_INF -> initFreqArrays()
+        }
+
+
         // mTrials list
-        createTrials()
+        createTrials_Time_Infants()
         currTone = tone2sec
 
         nTrials     = mTrials.size
@@ -265,14 +182,16 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
 
         if(isRepeat)    mTrial.repetitions++
 
-        noise?.setVolume(0.5f, 0.5f)
+        noise?.setVolume(0.4f, 0.4f)
         noise?.start()
 
-        firstTrain(mTrial.type)     // schedule first 2 stimuli
-        secondTrain(mTrial.type)    // schedule second 2 stimuli
+        mStimuliHandler.postDelayed({
+            firstTrain(mTrial.type)     // schedule first 2 stimuli
+            secondTrain(mTrial.type)    // schedule second 2 stimuli
+        }, 1000L)
     }
 
-    override fun nextTrial(prev_result: Int, elapsed: Int): Int {
+    override fun nextTrial(prev_result: String, elapsed: Int): Int {
         testEvent.accept(EVENT_UPDATE_TRIAL_ID)
         return super.nextTrial(prev_result, elapsed)
     }
@@ -283,13 +202,16 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
         noise?.stop()
         noise?.prepare()
 
-        if(nextTrailModality == TEST_NEXTTRIAL_BUTTON)
-            testEvent.accept(EVENT_SHOW_NEXT_BUTTON)
-        else{
-            // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
-            mStimuliHandler.postDelayed({
-                testEvent.accept(EVENT_SHOW_1SECABORT)
-            }, curISI)
+        when (nextTrailModality) {
+            TEST_NEXTTRIAL_BUTTON -> testEvent.accept(EVENT_SHOW_NEXT_BUTTON)
+            TEST_NEXTTRIAL_ANSWER -> testEvent.accept(EVENT_GIVE_ANSWER)
+            TEST_NEXTTRIAL_VOICE_ANSWER -> testEvent.accept(EVENT_GIVE_VOCAL_ANSWER)
+            TEST_NEXTTRIAL_AUTO -> {
+                // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
+                mStimuliHandler.postDelayed({
+                    testEvent.accept(EVENT_SHOW_1SECABORT)
+                }, curISI)
+            }
         }
     }
 
@@ -328,10 +250,9 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
 
     // class Trial(var id:Int=-1, val type:Int, val label:String, var audio_id:Int, var correct_answer:Int=-1, var user_answer:Int=-1,
     //                 var success:Boolean=false, var elapsed:Int=-1, var repetitions:Int=1)
-    private fun createTrials()
-    {
-        var cnt     = -1
-        for(i in 0 until NUM_REPETITIONS) {
+    private fun createTrials_Time_Infants() {
+        var cnt = -1
+        for (i in 0 until NUM_REPETITIONS) {
             mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T))
             mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A))
             mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A800_T))
@@ -340,6 +261,26 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
             mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T))
             mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T800))
             mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_T))
+        }
+    }
+
+    // class Trial(var id:Int=-1, val type:Int, val label:String, var audio_id:Int, var correct_answer:Int=-1, var user_answer:Int=-1,
+    //                 var success:Boolean=false, var elapsed:Int=-1, var repetitions:Int=1)
+    private fun createTrials_Time() {
+        var cnt = -1
+        for (i in 0 until NUM_REPETITIONS) {
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T200))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A800_T))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_T))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T500))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A200_T))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T800))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_T))
+            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A500_T))
         }
     }
 
@@ -523,27 +464,6 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
             }
         }
     }
-
-    // class Trial(var id:Int=-1, val type:Int, val label:String, var audio_id:Int, var correct_answer:Int=-1, var user_answer:Int=-1,
-    //                 var success:Boolean=false, var elapsed:Int=-1, var repetitions:Int=1)
-    private fun createTrials_old() {
-        var cnt = -1
-        for (i in 0 until NUM_REPETITIONS) {
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T200))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A800_T))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_T))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T500))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A200_T))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A_T800))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_T))
-            mTrials.add(TrialATB(++cnt, STIM_TYPE_TIME_A500_T))
-        }
-    }
-
 }
 
 /*

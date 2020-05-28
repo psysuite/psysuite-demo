@@ -19,21 +19,55 @@
     <string name="session">sessione</string>
     <string name="condition">condizione sperimentale</string>
 
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+
+    <string name="warn_tts_language_notsupported">lingua non supportata dal servizio di text-to-speech</string>
+    <string name="error_tts_notinitialized">il servizio di text-to-speech non si é inizializzato</string>
+
+    <string name="char_recognition_error">Errore di riconoscimento del parlato: %1$s</string>
+    <string name="char_recognition_empty">Non sono riuscito a riconoscere la risposta</string>
+    <string name="char_recognition_wrong">la risposta che hai dato non è corretta, ripeti</string>
+
+    <string name="char_recognition_timeout_error">tempo di attesa scaduto, ripeti</string>
+    <string name="char_recognition_network_error">errore di rete</string>
+    <string name="char_recognition_busy_error">riconoscitore occupato</string>
+    <string name="char_recognition_generic_error">errore generico </string>
+    <string name="char_recognition_missing_permission">mancano i permessi per registrare l\'audio</string>
+
     <!-- ATB -->
-    <string name="start_atb">Audio-Tactile Binding</string>
+    <string name="start_atb">Audio-Tactile Binding (AT-B)</string>
     <string name="atb_interactivity">interattivo</string>
 
-    <string-array name="atb_tests_array">
+    <string-array name="unused_atb_tests_array">
         <item>normale</item>
         <item>infanti latenze</item>
         <item>infanti frequenze</item>
     </string-array>
     <string name="whitenoise">aggiungi rumore bianco</string>
 
-    <string name="time_infants">tempo infanti</string>
-    <string name="frequency_infants">frequenza infanti</string>
+    <string name="atv_subtask_time_infants">tempo infanti</string>
+    <string name="atv_subtask_time_infants_15s">tempo infanti 1.5s</string>
+    <string name="atv_subtask_frequency_infants">frequenza infanti</string>
+
+    <string name="atb_rb1_text">uguali</string>
+    <string name="atb_rb3_text">diversi</string>
+    <string name="atb_question">Sono uguali?</string>
+
+    <!-- ATVB -->
+    <string name="start_atvb">Audio-Tactile-Visual Binding (ATV-B)</string>
+
+    <string name="atvb_subtask_time_single">Stimolo singolo</string>
+    <string name="atvb_subtask_time_double">Stimilo doppio</string>
+
+
+    <string name="atvb_rb1_text">si</string>
+    <string name="atvb_rb3_text">no</string>
+    <string name="atvb_question">Sono uguali?</string>
+
+
     <!-- TID -->
-    <string name="start_tid">Temporal Interval Discrimination</string>
+    <string name="start_tid">Temporal Interval Discrimination (TID)</string>
     <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
     <string name="tid_question_text_tactile">L\'intervallo tra la prima coppia di vibrazione era maggiore o minore dell\'intervallo tra la seconda coppia</string>
 
@@ -68,7 +102,7 @@
     <string name="tid_start_training_text">INIZIA TRAINING</string>
 
     <!-- BISECTION -->
-    <string name="start_bisection">BISECTION</string>
+    <string name="start_bisection">MULTIMODAL BISECTION</string>
 
     <string-array name="bis_sessions_array">
         <item>pre test</item>
@@ -88,7 +122,7 @@
     <string name="bisection_rb3_text">Più vicino al terzo</string>
 
     <!-- MUSICAL METERS -->
-    <string name="start_musicalmeter">MUSICAL METER</string>
+    <string name="start_musicalmeter">MUSICAL METER DISCRIMINATION (MMD)</string>
 
     <string name="mmeters_question_text">Le due sequenze sono uguali?</string>
 

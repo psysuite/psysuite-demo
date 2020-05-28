@@ -50,6 +50,10 @@ class VibrationManager(private val ctx: Context) {
             return
     }
 
+    fun cancel() {
+        vibrator?.cancel()
+    }
+
     // ===========================================================================================================
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun vibrateSingle26(duration: Long, ampl: Int = VibrationEffect.DEFAULT_AMPLITUDE) {

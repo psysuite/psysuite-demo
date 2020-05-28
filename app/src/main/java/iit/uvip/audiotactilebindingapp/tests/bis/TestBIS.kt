@@ -102,10 +102,10 @@ class TestBIS(
     init{
         val application = ctx.applicationContext as MainApplication
         vibrator        = application.vibrator
-
-        mAnswer1        = ctx.resources.getString(R.string.bisection_rb1_text)
-        mAnswer2        = ""
-        mAnswer3        = ctx.resources.getString(R.string.bisection_rb3_text)
+        validAnswers = mutableListOf(
+            ctx.resources.getString(R.string.bisection_rb1_text),
+            ctx.resources.getString(R.string.bisection_rb3_text)
+        )
 
         initTest()
     }
