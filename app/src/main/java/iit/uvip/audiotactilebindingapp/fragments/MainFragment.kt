@@ -2,19 +2,22 @@ package iit.uvip.audiotactilebindingapp.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.navigation.Navigation
+import iit.uvip.audiotactilebindingapp.MainActivity
 import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.subjects.SubjectATBParcel
-import iit.uvip.audiotactilebindingapp.subjects.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.subjects.SubjectTIDParcel
-import iit.uvip.audiotactilebindingapp.subjects.SubjectsBasic
-import iit.uvip.audiotactilebindingapp.tests.TestATBinding
-import iit.uvip.audiotactilebindingapp.tests.TestParcel
-import iit.uvip.audiotactilebindingapp.tests.TestBasic
-import iit.uvip.audiotactilebindingapp.tests.TestTID
+import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBDialogFragment
+import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBParcel
+import iit.uvip.audiotactilebindingapp.tests.atb.TestATB
+import iit.uvip.audiotactilebindingapp.tests.atvb.TestATVB
+import iit.uvip.audiotactilebindingapp.tests.bis.TestBIS
+import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.audiotactilebindingapp.tests.mmd.TestMMD
+import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDDialogFragment
+import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDParcel
+import iit.uvip.audiotactilebindingapp.tests.tid.TestTID
 import kotlinx.android.synthetic.main.fragment_main.*
 
 
@@ -24,29 +27,20 @@ class MainFragment : BaseFragment(
     hideAndroidControls = false
 )
 {
-    private lateinit var mSubjects: SubjectsBasic
-    private var subject: SubjectBasicParcel? = null
-
+    private lateinit var subject: SubjectBasicParcel
     override val LOG_TAG:String = MainFragment::class.java.simpleName
-
-    private var trainingTestName:String = ""
-    private var trainingTestCode:Int = -1
 
     companion object {
         @JvmStatic val TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE: Int    = 1
-        @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 2
+        @JvmStatic val TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE: Int   = 2
+        @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 3
+        @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 4
+        @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 5
         @JvmStatic val EVENT_SUBJECT:String                             = "subject"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mSubjects = SubjectsBasic(requireContext())
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-    override fun onResume() {
+    override fun onResume(){
         super.onResume()
-
-        subject = mSubjects.loadSubject()
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
@@ -57,6 +51,18 @@ class MainFragment : BaseFragment(
         bt_start_atb_test.setOnClickListener {
             showATBSubjectDialog()
         }
+
+        bt_start_atvb_test.setOnClickListener {
+            showATVBSubjectDialog()
+        }
+
+        bt_start_bisection.setOnClickListener {
+            showBISSubjectDialog()
+        }
+
+        bt_start_musicalmeter.setOnClickListener {
+            showMMDSubjectDialog()
+        }
     }
 
     //================================================================================================================
@@ -64,17 +70,61 @@ class MainFragment : BaseFragment(
     //================================================================================================================
     private fun showATBSubjectDialog(){
 
-        val bundle = Bundle()
+        subject = SubjectATBParcel.loadSubject()
+        subject.taskcodes = TestATB.getConditionsInfo(requireContext())
+        subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_BUTTON   // can choose whether pausing each trial
+
+        val bundle  = Bundle()
         bundle.putParcelable("subject", subject)
 
         val editNameDialogFragment = SubjectATBDialogFragment.newInstance("Some Title")
         editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
-        editNameDialogFragment.show(requireFragmentManager(), "Modifica Soggetto")
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
+    private fun showATVBSubjectDialog() {
+
+        subject = SubjectATBParcel.loadSubject()
+        subject.taskcodes = TestATVB.getConditionsInfo(requireContext())
+
+        subject.nextTrailModality = when ((activity as MainActivity).haveAudioRecordPermission) {
+            true    -> TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER
+            false   -> TestBasic.TEST_NEXTTRIAL_ANSWER
+        }
+
+        debugStart()
+        return
+
+        val bundle = Bundle()
+        bundle.putParcelable("subject", subject)
+
+        val editNameDialogFragment = SubjectATBDialogFragment.newInstance("Some Title")
+        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.arguments = bundle
+        editNameDialogFragment.setCancelable(false)
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
+    private fun debugStart() {
+        subject.label               = "a"
+        subject.age                 = 1
+        subject.gender              = 1
+        subject.type                = TestBasic.TEST_ATVB_TIME_SINGLESTIM
+        subject.nextTrailModality   = TestBasic.EVENT_GIVE_VOCAL_NORMAL_ANSWER
+        val bundle = Bundle()
+        bundle.putParcelable("test", subject)
+        Navigation.findNavController(bt_start_bisection).navigate(R.id.action_mainFragment_to_testFragment, bundle)
     }
 
     private fun showTIDSubjectDialog(){
+
+        subject = SubjectTIDParcel.loadSubject()
+        subject.taskcodes = TestTID.getConditionsInfo(requireContext())
+        subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_ANSWER
+        (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
+        (subject as SubjectTIDParcel).first_modality = 0
 
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
@@ -83,7 +133,40 @@ class MainFragment : BaseFragment(
         editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
-        editNameDialogFragment.show(requireFragmentManager(), "Modifica Soggetto")
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
+    private fun showBISSubjectDialog(){
+
+        subject = SubjectBasicParcel.loadSubject()
+        subject.taskcodes = TestBIS.getConditionsInfo(requireContext())
+        subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_ANSWER
+
+        val bundle = Bundle()
+        bundle.putParcelable("subject", subject)
+
+        val editNameDialogFragment = SubjectBasicDialogFragment.newInstance("Some Title")
+        editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.arguments = bundle
+        editNameDialogFragment.setCancelable(false)
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
+    private fun showMMDSubjectDialog() {
+
+        subject = SubjectBasicParcel.loadSubject()
+        subject.taskcodes =
+            TestMMD.getConditionsInfo(requireContext()) // taskcodes contains one element. subject.type is set automatically
+        subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_ANSWER
+
+        val bundle = Bundle()
+        bundle.putParcelable("subject", subject)
+
+        val editNameDialogFragment = SubjectBasicDialogFragment.newInstance("Some Title")
+        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.arguments = bundle
+        editNameDialogFragment.setCancelable(false)
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
     }
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
@@ -91,53 +174,39 @@ class MainFragment : BaseFragment(
     // subject info !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
         // Make sure fragment codes match up
+
+        if (data?.getParcelableExtra(EVENT_SUBJECT) as SubjectBasicParcel? == null)
+            return
+
         when(requestCode){
             TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) ?: subject
-                if (subject != null) mSubjects.writeJson(subj = subject)
-                onATBSubjectUpdated()
+                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectATBParcel
+                (subject as SubjectATBParcel).writeJson(requireContext())
+            }
+
+            TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE -> {
+                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectATBParcel
+                (subject as SubjectATBParcel).writeJson(requireContext())
             }
 
             TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) ?: subject
-                if (subject != null) mSubjects.writeJson(subj = subject)
-                onTIDSubjectUpdated()
+                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectTIDParcel
+                (subject as SubjectTIDParcel).writeJson(requireContext())
+            }
+
+            TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE -> {
+                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectBasicParcel
+                subject.writeJson(requireContext())
+            }
+
+            TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE -> {
+                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectBasicParcel
+                subject.writeJson(requireContext())
             }
         }
-    }
-    //================================================================================================================
-    // 3 - SUBJECT DATA INSERTED
-    //================================================================================================================
-    private fun onATBSubjectUpdated(){
 
-        if(subject != null) {
-            val test_param = TestATBinding.getExpFactorsType()
-            trainingTestCode = test_param.first
-            trainingTestName = test_param.second
-            startATBtest()
-        }
-    }
-
-    private fun onTIDSubjectUpdated(){
-
-        if(subject != null) {
-            val test_param = TestTID.getExpFactorsType(subject as SubjectTIDParcel)
-            trainingTestCode = test_param.first
-            trainingTestName = test_param.second
-        }
-    }
-    //================================================================================================================
-    // 4 - START TESTS
-    //================================================================================================================
-    private fun startATBtest(){
         val bundle = Bundle()
-        bundle.putParcelable("test", TestParcel(trainingTestCode, trainingTestName, subject!!.label, session = TestBasic.TEST_PRE, nextTrailModality = (subject!! as SubjectATBParcel).nextTrailModality))
-        Navigation.findNavController(bt_start_atb_test).navigate(R.id.action_mainFragment_to_testFragment, bundle)
-    }
-
-    private fun startTIDtest(){
-        val bundle = Bundle()
-        bundle.putParcelable("test", TestParcel(trainingTestCode, trainingTestName, subject!!.label, session = (subject!! as SubjectTIDParcel).session, nextTrailModality = TestBasic.TEST_NEXTTRIAL_ANSWER))
-        Navigation.findNavController(bt_start_atb_test).navigate(R.id.action_mainFragment_to_testFragment, bundle)
+        bundle.putParcelable("test", subject)
+        Navigation.findNavController(bt_start_bisection).navigate(R.id.action_mainFragment_to_testFragment, bundle)
     }
 }

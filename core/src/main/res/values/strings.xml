@@ -1,0 +1,16 @@
+<resources>
+
+    <string name="warn_tts_language_notsupported">lingua non supportata dal servizio di text-to-speech</string>
+    <string name="error_tts_notinitialized">il servizio di text-to-speech non si é inizializzato</string>
+
+    <string name="char_recognition_error">Errore di riconoscimento del parlato: %1$s</string>
+    <string name="char_recognition_empty">Non sono riuscito a riconoscere la risposta</string>
+    <string name="char_recognition_wrong">la risposta che hai dato non è corretta, ripeti</string>
+
+    <string name="char_recognition_timeout_error">tempo di attesa scaduto, ripeti</string>
+    <string name="char_recognition_network_error">errore di rete</string>
+    <string name="char_recognition_busy_error">riconoscitore occupato</string>
+    <string name="char_recognition_generic_error">errore generico </string>
+    <string name="char_recognition_missing_permission">mancano i permessi per registrare l\'audio</string>
+
+</resources>

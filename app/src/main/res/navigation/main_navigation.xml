@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="iit.uvip.audiotactilebindingapp.fragments.MainFragment"
-        android:label="Home"
+        android:label="U-VIP PSYCHOPHYSICS TESTER"
         tools:layout="@layout/fragment_main">
         <action
                 android:id="@+id/action_mainFragment_to_testFragment"
@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/testFragment"
         android:name="iit.uvip.audiotactilebindingapp.fragments.TestFragment"
-        android:label="TestFragment">
+        android:label="Run test....">
 
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>
 

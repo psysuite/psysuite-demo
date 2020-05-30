@@ -10,13 +10,51 @@
     <string name="resume">RIPRENDI</string>
     <string name="test_ended">Il Test è terminato</string>
 
+    <string name="name">NOME</string>
+    <string name="gender">SESSO</string>
+    <string name="age">ETA\'</string>
+
+    <string name="time">tempo</string>
+    <string name="frequency">frequenza</string>
+    <string name="session">sessione</string>
+    <string name="condition">condizione sperimentale</string>
+
+    <string name="yes">yes</string>
+    <string name="no">no</string>
 
     <!-- ATB -->
-    <string name="start_atb">INIZIA TEST ATB</string>
+    <string name="start_atb">Audio-Tactile Binding (AT-B)</string>
     <string name="atb_interactivity">interattivo</string>
 
+    <string-array name="unused_atb_tests_array">
+        <item>normale</item>
+        <item>infanti latenze</item>
+        <item>infanti frequenze</item>
+    </string-array>
+    <string name="whitenoise">aggiungi rumore bianco</string>
+
+    <string name="atv_subtask_time_infants">tempo infanti</string>
+    <string name="atv_subtask_time_infants_15s">tempo infanti 1.5s</string>
+    <string name="atv_subtask_frequency_infants">frequenza infanti</string>
+
+    <string name="atb_rb1_text">uguali</string>
+    <string name="atb_rb3_text">diversi</string>
+    <string name="atb_question">Sono uguali?</string>
+
+    <!-- ATVB -->
+    <string name="start_atvb">Audio-Tactile-Visual Binding (ATV-B)</string>
+
+    <string name="atvb_subtask_time_single">Stimolo singolo</string>
+    <string name="atvb_subtask_time_double">Stimilo doppio</string>
+
+
+    <string name="atvb_rb1_text">si</string>
+    <string name="atvb_rb3_text">no</string>
+    <string name="atvb_question">Sono uguali?</string>
+
+
     <!-- TID -->
-    <string name="start_tid">INIZIA TEST TID</string>
+    <string name="start_tid">Temporal Interval Discrimination (TID)</string>
     <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
     <string name="tid_question_text_tactile">L\'intervallo tra la prima coppia di vibrazione era maggiore o minore dell\'intervallo tra la seconda coppia</string>
 
@@ -39,9 +77,7 @@
         <item>seleziona sessione</item>
     </string-array>
 
-    <string name="tid_name_text">nome</string>
-    <string name="tid_gender_text">sesso</string>
-    <string name="tid_age_text">età</string>
+
 
     <string name="tid_group_interval_text">gruppo intervallo</string>
     <string name="tid_group_modality_text">gruppo modalità</string>
@@ -53,6 +89,16 @@
     <string name="tid_start_training_text">INIZIA TRAINING</string>
 
     <!-- BISECTION -->
+    <string name="start_bisection">MULTIMODAL BISECTION</string>
+
+    <string-array name="bis_sessions_array">
+        <item>pre test</item>
+        <item>session 1</item>
+        <item>session 2</item>
+        <item>session 3</item>
+        <item>post test</item>
+    </string-array>
+
     <string name="bisection_question_text_audio">Il secondo suono era più vicino al primo o al terzo?</string>
     <string name="bisection_question_text_video">La luce gialla era più vicina alla verde o alla rossa?</string>
     <string name="bisection_question_text_tactile">La seconda vibrazione era più vicina alla prima o alla terza?</string>
@@ -63,6 +109,8 @@
     <string name="bisection_rb3_text">Più vicino al terzo</string>
 
     <!-- MUSICAL METERS -->
+    <string name="start_musicalmeter">MUSICAL METER DISCRIMINATION (MMD)</string>
+
     <string name="mmeters_question_text">Le due sequenze sono uguali?</string>
 
     <string name="mmeters_rb1_text">SI, sono uguali</string>
