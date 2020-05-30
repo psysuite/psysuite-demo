@@ -5,7 +5,6 @@ import android.media.MediaPlayer
 import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 
 class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx, data)
 {
@@ -64,7 +63,7 @@ class TestATB(ctx: Context, override val data: SubjectATBParcel) : TestBasic(ctx
     private var vibration_trains_timings: MutableList<LongArray> = mutableListOf(
         STIM_DUR_AT, STIM_DUR_A200_T, STIM_DUR_A_T200, STIM_DUR_A, STIM_DUR_A500_T, STIM_DUR_A_T500, STIM_DUR_T, STIM_DUR_A800_T, STIM_DUR_A_T800)
 
-    private var vibrator: VibrationManager? = null
+    private var vibrator: org.albaspace.core.accessory.VibrationManager? = null
 
     private var vibration_trains_amplitudes: MutableList<IntArray> = mutableListOf(
         intArrayOf(amplitude, 0, amplitude, 0, amplitude, 0, amplitude),

@@ -17,15 +17,15 @@ import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasic
 import iit.uvip.audiotactilebindingapp.tests.mmd.TestMMD
 import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDParcel
 import iit.uvip.audiotactilebindingapp.tests.tid.TestTID
-import iit.uvip.audiotactilebindingapp.utility.SpeechRecognitionManager
-import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
-import iit.uvip.audiotactilebindingapp.utility.showToast
-import iit.uvip.k4b.utility.SpeechManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
+import org.albaspace.core.accessory.getTimeDifference
+import org.albaspace.core.accessory.showToast
+import org.albaspace.core.speech.SpeechManager
+import org.albaspace.core.speech.SpeechRecognitionManager
 import java.util.*
 
 /*
@@ -154,7 +154,7 @@ class TestFragment : BaseFragment(
     }
 
     private fun onTestEnded(){
-        showToast(getText(R.string.test_ended).toString(), requireContext())
+        showToast(getText(R.string.test_ended).toString(),requireContext())
         Navigation.findNavController(requireView()).navigate(R.id.action_testFragment_to_mainFragment)
     }
 
@@ -307,12 +307,13 @@ class TestFragment : BaseFragment(
 
                             if (res) {
                                 bt_abort.visibility = View.INVISIBLE
-                                val elapsedTime     = getTimeDifference(onsetDate)
+                                val elapsedTime     =
+                                    getTimeDifference(onsetDate)
                                 onNext(it.second!!, elapsedTime)
 
                             } else
                                 // text recognized but not allowed
-                                speechManager.speak(resources.getString(R.string.char_recognition_wrong), TextToSpeech.QUEUE_FLUSH, clb={ listenForVocalAnswer(valid_results)})
+                                speechManager.speak(resources.getString(org.albaspace.core.R.string.char_recognition_wrong), TextToSpeech.QUEUE_FLUSH, clb={ listenForVocalAnswer(valid_results)})
                         }
                         else ->
                             // RECOGNIZER ERROR

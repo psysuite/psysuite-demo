@@ -16,16 +16,9 @@ import iit.uvip.audiotactilebindingapp.fragments.MainFragment
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.utility.showToast
-import kotlinx.android.synthetic.main.fragment_subject_info_basic.*
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.bt_cancel
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.bt_clear
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.bt_confirm
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.labInteractive
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.radioGroupGender
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.swInteractive
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.txtAge
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.txtName
+import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
+
+import org.albaspace.core.accessory.showToast
 
 open class SubjectBasicDialogFragment: DialogFragment()
 {

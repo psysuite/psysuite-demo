@@ -10,8 +10,7 @@ import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
 import iit.uvip.audiotactilebindingapp.tests.common.TrialBasic
 import iit.uvip.audiotactilebindingapp.utility.QuestObject
-import iit.uvip.audiotactilebindingapp.utility.VibrationManager
-import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
+import org.albaspace.core.accessory.getTimeDifference
 import java.util.*
 
 
@@ -81,7 +80,7 @@ class TestTID(ctx: Context, override val data: SubjectTIDParcel) : TestBasic(ctx
         }
     }
 
-    var vibrator: VibrationManager?   // lateinit not necessary as initialized in constructor
+    var vibrator: org.albaspace.core.accessory.VibrationManager?   // lateinit not necessary as initialized in constructor
     private var mToneGen    = ToneGenerator(AudioManager.STREAM_SYSTEM, ToneGenerator.MAX_VOLUME)
     private var mTone       = ToneGenerator.TONE_CDMA_ALERT_INCALL_LITE
 

@@ -7,7 +7,6 @@ import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBParcel
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 
 class TestATVB(
     ctx: Context,
@@ -101,7 +100,7 @@ class TestATVB(
     private val EVENT_SECOND_TRAIN = 1201
 
     private val amplitude = 100
-    private var vibrator: VibrationManager? = null
+    private var vibrator: org.albaspace.core.accessory.VibrationManager? = null
 
     companion object {
 

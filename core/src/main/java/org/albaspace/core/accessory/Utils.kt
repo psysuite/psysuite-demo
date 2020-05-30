@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.utility
+package org.albaspace.core.accessory
 
 import android.app.DownloadManager
 import android.content.Context
@@ -19,7 +19,10 @@ fun showToast(text:String, ctx:Context, duration:Int=Toast.LENGTH_SHORT, gravity
 fun saveText(ctx:Context, filename: String, text: String, dir:String=Environment.DIRECTORY_DOWNLOADS, overwrite:Boolean=true, notifyDm:Boolean=false){
 
     if (!isExternalStorageWritable()){
-        showToast("Cannot write on External Storage", ctx)
+        showToast(
+            "Cannot write on External Storage",
+            ctx
+        )
         return
     }
     try {
@@ -29,7 +32,10 @@ fun saveText(ctx:Context, filename: String, text: String, dir:String=Environment
         val exist   = file.exists()
 
         if(exist) {
-            if (overwrite)  deleteFile(filename, dir)
+            if (overwrite) deleteFile(
+                filename,
+                dir
+            )
         }
 
         val bytes   = text.toByteArray(charset("UTF-8"))
@@ -52,7 +58,10 @@ fun saveText(ctx:Context, filename: String, text: String, dir:String=Environment
     }
     catch (exc: Exception)
     {
-        showToast("Could not save data to file!", ctx)
+        showToast(
+            "Could not save data to file!",
+            ctx
+        )
     }
 }
 

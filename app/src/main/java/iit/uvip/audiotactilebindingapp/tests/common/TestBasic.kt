@@ -7,8 +7,8 @@ import android.os.Parcelable
 import com.jakewharton.rxrelay2.PublishRelay
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.utility.deleteFile
-import iit.uvip.audiotactilebindingapp.utility.saveText
+import org.albaspace.core.accessory.deleteFile
+import org.albaspace.core.accessory.saveText
 import java.util.*
 
 

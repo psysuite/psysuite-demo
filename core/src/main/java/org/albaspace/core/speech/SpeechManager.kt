@@ -1,4 +1,4 @@
-package iit.uvip.k4b.utility
+package org.albaspace.core.speech
 
 import android.content.Context
 import android.content.res.Resources
@@ -7,7 +7,7 @@ import android.os.Handler
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
-import iit.uvip.audiotactilebindingapp.R
+import org.albaspace.core.R
 import java.util.*
 
 

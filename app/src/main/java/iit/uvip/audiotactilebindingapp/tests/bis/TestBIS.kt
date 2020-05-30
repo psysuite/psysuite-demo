@@ -9,7 +9,6 @@ import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 
 class TestBIS(
     ctx: Context,
@@ -92,7 +91,7 @@ class TestBIS(
     )
 
 
-    var vibrator: VibrationManager?   // lateinit not necessary as initialized in constructor
+    var vibrator: org.albaspace.core.accessory.VibrationManager?   // lateinit not necessary as initialized in constructor
     private var mToneGen    = ToneGenerator(AudioManager.STREAM_SYSTEM, ToneGenerator.MAX_VOLUME)
     private var mTone       = ToneGenerator.TONE_CDMA_ALERT_INCALL_LITE
 

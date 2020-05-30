@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.utility
+package org.albaspace.core.accessory
 
 import android.content.Context
 import android.os.Build

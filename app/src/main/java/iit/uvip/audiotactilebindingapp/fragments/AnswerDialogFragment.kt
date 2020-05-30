@@ -10,9 +10,9 @@ import android.widget.RadioButton
 import androidx.fragment.app.DialogFragment
 import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.utility.getTimeDifference
-import iit.uvip.audiotactilebindingapp.utility.showToast
 import kotlinx.android.synthetic.main.fragment_answer.*
+import org.albaspace.core.accessory.getTimeDifference
+import org.albaspace.core.accessory.showToast
 import java.util.*
 
 

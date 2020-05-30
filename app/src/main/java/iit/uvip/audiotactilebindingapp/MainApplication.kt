@@ -5,7 +5,6 @@ import android.app.Application
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.navigation.fragment.NavHostFragment
-import iit.uvip.audiotactilebindingapp.utility.VibrationManager
 import java.util.*
 
 // HERE SHOULD GO ONLY IMMUTABLE DATA !!!! (since system may re-create this instance silently)
@@ -17,7 +16,7 @@ class MainApplication : Application(), TextToSpeech.OnInitListener  {
 
     var tts: TextToSpeech? = null
 
-    var vibrator: VibrationManager? = null
+    var vibrator: org.albaspace.core.accessory.VibrationManager? = null
 
     companion object {
 
@@ -30,7 +29,7 @@ class MainApplication : Application(), TextToSpeech.OnInitListener  {
 
         Log.d("ME", "${NavHostFragment::class.java}")
 
-        vibrator = VibrationManager(this).init()
+        vibrator = org.albaspace.core.accessory.VibrationManager(this).init()
         tts         = TextToSpeech(applicationContext, this)
     }
 

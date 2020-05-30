@@ -8,8 +8,8 @@ import android.widget.RadioButton
 import iit.uvip.audiotactilebindingapp.R
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_dialog.SubjectLongitudinalDialogFragment
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.utility.showToast
 import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
+import org.albaspace.core.accessory.showToast
 
 class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment() {
     override val LOG_TAG: String = SubjectTIDDialogFragment::class.java.simpleName
@@ -57,10 +57,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment() {
                     radioGroupFirstModality.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
             }
             false -> {
-                showToast(
-                    "Seleziona un'opzione per la modalità iniziale di training",
-                    requireContext()
-                )
+                showToast("Seleziona un'opzione per la modalità iniziale di training", requireContext())
                 return null
             }
         }

@@ -8,11 +8,11 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
 import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.utility.existFile
-import iit.uvip.audiotactilebindingapp.utility.readText
-import iit.uvip.audiotactilebindingapp.utility.saveText
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
+import org.albaspace.core.accessory.existFile
+import org.albaspace.core.accessory.readText
+import org.albaspace.core.accessory.saveText
 
 /*
 This class manage simple subjects that participate in tests with only one condition.
@@ -96,11 +96,7 @@ open class SubjectATBParcel(
 
         return try {
             val json_subject = jsonAdapter.toJson(this)
-            saveText(
-                context,
-                filename + MainApplication.FILE_EXTENSION,
-                json_subject
-            )        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+            saveText(context, filename + MainApplication.FILE_EXTENSION, json_subject)        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
         } catch (e: Exception) {
             e.printStackTrace()
             return

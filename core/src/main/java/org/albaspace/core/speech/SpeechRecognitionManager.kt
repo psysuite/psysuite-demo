@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.utility
+package org.albaspace.core.speech
 
 import android.content.Context
 import android.content.Intent
@@ -9,9 +9,13 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import com.jakewharton.rxrelay2.PublishRelay
-import iit.uvip.audiotactilebindingapp.R
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import org.albaspace.core.R
+import org.albaspace.core.accessory.Optional
+import org.albaspace.core.accessory.isPresent
+import org.albaspace.core.accessory.orNull
+import org.albaspace.core.accessory.toOptional
 import java.util.*
 
 class SpeechRecognitionManager(private val ctx: Context) {

@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp.utility
+package org.albaspace.core.accessory
 
 sealed class Optional<out T> {
 

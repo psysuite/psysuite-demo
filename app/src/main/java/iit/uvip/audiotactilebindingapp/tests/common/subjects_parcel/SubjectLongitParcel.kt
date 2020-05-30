@@ -7,11 +7,11 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.audiotactilebindingapp.MainApplication
 import iit.uvip.audiotactilebindingapp.tests.common.TaskCode
-import iit.uvip.audiotactilebindingapp.utility.existFile
-import iit.uvip.audiotactilebindingapp.utility.readText
-import iit.uvip.audiotactilebindingapp.utility.saveText
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
+import org.albaspace.core.accessory.existFile
+import org.albaspace.core.accessory.readText
+import org.albaspace.core.accessory.saveText
 
 // base class for all longitudinal tests
 @Parcelize
