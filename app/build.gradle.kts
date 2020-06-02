@@ -36,16 +36,19 @@ androidExtensions {
 
 dependencies {
 
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.ejml:ejml-kotlin:0.39")
-    implementation(files( "jvm/koma-core-api-jvm-0.12.jar", "jvm/koma-core-ejml-0.12.jar"))
 
-    implementation(Dependencies.Moshi.moshi)
-    implementation(Dependencies.Moshi.moshiKt)
+
+
 
     implementation("com.intentfilter:android-permissions:2.0.54")
 
     implementation(project(":core"))
+    implementation(project(":psysuitecore"))
+
+
+    testImplementation("junit:junit:4.13")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 
 
 }

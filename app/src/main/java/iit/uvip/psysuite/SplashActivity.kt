@@ -1,4 +1,4 @@
-package iit.uvip.audiotactilebindingapp
+package iit.uvip.psysuite
 
 import android.content.Intent
 import android.os.Bundle

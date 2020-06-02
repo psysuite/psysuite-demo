@@ -1,24 +1,23 @@
-package iit.uvip.audiotactilebindingapp.fragments
+package iit.uvip.psysuite
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.Navigation
-import iit.uvip.audiotactilebindingapp.MainActivity
-import iit.uvip.audiotactilebindingapp.R
-import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBDialogFragment
-import iit.uvip.audiotactilebindingapp.tests.atb.SubjectATBParcel
-import iit.uvip.audiotactilebindingapp.tests.atb.TestATB
-import iit.uvip.audiotactilebindingapp.tests.atvb.TestATVB
-import iit.uvip.audiotactilebindingapp.tests.bis.TestBIS
-import iit.uvip.audiotactilebindingapp.tests.common.TestBasic
-import iit.uvip.audiotactilebindingapp.tests.common.subjects_dialog.SubjectBasicDialogFragment
-import iit.uvip.audiotactilebindingapp.tests.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.audiotactilebindingapp.tests.mmd.TestMMD
-import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDDialogFragment
-import iit.uvip.audiotactilebindingapp.tests.tid.SubjectTIDParcel
-import iit.uvip.audiotactilebindingapp.tests.tid.TestTID
+import iit.uvip.psysuite.core.common.TestBasic
+import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.bis.TestBIS
+import iit.uvip.psysuite.core.tests.mmd.TestMMD
+import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBDialogFragment
+import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB
+import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB
+import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
+import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
+import iit.uvip.psysuite.core.tests.tid.TestTID
 import kotlinx.android.synthetic.main.fragment_main.*
+import org.albaspazio.core.fragments.BaseFragment
 
 
 class MainFragment : BaseFragment(
@@ -36,7 +35,6 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 3
         @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 4
         @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 5
-        @JvmStatic val EVENT_SUBJECT:String                             = "subject"
     }
 
     override fun onResume(){
@@ -78,7 +76,9 @@ class MainFragment : BaseFragment(
         bundle.putParcelable("subject", subject)
 
         val editNameDialogFragment = SubjectATBDialogFragment.newInstance("Some Title")
-        editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.setTargetFragment(this ,
+            TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE
+        )
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
@@ -101,7 +101,9 @@ class MainFragment : BaseFragment(
         bundle.putParcelable("subject", subject)
 
         val editNameDialogFragment = SubjectATBDialogFragment.newInstance("Some Title")
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.setTargetFragment(this,
+            TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE
+        )
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
@@ -130,7 +132,9 @@ class MainFragment : BaseFragment(
         bundle.putParcelable("subject", subject)
 
         val editNameDialogFragment = SubjectTIDDialogFragment.newInstance("Some Title")
-        editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.setTargetFragment(this ,
+            TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE
+        )
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
@@ -146,7 +150,9 @@ class MainFragment : BaseFragment(
         bundle.putParcelable("subject", subject)
 
         val editNameDialogFragment = SubjectBasicDialogFragment.newInstance("Some Title")
-        editNameDialogFragment.setTargetFragment(this , TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.setTargetFragment(this ,
+            TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE
+        )
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
@@ -163,7 +169,9 @@ class MainFragment : BaseFragment(
         bundle.putParcelable("subject", subject)
 
         val editNameDialogFragment = SubjectBasicDialogFragment.newInstance("Some Title")
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.setTargetFragment(this,
+            TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE
+        )
         editNameDialogFragment.arguments = bundle
         editNameDialogFragment.setCancelable(false)
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
@@ -175,32 +183,32 @@ class MainFragment : BaseFragment(
     override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
         // Make sure fragment codes match up
 
-        if (data?.getParcelableExtra(EVENT_SUBJECT) as SubjectBasicParcel? == null)
+        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
             return
 
         when(requestCode){
             TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectATBParcel
+                subject = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectATBParcel
                 (subject as SubjectATBParcel).writeJson(requireContext())
             }
 
             TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectATBParcel
+                subject = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectATBParcel
                 (subject as SubjectATBParcel).writeJson(requireContext())
             }
 
             TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectTIDParcel
+                subject = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectTIDParcel
                 (subject as SubjectTIDParcel).writeJson(requireContext())
             }
 
             TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectBasicParcel
+                subject = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel
                 subject.writeJson(requireContext())
             }
 
             TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE -> {
-                subject = data?.getParcelableExtra(EVENT_SUBJECT) as SubjectBasicParcel
+                subject = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel
                 subject.writeJson(requireContext())
             }
         }

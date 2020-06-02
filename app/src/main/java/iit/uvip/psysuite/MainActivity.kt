@@ -1,7 +1,6 @@
-package iit.uvip.audiotactilebindingapp
+package iit.uvip.psysuite
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -15,11 +14,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
-import iit.uvip.audiotactilebindingapp.fragments.BaseFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import org.albaspazio.core.accessory.iNavigated
+import org.albaspazio.core.fragments.BaseFragment
 import java.util.*
 
-class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, DialogInterface.OnDismissListener  {
+class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener,
+    iNavigated {
 
     var haveAudioRecordPermission: Boolean = false
 
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             })
     }
 
-    fun refreshNavigationVisibility() {
+    override fun refreshNavigationVisibility() {
         val currentFragment = my_nav_host_fragment.childFragmentManager.fragments.firstOrNull() as? BaseFragment
 
         if (currentFragment?.hideAndroidControls == true) {
@@ -104,13 +105,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         }
     }
 
-    override fun onDismiss(dialog: DialogInterface) {}
 
     override fun onDestroy() {
-
-        // release TTS
-        val application = applicationContext as MainApplication
-        application.tts?.shutdown()
 
         dialog?.dismiss()
         findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
