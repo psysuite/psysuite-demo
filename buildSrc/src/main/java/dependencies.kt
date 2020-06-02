@@ -1,6 +1,6 @@
 object Configs {
 
-    const val applicationId     = "iit.uvip.audiotactilebindingapp"
+    const val applicationId     = "iit.uvip.psysuite"
     const val compileSdkVersion = 29
     const val minSdkVersion     = 24
     const val targetSdkVersion  = 26
