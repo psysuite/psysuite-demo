@@ -2,7 +2,6 @@ package iit.uvip.psysuite
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.view.View
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
@@ -20,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.albaspazio.core.accessory.show2MethodsDialog
 import org.albaspazio.core.accessory.showAlert
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.mail.EMailAccount
@@ -36,8 +36,6 @@ class MainFragment : BaseFragment(
     override val LOG_TAG:String = MainFragment::class.java.simpleName
 
     private var sendResult:Boolean = true
-
-    private val dataDir:String = Environment.DIRECTORY_DOWNLOADS
 
     private val emailAccount:EMailAccount = EMailAccount(
         "alberto.inuggi@gmail.com", "12qw!\"QW", "alberto.inuggi@gmail.com")
@@ -57,8 +55,7 @@ class MainFragment : BaseFragment(
             viewLifecycleOwner) { result ->
             onTestFinished(result)
         }
-        // /storage/self/primary/Download/a_2020522102124.txt
-//        val dir = Environment.getExternalStoragePublicDirectory(dataDir).absolutePath
+//        val dir = Environment.getExternalStoragePublicDirectory(nvironment.DIRECTORY_DOWNLOADS).absolutePath         // /storage/self/primary/Download/a_2020522102124.txt
 //        onTestFinished(TestResult(TestBasic.TEST_COMPLETED, arrayListOf("$dir/a_2020522102124.txt")))
     }
 
@@ -93,7 +90,7 @@ class MainFragment : BaseFragment(
     //================================================================================================================
     private fun showATBSubjectDialog(){
 
-        subject                     = SubjectATBParcel.loadSubject()
+        subject                     = SubjectATBParcel().loadSubject()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB"
 
@@ -109,7 +106,7 @@ class MainFragment : BaseFragment(
 
     private fun showATVBSubjectDialog() {
 
-        subject                 = SubjectATBParcel.loadSubject()
+        subject                 = SubjectATBParcel().loadSubject()
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass       = "iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB"
 
@@ -129,14 +126,15 @@ class MainFragment : BaseFragment(
         subject.age                 = 1
         subject.gender              = 1
         subject.type                = TestBasic.TEST_ATVB_TIME_DOUBLESTIM2
-        subject.writeJson(requireContext())
         subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+
+        subject.writeJson(requireContext())
         startTest(subject)
     }
 
     private fun showTIDSubjectDialog(){
 
-        subject                     = SubjectTIDParcel.loadSubject()
+        subject                     = SubjectTIDParcel().loadSubject()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.tid.TestTID"
 
@@ -155,7 +153,7 @@ class MainFragment : BaseFragment(
 
     private fun showBISSubjectDialog(){
 
-        subject                     = SubjectBasicParcel.loadSubject()
+        subject                     = SubjectBasicParcel().loadSubject()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.bis.TestBIS"
 
@@ -171,7 +169,7 @@ class MainFragment : BaseFragment(
 
     private fun showMMDSubjectDialog() {
 
-        subject                     = SubjectBasicParcel.loadSubject()
+        subject                     = SubjectBasicParcel().loadSubject()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.mmd.TestMMD"
 
@@ -229,21 +227,49 @@ class MainFragment : BaseFragment(
         Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_testFragment, bundle)
     }
 
+    //================================================================================================================
+    // 3 - TEST FINISHED
+    //================================================================================================================
+    // verify whether send results. if yes and abort ask whether sending anyway or not
     private fun onTestFinished(result:TestResult){
 
-        GlobalScope.launch{
+        if(sendResult){
+            if(result.code == TestBasic.TEST_COMPLETED) { // test concluded
+                sendResult(result)
+            }
+            else{                                         // test aborted. ask whether anyway submit results
+                show2MethodsDialog(activity,resources.getString(R.string.warning),
+                                            resources.getString(R.string.ask_send_results),
+                                            resources.getString(R.string.yes),
+                                            resources.getString(R.string.no),
+                                            {}){
+                    // pressed YES
+                    sendResult(result)
+                }
+            }
+        }
+        else{
+            if(result.code == TestBasic.TEST_COMPLETED) showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
+            else                                        showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
+        }
+    }
+    private fun sendResult(result:TestResult) {
+        GlobalScope.launch {
             try {
-                val res = sendResult(result)
-                if(res) showAlert(activity, "Success", "Result succesfully sent")
-                else    showAlert(activity, "Failure", "Authentication/setup problems")
-            } catch(e: Exception) {
-                showAlert(activity, "Failure", "The following error was found: $e")
+                val res = doSendResult(result)
+                withContext(Dispatchers.Main) {
+                    if (res)    showAlert(activity, resources.getString(R.string.success), resources.getString(R.string.results_sent))
+                    else        showAlert(activity, resources.getString(R.string.failure), resources.getString(R.string.email_account_error))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {showAlert(activity, resources.getString(R.string.failure), resources.getString(R.string.email_generic_error, e.toString()))}
             }
         }
     }
 
-    suspend fun sendResult(res:TestResult):Boolean = withContext(Dispatchers.IO) {
-        val mail: Mail = Mail(emailAccount)
+
+    private suspend fun doSendResult(res:TestResult):Boolean = withContext(Dispatchers.IO) {
+        val mail = Mail(emailAccount)
         return@withContext  mail.send(arrayOf("uvip.apptester@gmail.com"),
                                     "test result",
                                     "result", res.res_files)
