@@ -15,8 +15,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
 import kotlinx.android.synthetic.main.activity_main.*
-import org.albaspazio.core.accessory.iNavigated
 import org.albaspazio.core.fragments.BaseFragment
+import org.albaspazio.core.fragments.iNavigated
 import java.util.*
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener,

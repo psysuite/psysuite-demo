@@ -3,7 +3,7 @@ plugins {
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
 
-    id("name.remal.check-dependency-updates") version "1.0.192"
+    id("name.remal.check-dependency-updates") version "1.0.193"
 }
 
 android {
@@ -28,6 +28,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 androidExtensions {
@@ -35,10 +39,6 @@ androidExtensions {
 }
 
 dependencies {
-
-
-
-
 
     implementation("com.intentfilter:android-permissions:2.0.54")
 
