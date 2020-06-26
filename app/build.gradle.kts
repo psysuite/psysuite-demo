@@ -3,7 +3,7 @@ plugins {
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
 
-    id("name.remal.check-dependency-updates") version "1.0.192"
+    id("name.remal.check-dependency-updates") version "1.0.193"
 }
 
 android {
@@ -28,6 +28,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 androidExtensions {
@@ -36,16 +40,15 @@ androidExtensions {
 
 dependencies {
 
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.ejml:ejml-kotlin:0.39")
-    implementation(files( "jvm/koma-core-api-jvm-0.12.jar", "jvm/koma-core-ejml-0.12.jar"))
-
-    implementation(Dependencies.Moshi.moshi)
-    implementation(Dependencies.Moshi.moshiKt)
-
     implementation("com.intentfilter:android-permissions:2.0.54")
 
     implementation(project(":core"))
+    implementation(project(":psysuitecore"))
+
+
+    testImplementation("junit:junit:4.13")
+    androidTestImplementation("androidx.test:runner:1.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 
 
 }
