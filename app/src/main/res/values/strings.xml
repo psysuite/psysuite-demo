@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">PsySuite</string>
 
-    <string name="si">SI</string>
+    <string name="yes">SI</string>
     <string name="no">NO</string>
+    <string name="abort">interrompi</string>
 
 
-    <string name="warning">Attenzione</string>
 
 
     <string name="onend_test">Test completato</string>
@@ -17,10 +17,12 @@
     <string name="test_completed_success">Il Test è stato completato con successo</string>
     <string name="test_completed_abort">Il Test è stato interrotto </string>
 
+
     <string name="ask_send_results">Vuoi inviare i risultati del test</string>
     <string name="email_account_error">Errore con l\'account usato per inviare i risultati</string>
     <string name="email_generic_error">Errore generico durante l\'invio dei risultati: %1$s</string>
 
+    <string name="sending_results">Sto inviando i risultati</string>
     <string name="results_sent">I Risultati del test sono stati inviati correttamente</string>
 
 
