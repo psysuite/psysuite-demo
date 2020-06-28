@@ -89,7 +89,7 @@ class MainFragment : BaseFragment(
         val bundle  = Bundle()
         bundle.putParcelable("subject", subject)
 
-        val editNameDialogFragment = SubjectATBDialogFragment()
+        val editNameDialogFragment          = SubjectATBDialogFragment()
         editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments    = bundle
         editNameDialogFragment.isCancelable = false
@@ -107,7 +107,7 @@ class MainFragment : BaseFragment(
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
 
-        val editNameDialogFragment = SubjectATBDialogFragment()
+        val editNameDialogFragment          = SubjectATBDialogFragment()
         editNameDialogFragment.setTargetFragment(this,TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments    = bundle
         editNameDialogFragment.isCancelable = false
@@ -121,12 +121,11 @@ class MainFragment : BaseFragment(
         subject.testClass           = "iit.uvip.psysuite.core.tests.tid.TestTID"
 
         (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
-        (subject as SubjectTIDParcel).first_modality = 0
 
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
 
-        val editNameDialogFragment = SubjectTIDDialogFragment()
+        val editNameDialogFragment          = SubjectTIDDialogFragment()
         editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments    = bundle
         editNameDialogFragment.isCancelable = false
