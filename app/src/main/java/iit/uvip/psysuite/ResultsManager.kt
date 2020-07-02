@@ -12,6 +12,7 @@ import org.albaspazio.core.accessory.show2MethodsDialog
 import org.albaspazio.core.accessory.showAlert
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
+import org.albaspazio.core.mail.MailIntent
 
 class ResultsManager(private val resources: Resources, private val activity: Activity) {
 
@@ -32,6 +33,7 @@ class ResultsManager(private val resources: Resources, private val activity: Act
         if(ci.first != null)    emailRecipients = ci.first?.call(ci.second) as Array<String>
 
         if(sendResult){
+
             if(result.code == TestBasic.TEST_COMPLETED) sendResult(result)          // test concluded
             else                                        askWhetherSending(result)   // test aborted. ask whether anyway submit results
         }
@@ -48,7 +50,7 @@ class ResultsManager(private val resources: Resources, private val activity: Act
     private fun sendResult(result: TestResult) {
         mailJob = GlobalScope.launch {
             try {
-
+//                MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)
                 mailAD = withContext(Dispatchers.Main) {
                     return@withContext show1MethodDialog(activity, resources.getString(R.string.warning),
                         resources.getString(R.string.sending_results),
@@ -69,6 +71,12 @@ class ResultsManager(private val resources: Resources, private val activity: Act
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) { showAlert(activity, resources.getString(R.string.failure), resources.getString(R.string.email_generic_error, e.toString())) }
                 mailAD?.dismiss()
+
+                withContext(Dispatchers.Main) {
+                    show2MethodsDialog(activity,resources.getString(R.string.warning), resources.getString(R.string.ask_send_results_intent), resources.getString(R.string.yes), resources.getString(R.string.no), {}) {
+                        MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)   // pressed YES
+                    }
+                }
             }
         }
     }
