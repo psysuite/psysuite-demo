@@ -7,12 +7,12 @@ import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TestResult
 import kotlinx.coroutines.*
 import org.albaspazio.core.accessory.getCompanionObjectMethod
-import org.albaspazio.core.accessory.show1MethodDialog
-import org.albaspazio.core.accessory.show2MethodsDialog
-import org.albaspazio.core.accessory.showAlert
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
 import org.albaspazio.core.mail.MailIntent
+import org.albaspazio.core.ui.show1MethodDialog
+import org.albaspazio.core.ui.show2MethodsDialog
+import org.albaspazio.core.ui.showAlert
 
 class ResultsManager(private val resources: Resources, private val activity: Activity) {
 
@@ -38,13 +38,27 @@ class ResultsManager(private val resources: Resources, private val activity: Act
             else                                        askWhetherSending(result)   // test aborted. ask whether anyway submit results
         }
         else{
-            if(result.code == TestBasic.TEST_COMPLETED) showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
-            else                                        showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
+            if(result.code == TestBasic.TEST_COMPLETED) showAlert(
+                activity,
+                resources.getString(R.string.onend_test),
+                resources.getString(R.string.test_completed_success)
+            )
+            else showAlert(
+                activity,
+                resources.getString(R.string.onend_test),
+                resources.getString(R.string.test_completed_abort)
+            )
         }
     }
 
     private fun askWhetherSending(result: TestResult){
-        show2MethodsDialog(activity,resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no), {}) { sendResult(result)  }  // pressed YES
+        show2MethodsDialog(
+            activity,
+            resources.getString(R.string.warning),
+            resources.getString(R.string.ask_send_results),
+            resources.getString(R.string.yes),
+            resources.getString(R.string.no),
+            {}) { sendResult(result) }  // pressed YES
     }
 
     private fun sendResult(result: TestResult) {
@@ -52,9 +66,11 @@ class ResultsManager(private val resources: Resources, private val activity: Act
             try {
 //                MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)
                 mailAD = withContext(Dispatchers.Main) {
-                    return@withContext show1MethodDialog(activity, resources.getString(R.string.warning),
+                    return@withContext show1MethodDialog(
+                        activity, resources.getString(R.string.warning),
                         resources.getString(R.string.sending_results),
-                        resources.getString(R.string.abort)){
+                        resources.getString(R.string.abort)
+                    ) {
                         // abort mail submission
                         mailJob.cancel()
                         mailAD?.dismiss()
@@ -65,16 +81,43 @@ class ResultsManager(private val resources: Resources, private val activity: Act
                 mailAD?.dismiss()
 
                 withContext(Dispatchers.Main) {
-                    if (res)    showAlert(activity, resources.getString(R.string.success), resources.getString(R.string.results_sent))
-                    else        showAlert(activity, resources.getString(R.string.failure), resources.getString(R.string.email_account_error))
+                    if (res) showAlert(
+                        activity,
+                        resources.getString(R.string.success),
+                        resources.getString(R.string.results_sent)
+                    )
+                    else showAlert(
+                        activity,
+                        resources.getString(R.string.failure),
+                        resources.getString(R.string.email_account_error)
+                    )
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { showAlert(activity, resources.getString(R.string.failure), resources.getString(R.string.email_generic_error, e.toString())) }
+                withContext(Dispatchers.Main) {
+                    showAlert(
+                        activity,
+                        resources.getString(R.string.failure),
+                        resources.getString(R.string.email_generic_error, e.toString())
+                    )
+                }
                 mailAD?.dismiss()
 
                 withContext(Dispatchers.Main) {
-                    show2MethodsDialog(activity,resources.getString(R.string.warning), resources.getString(R.string.ask_send_results_intent), resources.getString(R.string.yes), resources.getString(R.string.no), {}) {
-                        MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)   // pressed YES
+                    show2MethodsDialog(
+                        activity,
+                        resources.getString(R.string.warning),
+                        resources.getString(R.string.ask_send_results_intent),
+                        resources.getString(R.string.yes),
+                        resources.getString(R.string.no),
+                        {}) {
+                        MailIntent.composeEmail(
+                            activity,
+                            "iit.uvip.psysuite.provider",
+                            emailRecipients,
+                            result.mailsubject,
+                            result.mailbody,
+                            result.res_files
+                        )   // pressed YES
                     }
                 }
             }

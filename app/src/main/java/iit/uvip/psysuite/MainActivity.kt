@@ -19,8 +19,7 @@ import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.iNavigated
 import java.util.*
 
-class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener,
-    iNavigated {
+class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, iNavigated {
 
     var haveAudioRecordPermission: Boolean = false
 
