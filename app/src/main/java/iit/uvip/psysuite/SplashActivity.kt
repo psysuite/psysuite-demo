@@ -23,7 +23,9 @@ class SplashActivity : AppCompatActivity() {
             {
                 // onSuccess
                 when(it){
-                    Constants.VERSION_UP_TO_UPDATE, Constants.UPDATE_CANCELLED -> go2main()
+                    Constants.VERSION_UP_TO_UPDATE,
+                    Constants.UPDATE_CANCELLED,
+                    Constants.NETWORK_ABSENT          -> go2main()
                 }
             },
             {
