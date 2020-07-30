@@ -10,8 +10,10 @@ import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TestResult
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBDialogFragment
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
+import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
+import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsDialogFragment
+import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -37,6 +39,7 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 3
         @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 4
         @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 5
+        @JvmStatic val TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE: Int = 6
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,8 +48,10 @@ class MainFragment : BaseFragment(
         resultsManager = ResultsManager(resources, requireActivity())
 
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.observe(viewLifecycleOwner) { result ->
-            // add subject file to the list of files "to-be-sent"
-            result.res_files.add(subject.getAbsoluteSubjectFilePath())
+
+            // if the list contains a results file => append res_files with subject file
+            if(result.res_files.isNotEmpty())
+                result.res_files.add(subject.getAbsoluteSubjectFilePath())
             resultsManager.onTestFinished(result)
         }
     }
@@ -75,6 +80,10 @@ class MainFragment : BaseFragment(
         bt_start_musicalmeter.setOnClickListener {
             showMMDSubjectDialog()
         }
+
+        bt_start_sample_test.setOnClickListener {
+            showSampleSubjectDialog()
+        }
     }
 
     //================================================================================================================
@@ -82,14 +91,14 @@ class MainFragment : BaseFragment(
     //================================================================================================================
     private fun showATBSubjectDialog(){
 
-        subject                     = SubjectATBParcel().loadSubject()
+        subject                     = SubjectBindingsParcel().loadSubject()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB"
 
         val bundle  = Bundle()
         bundle.putParcelable("subject", subject)
 
-        val editNameDialogFragment          = SubjectATBDialogFragment()
+        val editNameDialogFragment          = SubjectBindingsDialogFragment()
         editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments    = bundle
         editNameDialogFragment.isCancelable = false
@@ -97,8 +106,7 @@ class MainFragment : BaseFragment(
     }
 
     private fun showATVBSubjectDialog() {
-        subject                 = SubjectATBParcel().loadSubject()
-
+        subject                 = SubjectBindingsParcel().loadSubject()
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass       = "iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB"
 
@@ -107,7 +115,7 @@ class MainFragment : BaseFragment(
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
 
-        val editNameDialogFragment          = SubjectATBDialogFragment()
+        val editNameDialogFragment = SubjectBindingsDialogFragment()
         editNameDialogFragment.setTargetFragment(this,TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE)
         editNameDialogFragment.arguments    = bundle
         editNameDialogFragment.isCancelable = false
@@ -163,6 +171,22 @@ class MainFragment : BaseFragment(
         editNameDialogFragment.isCancelable = false
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
     }
+
+    private fun showSampleSubjectDialog(){
+
+        subject                     = SubjectSampleParcel().loadSubject()
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.testClass           = "iit.uvip.psysuite.core.tests.sample.TestSample"
+
+        val bundle = Bundle()
+        bundle.putParcelable("subject", subject)
+
+        val editNameDialogFragment          = SubjectSampleDialogFragment()
+        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.arguments    = bundle
+        editNameDialogFragment.isCancelable = false
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
@@ -177,7 +201,8 @@ class MainFragment : BaseFragment(
             TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE,
-            TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE  -> {
+            TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE,
+            TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE -> {
                 subject         = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
                 subject.device  = Device().setRam(requireContext())
                 subject.writeJson(requireContext())

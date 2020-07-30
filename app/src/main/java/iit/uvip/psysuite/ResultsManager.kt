@@ -24,41 +24,27 @@ class ResultsManager(private val resources: Resources, private val activity: Act
     private lateinit var mailJob: Job
     private var mailAD: AlertDialog? = null
 
-
-    // verify whether send results. if yes and abort ask whether sending anyway or not
+    // verify whether send results. if result.res_files is not empty and yes and abort ask whether sending anyway or not
     fun onTestFinished(result: TestResult){
 
         // check whether test defined specific recipients. otherwise use the default one(s)
         val ci          = getCompanionObjectMethod(result.testClass, "getEmailRecipients")
         if(ci.first != null)    emailRecipients = ci.first?.call(ci.second) as Array<String>
 
-        if(sendResult){
+        if(sendResult && result.res_files.isNotEmpty()){
 
             if(result.code == TestBasic.TEST_COMPLETED) sendResult(result)          // test concluded
             else                                        askWhetherSending(result)   // test aborted. ask whether anyway submit results
         }
         else{
-            if(result.code == TestBasic.TEST_COMPLETED) showAlert(
-                activity,
-                resources.getString(R.string.onend_test),
-                resources.getString(R.string.test_completed_success)
-            )
-            else showAlert(
-                activity,
-                resources.getString(R.string.onend_test),
-                resources.getString(R.string.test_completed_abort)
-            )
+            if(result.code == TestBasic.TEST_COMPLETED) showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
+            else                                        showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
         }
     }
 
     private fun askWhetherSending(result: TestResult){
-        show2MethodsDialog(
-            activity,
-            resources.getString(R.string.warning),
-            resources.getString(R.string.ask_send_results),
-            resources.getString(R.string.yes),
-            resources.getString(R.string.no),
-            {}) { sendResult(result) }  // pressed YES
+        show2MethodsDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no), {})
+            { sendResult(result) }  // pressed YES
     }
 
     private fun sendResult(result: TestResult) {
@@ -66,11 +52,7 @@ class ResultsManager(private val resources: Resources, private val activity: Act
             try {
 //                MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)
                 mailAD = withContext(Dispatchers.Main) {
-                    return@withContext show1MethodDialog(
-                        activity, resources.getString(R.string.warning),
-                        resources.getString(R.string.sending_results),
-                        resources.getString(R.string.abort)
-                    ) {
+                    return@withContext show1MethodDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.sending_results), resources.getString(R.string.abort)){
                         // abort mail submission
                         mailJob.cancel()
                         mailAD?.dismiss()
