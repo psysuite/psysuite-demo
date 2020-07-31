@@ -61,6 +61,8 @@ class MainFragment : BaseFragment(
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
+        labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
+
         bt_start_tid_test.setOnClickListener{
             showTIDSubjectDialog()
         }
@@ -222,7 +224,7 @@ class MainFragment : BaseFragment(
         subject.label               = "a"
         subject.age                 = 1
         subject.gender              = 1
-        subject.type                = TestBasic.TEST_ATVB_TIME_DOUBLESTIM2
+        subject.type                = TestBasic.TEST_ATVB_TIME_D_BAL
         subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
         subject.device              = Device().setRam(requireContext())
         subject.writeJson(requireContext())

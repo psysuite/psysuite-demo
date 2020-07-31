@@ -1,6 +1,5 @@
 package iit.uvip.psysuite
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -11,13 +10,11 @@ import org.albaspazio.core.updater.UpdateManager
 
 class SplashActivity : AppCompatActivity() {
 
-    @SuppressLint("StringFormatInvalid")  // ISSUE: resources.getString(R.string.update_error_message, it) gives error...don't know why
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val url = "https://api.allspeak.eu/stableupdate.xml"
-//        val url = "https://drive.google.com/file/d/1FQly9VIoYjiKkbx9axH0ZIJqKV49vFne/view?usp=sharing"
-//        val url = "https://drive.google.com/uc?id=1FQly9VIoYjiKkbx9axH0ZIJqKV49vFne&export=download"
+        val url = "https://api.allspeak.eu/psysuitestableupdate.xml"
+//        val url = "http://192.168.1.14:8095/psysuitestableupdate.xml"     // localhost @home
 
         UpdateManager(this, url,
             {

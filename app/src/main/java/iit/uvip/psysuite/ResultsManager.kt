@@ -11,7 +11,7 @@ import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
 import org.albaspazio.core.mail.MailIntent
 import org.albaspazio.core.ui.show1MethodDialog
-import org.albaspazio.core.ui.show2MethodsDialog
+import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 
 class ResultsManager(private val resources: Resources, private val activity: Activity) {
@@ -43,8 +43,8 @@ class ResultsManager(private val resources: Resources, private val activity: Act
     }
 
     private fun askWhetherSending(result: TestResult){
-        show2MethodsDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no), {})
-            { sendResult(result) }  // pressed YES
+        show2ChoisesDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no),
+            { /* pressed YES */ sendResult(result) },{})
     }
 
     private fun sendResult(result: TestResult) {
@@ -76,31 +76,23 @@ class ResultsManager(private val resources: Resources, private val activity: Act
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    showAlert(
-                        activity,
-                        resources.getString(R.string.failure),
-                        resources.getString(R.string.email_generic_error, e.toString())
-                    )
+                    showAlert(activity, resources.getString(R.string.failure), resources.getString(R.string.email_generic_error, e.toString()))
                 }
                 mailAD?.dismiss()
 
                 withContext(Dispatchers.Main) {
-                    show2MethodsDialog(
-                        activity,
-                        resources.getString(R.string.warning),
-                        resources.getString(R.string.ask_send_results_intent),
-                        resources.getString(R.string.yes),
-                        resources.getString(R.string.no),
-                        {}) {
-                        MailIntent.composeEmail(
-                            activity,
-                            "iit.uvip.psysuite.provider",
-                            emailRecipients,
-                            result.mailsubject,
-                            result.mailbody,
-                            result.res_files
-                        )   // pressed YES
-                    }
+                    show2ChoisesDialog(activity, resources.getString(R.string.warning),
+                        resources.getString(R.string.ask_send_results_intent), resources.getString(R.string.yes), resources.getString(R.string.no),
+                        {
+                            MailIntent.composeEmail(
+                                activity,
+                                "iit.uvip.psysuite.provider",
+                                emailRecipients,
+                                result.mailsubject,
+                                result.mailbody,
+                                result.res_files
+                            )   // pressed YES
+                        }, {})
                 }
             }
         }
