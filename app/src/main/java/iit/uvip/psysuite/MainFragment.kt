@@ -93,9 +93,9 @@ class MainFragment : BaseFragment(
     //================================================================================================================
     private fun showATBSubjectDialog(){
 
-        subject                     = SubjectBindingsParcel().loadSubject()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass           = "iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB"
+        subject                 = SubjectBindingsParcel()
+        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
+        subject.testClass       = "iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB"
 
         val bundle  = Bundle()
         bundle.putParcelable("subject", subject)
@@ -108,7 +108,7 @@ class MainFragment : BaseFragment(
     }
 
     private fun showATVBSubjectDialog() {
-        subject                 = SubjectBindingsParcel().loadSubject()
+        subject                 = SubjectBindingsParcel()
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass       = "iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB"
 
@@ -126,7 +126,7 @@ class MainFragment : BaseFragment(
 
     private fun showTIDSubjectDialog(){
 
-        subject                     = SubjectTIDParcel().loadSubject()
+        subject                     = SubjectTIDParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.tid.TestTID"
 
@@ -144,7 +144,7 @@ class MainFragment : BaseFragment(
 
     private fun showBISSubjectDialog(){
 
-        subject                     = SubjectBasicParcel().loadSubject()
+        subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.bis.TestBIS"
 
@@ -160,7 +160,7 @@ class MainFragment : BaseFragment(
 
     private fun showMMDSubjectDialog() {
 
-        subject                     = SubjectBasicParcel().loadSubject()
+        subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.mmd.TestMMD"
 
@@ -176,7 +176,7 @@ class MainFragment : BaseFragment(
 
     private fun showSampleSubjectDialog(){
 
-        subject                     = SubjectSampleParcel().loadSubject()
+        subject                     = SubjectSampleParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.testClass           = "iit.uvip.psysuite.core.tests.sample.TestSample"
 
