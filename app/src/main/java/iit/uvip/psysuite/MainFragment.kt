@@ -6,6 +6,7 @@ import android.view.View
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import iit.uvip.psysuite.core.common.StimuliDelay
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TestResult
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
@@ -214,6 +215,9 @@ class MainFragment : BaseFragment(
     }
 
     private fun startTest(subj:SubjectBasicParcel){
+
+        subj.stimuliDelay = StimuliDelay(0L, 6L, 35L)   // these values were obtained with the oscilloscope and are device-dependent
+
         val bundle = Bundle()
         bundle.putParcelable(TestBasic.TESTINFO_BUNDLE_LABEL, subj)
         Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_testFragment, bundle)
@@ -232,3 +236,4 @@ class MainFragment : BaseFragment(
     }
     // =====================================================================
 }
+
