@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">PsySuite</string>
 
     <string name="yes">SI</string>
     <string name="no">NO</string>
@@ -18,7 +17,9 @@
     <string name="test_completed_abort">Il Test è stato interrotto </string>
 
 
-    <string name="ask_send_results">Vuoi inviare i risultati del test</string>
+    <string name="ask_send_results">Vuoi inviare i risultati del test?</string>
+
+    <string name="ask_send_results_intent">Vuoi riprovare ad inviare i risultati del test usando il tuo programma di posta elettronica?</string>
     <string name="email_account_error">Errore con l\'account usato per inviare i risultati</string>
     <string name="email_generic_error">Errore generico durante l\'invio dei risultati: %1$s</string>
 
