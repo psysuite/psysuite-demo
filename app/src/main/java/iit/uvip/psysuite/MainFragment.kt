@@ -14,13 +14,13 @@ import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsDialogFragment
-import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import kotlinx.android.synthetic.main.fragment_main.*
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
+import org.albaspazio.core.updater.UpdateManager
 
 
 class MainFragment : BaseFragment(
@@ -41,6 +41,7 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 4
         @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 5
         @JvmStatic val TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE: Int = 6
+        @JvmStatic val TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE: Int = 7
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,6 +85,10 @@ class MainFragment : BaseFragment(
             showMMDSubjectDialog()
         }
 
+        bt_start_tfi_test.setOnClickListener {
+            showTFISubjectDialog()
+        }
+
         bt_start_sample_test.setOnClickListener {
             showSampleSubjectDialog()
         }
@@ -94,9 +99,9 @@ class MainFragment : BaseFragment(
     //================================================================================================================
     private fun showATBSubjectDialog(){
 
-        subject                 = SubjectBindingsParcel()
+        subject                 = SubjectBasicParcel()
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass       = "iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB"
+        subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB")
 
         val bundle  = Bundle()
         bundle.putParcelable("subject", subject)
@@ -109,9 +114,9 @@ class MainFragment : BaseFragment(
     }
 
     private fun showATVBSubjectDialog() {
-        subject                 = SubjectBindingsParcel()
+        subject                 = SubjectBasicParcel()
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass       = "iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB"
+        subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB")
 
 //        debugStart()
 //        return
@@ -129,7 +134,7 @@ class MainFragment : BaseFragment(
 
         subject                     = SubjectTIDParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass           = "iit.uvip.psysuite.core.tests.tid.TestTID"
+        subject.classes           = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
 
         (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
 
@@ -147,7 +152,7 @@ class MainFragment : BaseFragment(
 
         subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass           = "iit.uvip.psysuite.core.tests.bis.TestBIS"
+        subject.classes           = listOf("iit.uvip.psysuite.core.tests.bis.TestBIS")
 
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
@@ -163,7 +168,7 @@ class MainFragment : BaseFragment(
 
         subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass           = "iit.uvip.psysuite.core.tests.mmd.TestMMD"
+        subject.classes           = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
 
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
@@ -175,11 +180,28 @@ class MainFragment : BaseFragment(
         editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
     }
 
+    private fun showTFISubjectDialog() {
+
+        subject                     = SubjectBasicParcel()
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
+                                             "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
+
+        val bundle = Bundle()
+        bundle.putParcelable("subject", subject)
+
+        val editNameDialogFragment = SubjectBasicDialogFragment()
+        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE)
+        editNameDialogFragment.arguments    = bundle
+        editNameDialogFragment.isCancelable = false
+        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+    }
+
     private fun showSampleSubjectDialog(){
 
         subject                     = SubjectSampleParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.testClass           = "iit.uvip.psysuite.core.tests.sample.TestSample"
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.sample.TestSample")
 
         val bundle = Bundle()
         bundle.putParcelable("subject", subject)
@@ -205,9 +227,11 @@ class MainFragment : BaseFragment(
             TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE,
+            TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE -> {
                 subject         = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
                 subject.device  = Device().setRam(requireContext())
+                subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
                 subject.writeJson(requireContext())
             }
         }

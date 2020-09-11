@@ -4,8 +4,8 @@ object Configs {
     const val compileSdkVersion = 29
     const val minSdkVersion     = 23
     const val targetSdkVersion  = 26
-    const val versionCode       = 25
-    const val versionName       = "0.9.5.2"
+    const val versionCode       = 26
+    const val versionName       = "0.9.6.0"
 }
 
 object Versions {
