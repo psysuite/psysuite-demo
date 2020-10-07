@@ -2,8 +2,9 @@ plugins {
     id(Plugins.androidApplication)
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
+    id("kotlin-android")
 
-    id("name.remal.check-dependency-updates") version "1.0.193"
+    id("name.remal.check-dependency-updates") version "1.0.211"
 }
 
 android {
@@ -44,11 +45,12 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":psysuitecore"))
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
 
     testImplementation("junit:junit:4.13")
-    androidTestImplementation("androidx.test:runner:1.2.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 
 
 }

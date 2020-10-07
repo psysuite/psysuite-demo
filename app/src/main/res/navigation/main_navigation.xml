@@ -12,6 +12,9 @@
         <action
                 android:id="@+id/action_mainFragment_to_testFragment"
                 app:destination="@id/testFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_bindingsFragment"
+            app:destination="@id/bindingsFragment" />
     </fragment>
 
 
@@ -22,6 +25,14 @@
 
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>
 
+    </fragment>
+    <fragment
+        android:id="@+id/bindingsFragment"
+        android:name="iit.uvip.psysuite.BindingsFragment"
+        android:label="BindingsFragment" >
+        <action
+            android:id="@+id/action_bindingsFragment_to_testFragment"
+            app:destination="@id/testFragment" />
     </fragment>
 
 </navigation>

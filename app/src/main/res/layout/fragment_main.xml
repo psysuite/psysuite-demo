@@ -8,33 +8,32 @@
 
 
     <Button
-            android:id="@+id/bt_start_tid_test"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="380dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
-            android:enabled="true"
-            android:text="@string/tid_label"
-            android:textColorLink="@color/colorAccent"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.516"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bt_start_musicalmeter" />
-
+        android:id="@+id/bt_start_tid_test"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="380dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="16dp"
+        android:enabled="true"
+        android:text="@string/tid_label"
+        android:textColorLink="@color/colorAccent"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_bis" />
 
     <Button
         android:id="@+id/bt_start_sample_test"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="380dp"
         android:layout_height="80dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:enabled="true"
         android:text="@string/samples_test"
         android:textColorLink="@color/colorAccent"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintHorizontal_bias="0.516"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bt_start_tfi_test" />
 
@@ -43,65 +42,56 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="380dp"
         android:layout_height="80dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:enabled="true"
         android:text="@string/tfi_label"
         android:textColorLink="@color/colorAccent"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintHorizontal_bias="0.612"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bt_start_tid_test" />
 
     <Button
-            android:id="@+id/bt_start_bisection"
-            style="@style/Base.Widget.AppCompat.Button.Colored"
-            android:layout_width="380dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
-            android:enabled="true"
-            android:text="@string/start_bisection"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.516"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bt_start_atvb_test" />
-
-    <Button
-            android:id="@+id/bt_start_musicalmeter"
-            style="@style/Base.Widget.AppCompat.Button.Colored"
-            android:layout_width="380dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="12dp"
-            android:enabled="true"
-            android:text="@string/start_musicalmeter"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.483"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bt_start_bisection" />
-
-    <Button
-        android:id="@+id/bt_start_atb_test"
+        android:id="@+id/bt_start_bis"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="185dp"
+        android:layout_width="380dp"
         android:layout_height="80dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:enabled="true"
-        android:text="@string/start_atb"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/bt_start_atvb_test"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="185dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="12dp"
-        android:text="@string/start_atvb"
+        android:text="@string/start_bisection"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.612"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_musicalmeter" />
+
+    <Button
+        android:id="@+id/bt_start_musicalmeter"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="380dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="16dp"
+        android:enabled="true"
+        android:text="@string/start_musicalmeter"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.612"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_bindings_test" />
+
+    <Button
+        android:id="@+id/bt_start_bindings_test"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="380dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="16dp"
+        android:enabled="true"
+        android:text="@string/start_bindings"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
