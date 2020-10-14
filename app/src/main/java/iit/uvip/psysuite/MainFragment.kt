@@ -36,11 +36,12 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE: Int    = 1
         @JvmStatic val TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE:Int    = 2
         @JvmStatic val TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE:Int     = 3
-        @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 4
-        @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 5
-        @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 6
-        @JvmStatic val TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE: Int = 7
-        @JvmStatic val TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE: Int    = 8
+        @JvmStatic val TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE:Int     = 4
+        @JvmStatic val TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE: Int    = 5
+        @JvmStatic val TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE: Int    = 6
+        @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 7
+        @JvmStatic val TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE: Int = 8
+        @JvmStatic val TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE: Int    = 9
 
     }
 
@@ -82,6 +83,8 @@ class MainFragment : BaseFragment(
         }
 
         bt_start_tfi_test.setOnClickListener {
+//            debugStart()
+//            return@setOnClickListener
             showTFISubjectDialog()
         }
 
@@ -211,12 +214,18 @@ class MainFragment : BaseFragment(
 
     // =====================================================================
     private fun debugStart() {
+        subject                     = SubjectBasicParcel()
         subject.label               = "a"
         subject.age                 = 1
         subject.gender              = 1
-        subject.type                = TestBasic.TEST_ATVB_TIME_D_BAL
-        subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+        subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_NOCHOOSE
         subject.device              = Device().setRam(requireContext())
+
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
+            "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
+        subject.type                = TestBasic.TEST_TFI
+
         subject.writeJson(requireContext())
         startTest(subject)
     }
