@@ -1,13 +1,19 @@
 package iit.uvip.psysuite
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
@@ -16,10 +22,10 @@ import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 import org.albaspazio.core.fragments.BaseFragment
-import org.albaspazio.core.fragments.iNavigated
 import java.util.*
 
-class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, iNavigated {
+
+class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
 
     var haveAudioRecordPermission: Boolean = false
 
@@ -27,6 +33,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private val TEST_PERMISSIONS_REQUEST_INTERNET = 2
 
     private var dialog: AlertDialog? = null
+
+    // This will be called whenever an Intent with an action named "NAVIGATION_UPDATE" is broadcasted.
+    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            if(intent.action == "NAVIGATION_UPDATE") refreshNavigationVisibility()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +55,20 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET),TEST_PERMISSIONS_REQUEST_INTERNET)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Unregister since the activity is paused.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.my_nav_host_fragment).navigateUp()
@@ -69,7 +96,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             })
     }
 
-    override fun refreshNavigationVisibility() {
+    fun refreshNavigationVisibility() {
         val currentFragment = my_nav_host_fragment.childFragmentManager.fragments.firstOrNull() as? BaseFragment
 
         if (currentFragment?.hideAndroidControls == true) {
@@ -90,23 +117,23 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         when(currentFragment?.LOG_TAG){
             "AnswerDialogFragment", "TestFragment"  -> {}
-            "MainFragment"          -> {
+            "MainFragment"      -> {
                                 AlertDialog.Builder(this)
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setTitle("Chiudi ?")
-                                    .setMessage("Vuoi uscire dall'applicazione ??")
-                                    .setCancelable(false)
-                                    .setPositiveButton("SI"){ _, _ -> finish() }
-                                    .setNegativeButton("NO", null)
-                                    .show()
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("Chiudi ?")
+                                .setMessage("Vuoi uscire dall'applicazione ??")
+                                .setCancelable(false)
+                                .setPositiveButton("SI"){ _, _ -> finish() }
+                                .setNegativeButton("NO", null)
+                                .show()
             }
-            else                    -> super.onBackPressed()
+            else                -> super.onBackPressed()
         }
     }
 
 
     override fun onDestroy() {
-
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         dialog?.dismiss()
         findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
         super.onDestroy()
