@@ -3,12 +3,15 @@ package iit.uvip.psysuite
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TestResult
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicListParcel
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
@@ -27,12 +30,16 @@ class MainFragment : BaseFragment(
     hideAndroidControls = false
 )
 {
+
     private lateinit var subject: SubjectBasicParcel
     override val LOG_TAG:String = MainFragment::class.java.simpleName
 
     private lateinit var resultsManager:ResultsManager
 
     companion object {
+        @JvmStatic val isDebug:Boolean = false
+
+
         @JvmStatic val TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE: Int    = 1
         @JvmStatic val TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE:Int    = 2
         @JvmStatic val TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE:Int     = 3
@@ -42,6 +49,33 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 7
         @JvmStatic val TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE: Int = 8
         @JvmStatic val TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE: Int    = 9
+
+        fun showDialog(subj:SubjectBasicParcel, df:SubjectBasicDialogFragment, rc:Int, frg:Fragment, pfm:FragmentManager){
+
+            subj.isDebug    = isDebug
+
+            if(isDebug){
+                subj.label  = "a"
+                subj.age    = 1
+                subj.gender = 0
+            }
+
+            val bundle = Bundle()
+            bundle.putParcelable("subject", subj)
+
+            df.arguments    = bundle
+            df.setTargetFragment(frg, rc)
+            df.isCancelable = false
+            df.show(pfm, "Modifica Soggetto")
+        }
+
+        fun startTest(subj:SubjectBasicParcel, v:View, nav_action:Int = R.id.action_mainFragment_to_testFragment){
+            subj.stimuliDelays  = MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
+
+            val bundle = Bundle()
+            bundle.putParcelable(TestBasic.TESTINFO_BUNDLE_LABEL, subj)
+            Navigation.findNavController(v).navigate(nav_action, bundle)
+        }
 
     }
 
@@ -99,52 +133,30 @@ class MainFragment : BaseFragment(
 
     private fun showTIDSubjectDialog(){
 
-        subject                     = SubjectTIDParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes           = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
-
+        subject                 = SubjectTIDParcel()
+        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes         = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
         (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment          = SubjectTIDDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        showDialog(subject, SubjectTIDDialogFragment(), TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showBISSubjectDialog(){
 
-        subject                     = SubjectBasicParcel()
+        subject                     = SubjectBasicListParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes           = listOf("iit.uvip.psysuite.core.tests.bis.TestBIS")
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.bis.TestBIS")
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment = SubjectBasicDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showMMDSubjectDialog() {
 
         subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes           = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment = SubjectBasicDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showTFISubjectDialog() {
@@ -154,14 +166,7 @@ class MainFragment : BaseFragment(
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
                                              "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment = SubjectBasicDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showSampleSubjectDialog(){
@@ -170,15 +175,9 @@ class MainFragment : BaseFragment(
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.sample.TestSample")
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment          = SubjectSampleDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        showDialog(subject, SubjectSampleDialogFragment(), TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
+
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
@@ -200,17 +199,9 @@ class MainFragment : BaseFragment(
                 subject.writeJson(requireContext())
             }
         }
-        startTest(subject)
+        startTest(subject, requireView())
     }
 
-    private fun startTest(subj:SubjectBasicParcel){
-
-        subj.stimuliDelays = MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
-
-        val bundle = Bundle()
-        bundle.putParcelable(TestBasic.TESTINFO_BUNDLE_LABEL, subj)
-        Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_testFragment, bundle)
-    }
 
     // =====================================================================
     private fun debugStart() {
@@ -227,7 +218,7 @@ class MainFragment : BaseFragment(
         subject.type                = TestBasic.TEST_TFI
 
         subject.writeJson(requireContext())
-        startTest(subject)
+        startTest(subject, requireView())
     }
     // =====================================================================
 }
