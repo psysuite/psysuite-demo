@@ -1,0 +1,34 @@
+BIS
+    mTrials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_TACTILE, STIMULUS_TYPE_AUDIO_TACTILE, corr_answ, 100, CONFLICT_TYPE_NONE, STIMULUS_DURATION_AUDIO.toInt(), STIMULUS_DURATION_TACTILE.toInt()))
+    mTrials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_TACTILE, STIMULUS_TYPE_AUDIO_TACTILE, corr_answ, 900, CONFLICT_TYPE_NONE, STIMULUS_DURATION_AUDIO.toInt(), STIMULUS_DURATION_TACTILE.toInt()))
+
+    mTrials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VIDEO, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, 100, STIMULUS_TYPE_VIDEO_AUDIO_LOG, STIMULUS_DURATION_AUDIO.toInt(), STIMULUS_DURATION_VISUAL.toInt()))
+    mTrials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VIDEO, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, 900, STIMULUS_TYPE_VIDEO_AUDIO_LOG, STIMULUS_DURATION_AUDIO.toInt(), STIMULUS_DURATION_VISUAL.toInt()))
+    mTrials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VIDEO, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, 100, STIMULUS_TYPE_AUDIO_VIDEO_LOG, STIMULUS_DURATION_VISUAL.toInt(), STIMULUS_DURATION_AUDIO.toInt()))
+    mTrials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VIDEO, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, 900, STIMULUS_TYPE_AUDIO_VIDEO_LOG, STIMULUS_DURATION_VISUAL.toInt(), STIMULUS_DURATION_AUDIO.toInt()))
+
+TID
+    mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+    mTrials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b,(subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+
+    mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+    mTrials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b,(subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+
+TFI
+    block_trials.add(TrialTFI(-1, cond_type++, "tfi", "1,1,1", soa_1))
+    block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,2", soa_1))
+
+ATVB
+
+    trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, validAnswers[0]))
+    trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_TV, 100, validAnswers[0]))
+    trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV_A, 100, validAnswers[0]))
+
+BIMODALIB
+    trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, validAnswers[0]))
+    trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_T, 50, validAnswers[0]))
+    trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_A, 50, validAnswers[0]))
+
+MMD
+    mTrials.add(TrialMMD(-1, 0, "same", validAnswers[0], i))
+    mTrials.add(TrialMMD(-1, 1, "diff", validAnswers[1], i))

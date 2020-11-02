@@ -1,9 +1,6 @@
 package iit.uvip.psysuite
 
 import android.content.Intent
-import android.os.Bundle
-import androidx.navigation.Navigation
-import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TestBasic.Companion.TEST_WNOISE_CHOOSE_OFF
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
@@ -49,14 +46,7 @@ class BindingsFragment  : BaseFragment(
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB")
 
-        val bundle  = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment          = SubjectBindingsDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showATVBSubjectDialog() {
@@ -64,14 +54,7 @@ class BindingsFragment  : BaseFragment(
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB")
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment = SubjectBindingsDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showTVBSubjectDialog() {
@@ -79,14 +62,7 @@ class BindingsFragment  : BaseFragment(
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB")
 
-        val bundle = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment = SubjectBindingsDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showAVBSubjectDialog(){
@@ -96,14 +72,7 @@ class BindingsFragment  : BaseFragment(
         subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB")
         subject.whitenoise      = TEST_WNOISE_CHOOSE_OFF
 
-        val bundle  = Bundle()
-        bundle.putParcelable("subject", subject)
-
-        val editNameDialogFragment          = SubjectBindingsDialogFragment()
-        editNameDialogFragment.setTargetFragment(this, MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE)
-        editNameDialogFragment.arguments    = bundle
-        editNameDialogFragment.isCancelable = false
-        editNameDialogFragment.show(parentFragmentManager, "Modifica Soggetto")
+        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
@@ -125,16 +94,6 @@ class BindingsFragment  : BaseFragment(
                 subject.writeJson(requireContext())
             }
         }
-        startTest(subject)
-    }
-
-
-    private fun startTest(subj:SubjectBasicParcel){
-
-        subj.stimuliDelays = MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
-
-        val bundle = Bundle()
-        bundle.putParcelable(TestBasic.TESTINFO_BUNDLE_LABEL, subj)
-        Navigation.findNavController(requireView()).navigate(R.id.action_bindingsFragment_to_testFragment, bundle)
+        MainFragment.startTest(subject, requireView(), R.id.action_bindingsFragment_to_testFragment)
     }
 }
