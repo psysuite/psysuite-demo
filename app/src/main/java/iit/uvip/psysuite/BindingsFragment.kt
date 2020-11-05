@@ -1,10 +1,10 @@
 package iit.uvip.psysuite
 
 import android.content.Intent
-import iit.uvip.psysuite.core.common.TestBasic.Companion.TEST_WNOISE_CHOOSE_OFF
-import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.TestBasic.Companion.TEST_WNOISE_CHOOSE_OFF
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsDialogFragment
+import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import kotlinx.android.synthetic.main.fragment_bindings.*
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam

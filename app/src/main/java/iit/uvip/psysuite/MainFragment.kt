@@ -8,15 +8,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.common.TestResult
-import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicListParcel
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicListParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
+import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.android.synthetic.main.fragment_main.*
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
@@ -84,7 +84,8 @@ class MainFragment : BaseFragment(
 
         resultsManager = ResultsManager(resources, requireActivity())
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.observe(viewLifecycleOwner) { result ->
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(
+            TestBasic.TEST_BUNDLE_RESULT_LABEL)?.observe(viewLifecycleOwner) { result ->
 
             // if the list contains a results file => append res_files with subject file
             if(result.res_files.isNotEmpty())
@@ -133,9 +134,9 @@ class MainFragment : BaseFragment(
 
     private fun showTIDSubjectDialog(){
 
-        subject                 = SubjectTIDParcel()
-        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes         = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
+        subject                     = SubjectTIDParcel()
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
         (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
 
         showDialog(subject, SubjectTIDDialogFragment(), TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE, this, parentFragmentManager)

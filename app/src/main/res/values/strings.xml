@@ -1,7 +1,7 @@
 <resources>
 
-    <string name="yes">SI</string>
-    <string name="no">NO</string>
+    <string name="yes">si</string>
+    <string name="no">no</string>
     <string name="abort">interrompi</string>
 
 

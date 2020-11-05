@@ -3,8 +3,8 @@ package iit.uvip.psysuite
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.res.Resources
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.common.TestResult
+import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.coroutines.*
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.mail.EMailAccount
