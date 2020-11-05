@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/testFragment"
-        android:name="iit.uvip.psysuite.core.fragments.TestFragment"
+        android:name="iit.uvip.psysuite.core.ui.fragments.TestFragment"
         android:label="Run test....">
 
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>

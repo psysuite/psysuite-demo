@@ -6,7 +6,7 @@ import android.content.Context
 import android.media.AudioManager
 import android.util.Log
 import androidx.navigation.fragment.NavHostFragment
-import iit.uvip.psysuite.core.common.DelaysAligner
+import iit.uvip.psysuite.core.stimuli.DelaysAligner
 
 // HERE SHOULD GO ONLY IMMUTABLE DATA !!!! (since system may re-create this instance silently)
 // now it contains support for:
