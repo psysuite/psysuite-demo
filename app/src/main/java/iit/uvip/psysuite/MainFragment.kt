@@ -215,7 +215,7 @@ class MainFragment : BaseFragment(
 
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
-            "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
+                                             "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
         subject.type                = TestBasic.TEST_TFI
 
         subject.writeJson(requireContext())

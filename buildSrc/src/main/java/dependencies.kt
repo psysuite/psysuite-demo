@@ -4,15 +4,15 @@ object Configs {
     const val compileSdkVersion = 29
     const val minSdkVersion     = 23
     const val targetSdkVersion  = 26
-    const val versionCode       = 30
-    const val versionName       = "0.9.9.0"
+    const val versionCode       = 31
+    const val versionName       = "0.9.9.1"
 }
 
 object Versions {
 
     const val kotlin = "1.4.10"
     const val ktx = "1.4.0-alpha01"
-    const val gradlePlugin = "4.1.0"
+    const val gradlePlugin = "4.1.1"
 
     const val navVersion = "2.3.0"
     const val navSafeArgsGradlePlugin = "1.0.0"
@@ -38,7 +38,6 @@ object Dependencies {
     object Moshi {
         const val moshi = "com.squareup.moshi:moshi:${Versions.moshi}"
         const val moshiKt = "com.squareup.moshi:moshi-kotlin:${Versions.moshi}"
-
     }
 }
 
@@ -49,7 +48,6 @@ object ClassPaths {
     const val navSafeArgsGradlePlugin = "android.arch.navigation:navigation-safe-args-gradle-plugin:${Versions.navSafeArgsGradlePlugin}"
 }
 
-
 object Plugins {
 
     const val androidApplication    = "com.android.application"
@@ -57,7 +55,6 @@ object Plugins {
     const val kotlinAndroid         = "android"
     const val kotlinExtensions      = "android.extensions"
 }
-
 
 object ProGuards {
 
