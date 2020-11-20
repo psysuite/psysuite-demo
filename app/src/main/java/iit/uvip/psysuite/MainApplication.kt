@@ -14,8 +14,6 @@ import iit.uvip.psysuite.core.stimuli.DelaysAligner
 
 class MainApplication : Application(){
 
-
-
     companion object {
         @JvmStatic val delaysAligner = DelaysAligner(10L, 29L, 18L,0L, 0L, 29L, 29L)
 //        @JvmStatic val delaysAligner = DelaysAligner(0L, 0L, 6L, 6L, 35L, 35L)

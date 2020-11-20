@@ -88,9 +88,10 @@ class BindingsFragment  : BaseFragment(
             MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
             MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE,
             MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE -> {
-                subject         = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device  = Device().setRam(requireContext())
-                subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
+                subject.device          = Device().setRam(requireContext())
+                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
+                subject.stimuliDelays   = MainApplication.delaysAligner
                 subject.writeJson(requireContext())
             }
         }

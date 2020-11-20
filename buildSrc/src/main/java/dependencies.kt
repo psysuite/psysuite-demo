@@ -4,8 +4,8 @@ object Configs {
     const val compileSdkVersion = 29
     const val minSdkVersion     = 23
     const val targetSdkVersion  = 26
-    const val versionCode       = 31
-    const val versionName       = "0.9.9.1"
+    const val versionCode       = 33
+    const val versionName       = "0.9.9.3"
 }
 
 object Versions {
@@ -58,6 +58,6 @@ object Plugins {
 
 object ProGuards {
 
-    val androidDefault = "proguard-rules.pro"
-    val proguardTxt = "proguard-android.txt"
+    const val androidDefault = "proguard-rules.pro"
+    const val proguardTxt = "proguard-android.txt"
 }
