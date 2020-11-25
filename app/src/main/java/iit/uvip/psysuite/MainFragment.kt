@@ -34,8 +34,6 @@ class MainFragment : BaseFragment(
     private lateinit var subject: SubjectBasicParcel
     override val LOG_TAG:String = MainFragment::class.java.simpleName
 
-    private lateinit var resultsManager:ResultsManager
-
     companion object {
         @JvmStatic val isDebug:Boolean = false
 
@@ -82,16 +80,11 @@ class MainFragment : BaseFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        resultsManager = ResultsManager(resources, requireActivity())
-
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(
-            TestBasic.TEST_BUNDLE_RESULT_LABEL)?.observe(viewLifecycleOwner) { result ->
-
-            // if the list contains a results file => append res_files with subject file
-            if(result.res_files.isNotEmpty())
-                result.res_files.add(subject.getAbsoluteSubjectFilePath())
-            resultsManager.onTestFinished(result)
-        }
+        // in the fragment going back here I call: setNavigationResult(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
+        findNavController().currentBackStackEntry?.savedStateHandle?.
+            getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
+            observe(viewLifecycleOwner) {
+                ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
     }
 
     override fun onResume(){
@@ -198,7 +191,7 @@ class MainFragment : BaseFragment(
                 subject.device          = Device().setRam(requireContext())
                 subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
                 subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext())
+                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
             }
         }
         startTest(subject, requireView())

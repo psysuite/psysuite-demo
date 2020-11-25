@@ -6,6 +6,7 @@ import android.content.res.Resources
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.coroutines.*
+import org.albaspazio.core.accessory.SingletonHolder
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
@@ -14,9 +15,15 @@ import org.albaspazio.core.ui.show1MethodDialog
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 
-class ResultsManager(private val resources: Resources, private val activity: Activity) {
+// SINGLETON
+class ResultsManager private constructor(private val activity: Activity) {
+
+    companion object : SingletonHolder<ResultsManager, Activity>(::ResultsManager)
+
 
     private var sendResult:Boolean = true
+
+    private val resources: Resources = activity.resources
 
     private val emailAccount: EMailAccount      = EMailAccount("uvip.apptester@gmail.com", "uvipapptester19", "uvip.apptester@gmail.com")
     private var emailRecipients:Array<String>   = arrayOf("uvip.apptester@gmail.com")
@@ -34,11 +41,14 @@ class ResultsManager(private val resources: Resources, private val activity: Act
         if(sendResult && result.res_files.isNotEmpty()){
 
             if(result.code == TestBasic.TEST_COMPLETED) sendResult(result)          // test concluded
-            else                                        askWhetherSending(result)   // test aborted. ask whether anyway submit results
+            else                                        askWhetherSending(result)   // test aborted or block ended. ask whether anyway submit results
         }
         else{
-            if(result.code == TestBasic.TEST_COMPLETED) showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
-            else                                        showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
+            when(result.code){
+                TestBasic.TEST_COMPLETED            -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
+                TestBasic.TEST_ABORTED_WITH_ERROR   -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
+                TestBasic.BLOCK_COMPLETED           -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_partially_completed))
+            }
         }
     }
 
