@@ -149,6 +149,7 @@ class MainFragment : BaseFragment(
         subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
+        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED
 
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }

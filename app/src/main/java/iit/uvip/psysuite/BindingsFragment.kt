@@ -7,7 +7,6 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.TestBasic.Companion.TEST_WNOISE_CHOOSE_OFF
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsDialogFragment
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
@@ -87,7 +86,7 @@ class BindingsFragment  : BaseFragment(
         subject                 = SubjectBasicParcel()
         subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
         subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB")
-        subject.whitenoise      = TEST_WNOISE_CHOOSE_OFF
+        subject.whitenoise      = TestBasic.TEST_WNOISE_DISABLED
 
         MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
