@@ -24,8 +24,12 @@
 
     <string name="sending_results">Sto inviando i risultati</string>
     <string name="results_sent">I Risultati del test sono stati inviati correttamente</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="settings">Settings</string>
+    <string name="manage_results">Gestisci Risultati</string>
+    <string name="show_manual">Consulta il manuale</string>
+    <string name="show_manual_error">Il manuale non è disponibile</string>
+
 
 
 </resources>

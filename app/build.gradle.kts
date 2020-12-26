@@ -2,8 +2,6 @@ plugins {
     id(Plugins.androidApplication)
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
-    id("kotlin-android")
-
     id("name.remal.check-dependency-updates") version "1.0.211"
 }
 
@@ -31,13 +29,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
     testOptions {
         // include the android resources in local tests. See http://robolectric.org/migrating/#migrating-to-40
         unitTests.isIncludeAndroidResources = true
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
@@ -52,7 +50,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":psysuitecore"))
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-
 
     testImplementation("junit:junit:4.13")
     testImplementation("org.robolectric:robolectric:4.2")
@@ -84,6 +81,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.1.0")
     androidTestImplementation("androidx.test:rules:1.1.0")
 
+    
     // Assertions
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.ext:truth:1.1.0")

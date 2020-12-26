@@ -3,11 +3,13 @@ package iit.uvip.psysuite
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.res.Resources
+import android.os.Environment
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.coroutines.*
 import org.albaspazio.core.accessory.SingletonHolder
 import org.albaspazio.core.accessory.getCompanionObjectMethod
+import org.albaspazio.core.filesystem.createFolder
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
 import org.albaspazio.core.mail.MailIntent
@@ -30,6 +32,16 @@ class ResultsManager private constructor(private val activity: Activity) {
 
     private lateinit var mailJob: Job
     private var mailAD: AlertDialog? = null
+
+
+    fun createResultsFolder() {
+        //create PsySuite results folder in /Downloads
+
+//        if() {
+            createFolder(activity, Environment.DIRECTORY_DOWNLOADS + "/psysuite_data")
+//        }
+    }
+
 
     // verify whether send results. if result.res_files is not empty and yes and abort ask whether sending anyway or not
     fun onTestFinished(result: TestResult){

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+<!--    <Preference-->
+<!--        app:title="SETTINGS"-->
+<!--        app:summary="Sample preferences using basic attributes"-->
+<!--        app:fragment="iit.uvip.psysuite.settings.SettingsFragment"/>-->
+    <PreferenceCategory android:title="Results">
+
+        <EditTextPreference
+            android:defaultValue="@string/main_email"
+            android:key="pref_main_email"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="main e-mail address" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Stimuli reciprocal delays">
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_a1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Audio1"
+            android:defaultValue="@integer/pref_delay_a1"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_a2"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Audio2"
+            android:defaultValue="@integer/pref_delay_a2"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_a3"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Audio3"
+            android:defaultValue="@integer/pref_delay_a3"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_t1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Tactile1"
+            android:defaultValue="@integer/pref_delay_t1"
+            app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_t2"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Tactile2"
+            android:defaultValue="@integer/pref_delay_t2"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_v1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Visual1"
+            android:defaultValue="@integer/pref_delay_v1"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_delay_v2"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Visual2"
+            android:defaultValue="@integer/pref_delay_v2"
+            app:useSimpleSummaryProvider="true"/>
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>
+
+
