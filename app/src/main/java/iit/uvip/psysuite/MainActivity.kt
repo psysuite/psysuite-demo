@@ -22,7 +22,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
-import iit.uvip.psysuite.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.pdf.PdfViewActivity
@@ -78,18 +77,19 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         //TODO hide menu_action_results when already in resultsFragment
         return when(item.itemId) {
-            R.id.menu_action_settings -> {
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            R.id.menu_action_results -> {
-                findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsFragment)
-                true
-            }
+//            R.id.menu_action_settings -> {
+//                val intent = Intent(this, SettingsActivity::class.java)
+//                startActivity(intent)
+//                true
+//            }
+//            R.id.menu_action_results -> {
+//                findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsFragment)
+//                true
+//            }
             R.id.menu_action_manual ->{
                 val intent = Intent(this, PdfViewActivity::class.java)
                 intent.putExtra("pdfAssetName", "PsySuite_manual.pdf")
+                intent.putExtra("title", "Manuale")
                 intent.putExtra("error_message", resources.getString(R.string.show_manual_error))
                 startActivity(intent)
                 true
