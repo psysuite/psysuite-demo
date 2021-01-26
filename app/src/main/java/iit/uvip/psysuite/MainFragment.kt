@@ -33,6 +33,7 @@ class MainFragment : BaseFragment(
 
     private lateinit var subject: SubjectBasicParcel
     override val LOG_TAG:String = MainFragment::class.java.simpleName
+    private var isSubjectDFopening:Boolean = false
 
     companion object {
         @JvmStatic val isDebug:Boolean = false
@@ -81,43 +82,61 @@ class MainFragment : BaseFragment(
         super.onViewCreated(view, savedInstanceState)
 
         // in the fragment going back here I call: setNavigationResult(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
-        findNavController().currentBackStackEntry?.savedStateHandle?.
-            getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
-            observe(viewLifecycleOwner) {
-                ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
+            observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it) }
     }
 
     override fun onResume(){
         super.onResume()
+
+        isSubjectDFopening = false
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
         labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
 
         bt_start_tid_test.setOnClickListener{
-            showTIDSubjectDialog()
+            if(!isSubjectDFopening){
+                isSubjectDFopening = true
+                showTIDSubjectDialog()
+            }
         }
 
         bt_start_bindings_test.setOnClickListener {
-            Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_bindingsFragment)
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_bindingsFragment)
+            }
         }
 
         bt_start_bis.setOnClickListener {
-            showBISSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showBISSubjectDialog()
+            }
         }
 
         bt_start_musicalmeter.setOnClickListener {
-            showMMDSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showMMDSubjectDialog()
+            }
         }
 
         bt_start_tfi_test.setOnClickListener {
 //            debugStart()
 //            return@setOnClickListener
-            showTFISubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showTFISubjectDialog()
+            }
         }
 
         bt_start_sample_test.setOnClickListener {
-            showSampleSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showSampleSubjectDialog()
+            }
         }
     }
 
@@ -179,6 +198,7 @@ class MainFragment : BaseFragment(
     // subject info !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent?) {
 
+        isSubjectDFopening = false
         if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
             return
 
@@ -211,7 +231,7 @@ class MainFragment : BaseFragment(
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
                                              "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
-        subject.type                = TestBasic.TEST_TFI
+        subject.type                = TestBasic.TEST_TFI_BIMODAL
 
         subject.writeJson(requireContext())
         startTest(subject, requireView())

@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private var dialog: AlertDialog? = null
 
-
     // This will be called whenever an Intent with an action named "NAVIGATION_UPDATE" is broadcasted.
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -60,9 +59,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET),TEST_PERMISSIONS_REQUEST_INTERNET)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-
-        //startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

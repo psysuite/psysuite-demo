@@ -24,35 +24,47 @@ class BindingsFragment  : BaseFragment(
 {
     override val LOG_TAG:String = BindingsFragment::class.java.simpleName
     private lateinit var subject: SubjectBasicParcel
+    private var isSubjectDFopening:Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // in the fragment going back here I call:
         // findNavController().previousBackStackEntry?.savedStateHandle?.set(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
-        findNavController().currentBackStackEntry?.savedStateHandle?.
-            getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
-            observe(viewLifecycleOwner) {
-                ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
+            observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
     }
 
     override fun onResume() {
         super.onResume()
+        isSubjectDFopening = false
 
         bt_start_atb_test.setOnClickListener {
-            showATBSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showATBSubjectDialog()
+            }
         }
 
         bt_start_atvb_test.setOnClickListener {
-            showATVBSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showATVBSubjectDialog()
+            }
         }
 
         bt_start_tvb_test.setOnClickListener {
-            showTVBSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showTVBSubjectDialog()
+            }
         }
 
         bt_start_avb_test.setOnClickListener {
-            showAVBSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showAVBSubjectDialog()
+            }
         }
     }
 
@@ -96,6 +108,7 @@ class BindingsFragment  : BaseFragment(
     // subject info !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
 
+        isSubjectDFopening = false
         if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
             return
 
