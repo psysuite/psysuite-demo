@@ -3,6 +3,7 @@ package iit.uvip.psysuite
 
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import iit.uvip.psysuite.core.model.preferences.ProjectPreferences
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 
@@ -22,10 +23,13 @@ class MainApplication : Application(){
 
 
     private var devicesDelays:HashMap<String, DelaysAligner> = hashMapOf(
-        "Mi A2 Lite_9" to DelaysAligner(10L, 37L, 0L, 15L, 15L, 35L, 45L),
-        "Mi A2 Lite_10" to DelaysAligner(10L, 37L, 0L, 15L, 15L, 35L, 45L),
-        "SM-A405FN_9" to DelaysAligner(10L, 36L, 0L, 38L, 38L, 25L, 35L),
-        "SM-A405FN_10" to DelaysAligner(10L, 36L, 0L, 38L, 38L, 25L, 35L)
+        "Mi A2 Lite_9"  to DelaysAligner(4L, 40L, 4L, 0L,5L, 0L, 30L, 53L),
+        "Mi A2 Lite_10" to DelaysAligner(4L, 40L, 4L, 0L,5L, 0L, 30L, 53L),
+        "SM-A405FN_9"   to DelaysAligner(0L, 165L, 4L, 0L, 28L, 0L, 20L, 0L),
+        "SM-A405FN_10"  to DelaysAligner(0L, 165L, 4L, 0L, 28L, 0L, 20L, 0L)
+
+//        "SM-A405FN_9"   to DelaysAligner(35L, 71L, 35L, 0L, 73L, 73L, 60L, 60L),
+//        "SM-A405FN_10"  to DelaysAligner(35L, 71L, 35L, 0L, 73L, 73L, 60L, 60L)
     )
 
     private val defaultDelays:DelaysAligner = devicesDelays["${Build.MODEL}_${Build.VERSION.RELEASE}"] ?: devicesDelays["SM-A405FN_10"]!!
@@ -40,5 +44,6 @@ class MainApplication : Application(){
         // create preference file (if not exist), init preferences
         ProjectPreferences.init(applicationContext, defaultDelays)
         delaysAligner = ProjectPreferences.getSystemDelays()
+        Log.d("MainApplication", "OnCreate: SYSTEM DELAYS=> $delaysAligner")
     }
 }
