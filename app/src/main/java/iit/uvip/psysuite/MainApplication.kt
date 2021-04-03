@@ -25,6 +25,7 @@ class MainApplication : Application(){
     private var devicesDelays:HashMap<String, DelaysAligner> = hashMapOf(
         "Mi A2 Lite_9"  to DelaysAligner(4L, 40L, 4L, 0L,5L, 0L, 30L, 53L),
         "Mi A2 Lite_10" to DelaysAligner(4L, 40L, 4L, 0L,5L, 0L, 30L, 53L),
+//        "Mi A2 Lite_10" to DelaysAligner(4L, 40L, 4L, 0L,0L, 0L, 0L, 53L),
         "SM-A405FN_9"   to DelaysAligner(0L, 165L, 4L, 0L, 28L, 0L, 20L, 0L),
         "SM-A405FN_10"  to DelaysAligner(0L, 165L, 4L, 0L, 28L, 0L, 20L, 0L)
 
