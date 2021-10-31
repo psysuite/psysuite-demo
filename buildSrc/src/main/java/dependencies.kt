@@ -4,21 +4,21 @@ object Configs {
     const val compileSdkVersion = 29
     const val minSdkVersion     = 23
     const val targetSdkVersion  = 26
-    const val versionCode       = 44
-    const val versionName       = "0.11.2.44"
+    const val versionCode       = 46
+    const val versionName       = "0.11.4.46"
 }
 
 object Versions {
 
-    const val kotlin = "1.4.21"
-    const val ktx = "1.4.0-alpha01"
+    const val kotlin = "1.5.31"
+    const val ktx = "1.7.0"
     const val gradlePlugin = "4.1.1"
 
-    const val navVersion = "2.3.0"
+    const val navVersion = "2.3.5"
     const val navSafeArgsGradlePlugin = "1.0.0"
-    const val moshi = "1.11.0"
+    const val moshi = "1.12.0"
 
-    const val fragment = "1.2.5"
+    const val fragment = "1.3.6"
 }
 
 object Dependencies {

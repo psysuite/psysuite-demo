@@ -2,7 +2,7 @@ plugins {
     id(Plugins.androidApplication)
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
-    id("name.remal.check-dependency-updates") version "1.0.211"
+    id("name.remal.check-dependency-updates") version "1.5.0"
 }
 
 android {
@@ -53,7 +53,7 @@ dependencies {
 
     testImplementation("junit:junit:4.13")
     testImplementation("org.robolectric:robolectric:4.2")
-    testImplementation("androidx.test:core:1.3.0")
+    testImplementation("androidx.test:core:1.4.0")
     testImplementation("androidx.test:runner:1.3.0")
     testImplementation("androidx.test.ext:junit:1.1.2")
     testImplementation("androidx.test.ext:truth:1.3.0")
@@ -65,7 +65,7 @@ dependencies {
 
     androidTestImplementation("androidx.navigation:navigation-testing:${Versions.navVersion}")
 
-    implementation("androidx.fragment:fragment:1.1.0")
+    implementation("androidx.fragment:fragment:1.3.6")
     debugImplementation ("androidx.fragment:fragment-testing:1.1.0"){
         exclude("androidx.test", "core-ktx")
     }
