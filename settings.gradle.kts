@@ -1,3 +1,4 @@
+include(":nativeaudio")
 include(":psysuitecore")
 project(":psysuitecore").projectDir = File(settingsDir, "../modules/psysuitecore/psysuitecore")
 

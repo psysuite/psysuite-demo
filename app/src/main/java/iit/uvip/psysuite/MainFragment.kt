@@ -8,15 +8,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.common.TestResult
-import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicListParcel
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicListParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
+import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.android.synthetic.main.fragment_main.*
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
@@ -33,8 +33,7 @@ class MainFragment : BaseFragment(
 
     private lateinit var subject: SubjectBasicParcel
     override val LOG_TAG:String = MainFragment::class.java.simpleName
-
-    private lateinit var resultsManager:ResultsManager
+    private var isSubjectDFopening:Boolean = false
 
     companion object {
         @JvmStatic val isDebug:Boolean = false
@@ -82,48 +81,62 @@ class MainFragment : BaseFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        resultsManager = ResultsManager(resources, requireActivity())
-
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.observe(viewLifecycleOwner) { result ->
-
-            // if the list contains a results file => append res_files with subject file
-            if(result.res_files.isNotEmpty())
-                result.res_files.add(subject.getAbsoluteSubjectFilePath())
-            resultsManager.onTestFinished(result)
-        }
+        // in the fragment going back here I call: setNavigationResult(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
+            observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it) }
     }
 
     override fun onResume(){
         super.onResume()
+
+        isSubjectDFopening = false
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
         labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
 
         bt_start_tid_test.setOnClickListener{
-            showTIDSubjectDialog()
+            if(!isSubjectDFopening){
+                isSubjectDFopening = true
+                showTIDSubjectDialog()
+            }
         }
 
         bt_start_bindings_test.setOnClickListener {
-            Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_bindingsFragment)
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_bindingsFragment)
+            }
         }
 
         bt_start_bis.setOnClickListener {
-            showBISSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showBISSubjectDialog()
+            }
         }
 
         bt_start_musicalmeter.setOnClickListener {
-            showMMDSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showMMDSubjectDialog()
+            }
         }
 
         bt_start_tfi_test.setOnClickListener {
 //            debugStart()
 //            return@setOnClickListener
-            showTFISubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showTFISubjectDialog()
+            }
         }
 
         bt_start_sample_test.setOnClickListener {
-            showSampleSubjectDialog()
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showSampleSubjectDialog()
+            }
         }
     }
 
@@ -133,9 +146,9 @@ class MainFragment : BaseFragment(
 
     private fun showTIDSubjectDialog(){
 
-        subject                 = SubjectTIDParcel()
-        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes         = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
+        subject                     = SubjectTIDParcel()
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
         (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
 
         showDialog(subject, SubjectTIDDialogFragment(), TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
@@ -155,6 +168,7 @@ class MainFragment : BaseFragment(
         subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
+        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED
 
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
@@ -184,6 +198,7 @@ class MainFragment : BaseFragment(
     // subject info !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent?) {
 
+        isSubjectDFopening = false
         if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
             return
 
@@ -193,10 +208,11 @@ class MainFragment : BaseFragment(
             TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE -> {
-                subject         = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device  = Device().setRam(requireContext())
-                subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.writeJson(requireContext())
+                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
+                subject.device          = Device().setRam(requireContext())
+                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
+                subject.stimuliDelays   = MainApplication.delaysAligner
+                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
             }
         }
         startTest(subject, requireView())
@@ -214,8 +230,8 @@ class MainFragment : BaseFragment(
 
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
-            "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
-        subject.type                = TestBasic.TEST_TFI
+                                             "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
+        subject.type                = TestBasic.TEST_TFI_BIMODAL
 
         subject.writeJson(requireContext())
         startTest(subject, requireView())

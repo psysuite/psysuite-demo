@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
@@ -22,8 +24,8 @@ import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 import org.albaspazio.core.fragments.BaseFragment
+import org.albaspazio.core.pdf.PdfViewActivity
 import java.util.*
-
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
 
@@ -57,6 +59,39 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET),TEST_PERMISSIONS_REQUEST_INTERNET)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        //TODO hide menu_action_results when already in resultsFragment
+        return when(item.itemId) {
+//            R.id.menu_action_settings -> {
+//                val intent = Intent(this, SettingsActivity::class.java)
+//                startActivity(intent)
+//                true
+//            }
+//            R.id.menu_action_results -> {
+//                findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsFragment)
+//                true
+//            }
+            R.id.menu_action_manual ->{
+                val intent = Intent(this, PdfViewActivity::class.java)
+                intent.putExtra("pdfAssetName", "PsySuite_manual.pdf")
+                intent.putExtra("title", "Manuale")
+                intent.putExtra("error_message", resources.getString(R.string.show_manual_error))
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onPause() {
