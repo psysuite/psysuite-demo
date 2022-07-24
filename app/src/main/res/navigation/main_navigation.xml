@@ -13,8 +13,8 @@
                 android:id="@+id/action_mainFragment_to_testFragment"
                 app:destination="@id/testFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_bindingsFragment"
-            app:destination="@id/bindingsFragment" />
+            android:id="@+id/action_mainFragment_to_temporaltestsFragment"
+            app:destination="@id/temporalTestsFragment" />
         <action
             android:id="@+id/action_mainFragment_to_resultsFragment"
             app:destination="@id/resultsFragment" />
@@ -41,5 +41,16 @@
         android:id="@+id/resultsFragment"
         android:name="iit.uvip.psysuite.core.ui.fragments.ResultsFragment"
         android:label="Manage Test Results" />
+    <fragment
+        android:id="@+id/temporalTestsFragment"
+        android:name="iit.uvip.psysuite.TemporalTestsFragment"
+        android:label="TemporalTestsFragment" >
+        <action
+            android:id="@+id/action_temporalTestsFragment_to_bindingsFragment"
+            app:destination="@id/bindingsFragment" />
+        <action
+            android:id="@+id/action_temporalTestsFragment_to_testFragment"
+            app:destination="@id/testFragment" />
+    </fragment>
 
 </navigation>

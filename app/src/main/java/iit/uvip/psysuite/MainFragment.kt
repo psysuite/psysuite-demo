@@ -1,5 +1,6 @@
 package iit.uvip.psysuite
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -13,8 +14,6 @@ import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
-import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
-import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -48,6 +47,7 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE: Int    = 7
         @JvmStatic val TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE: Int = 8
         @JvmStatic val TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE: Int    = 9
+        @JvmStatic val TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE: Int    = 10
 
         fun showDialog(subj:SubjectBasicParcel, df:SubjectBasicDialogFragment, rc:Int, frg:Fragment, pfm:FragmentManager){
 
@@ -86,6 +86,7 @@ class MainFragment : BaseFragment(
             observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it) }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onResume(){
         super.onResume()
 
@@ -95,24 +96,10 @@ class MainFragment : BaseFragment(
 
         labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
 
-        bt_start_tid_test.setOnClickListener{
-            if(!isSubjectDFopening){
-                isSubjectDFopening = true
-                showTIDSubjectDialog()
-            }
-        }
 
-        bt_start_bindings_test.setOnClickListener {
+        bt_start_temporal_test.setOnClickListener {
             if(!isSubjectDFopening) {
-                isSubjectDFopening = true
-                Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_bindingsFragment)
-            }
-        }
-
-        bt_start_bis.setOnClickListener {
-            if(!isSubjectDFopening) {
-                isSubjectDFopening = true
-                showBISSubjectDialog()
+                Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_temporaltestsFragment)
             }
         }
 
@@ -124,11 +111,19 @@ class MainFragment : BaseFragment(
         }
 
         bt_start_tfi_test.setOnClickListener {
-//            debugStart()
-//            return@setOnClickListener
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showTFISubjectDialog()
+            }
+        }
+
+        bt_start_figure_ground_illusion_test.setOnClickListener {
+//            debugStart()
+//            return@setOnClickListener
+
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showFGISubjectDialog()
             }
         }
 
@@ -144,23 +139,15 @@ class MainFragment : BaseFragment(
     // 1 - SHOW SUBJECT DATA INSERTION DIALOG
     //================================================================================================================
 
-    private fun showTIDSubjectDialog(){
 
-        subject                     = SubjectTIDParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
-        (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
-
-        showDialog(subject, SubjectTIDDialogFragment(), TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
-    }
-
-    private fun showBISSubjectDialog(){
+    private fun showFGISubjectDialog(){
 
         subject                     = SubjectBasicListParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.bis.TestBIS")
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.fgi.TestFGI")
+        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED    // white noise UI flag is invisible
 
-        showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
+        showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showMMDSubjectDialog() {
@@ -168,7 +155,7 @@ class MainFragment : BaseFragment(
         subject                     = SubjectBasicParcel()
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
         subject.classes             = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
-        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED
+        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED    // white noise UI flag is invisible
 
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
@@ -203,10 +190,9 @@ class MainFragment : BaseFragment(
             return
 
         when(requestCode){
-            TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE,
-            TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE,
+            TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE,
             TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE -> {
                 subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
                 subject.device          = Device().setRam(requireContext())
@@ -229,9 +215,8 @@ class MainFragment : BaseFragment(
         subject.device              = Device().setRam(requireContext())
 
         subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
-                                             "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
-        subject.type                = TestBasic.TEST_TFI_BIMODAL
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.fgi.TestFGI")
+        subject.type                = TestBasic.TEST_FGI_1_UNSCRAMBLED
 
         subject.writeJson(requireContext())
         startTest(subject, requireView())

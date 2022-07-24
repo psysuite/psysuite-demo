@@ -1,0 +1,124 @@
+package iit.uvip.psysuite
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.observe
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicListParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
+import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
+import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.utility.TestResult
+import kotlinx.android.synthetic.main.fragment_temporaltests.*
+import org.albaspazio.core.accessory.Device
+import org.albaspazio.core.accessory.setRam
+import org.albaspazio.core.fragments.BaseFragment
+import org.albaspazio.core.updater.UpdateManager
+
+class TemporalTestsFragment  : BaseFragment(
+    layout = R.layout.fragment_temporaltests,
+    landscape = false,
+    hideAndroidControls = false
+)
+{
+    override val LOG_TAG:String = TemporalTestsFragment::class.java.simpleName
+    private lateinit var subject: SubjectBasicParcel
+    private var isSubjectDFopening:Boolean = false
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // in the fragment going back here I call:
+        // findNavController().previousBackStackEntry?.savedStateHandle?.set(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
+            observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        bt_start_tid_test.setOnClickListener{
+            if(!isSubjectDFopening){
+                isSubjectDFopening = true
+                showTIDSubjectDialog()
+            }
+        }
+
+        bt_start_bindings.setOnClickListener {
+            if(!isSubjectDFopening) {
+                Navigation.findNavController(requireView()).navigate(R.id.action_temporalTestsFragment_to_bindingsFragment)
+            }
+        }
+
+        bt_start_bis.setOnClickListener {
+            if(!isSubjectDFopening) {
+                isSubjectDFopening = true
+                showBISSubjectDialog()
+            }
+        }
+
+
+    }
+
+    //================================================================================================================
+    // 1 - SHOW SUBJECT DATA INSERTION DIALOG
+    //================================================================================================================
+
+    private fun showTIDSubjectDialog(){
+
+        subject                     = SubjectTIDParcel()
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
+        (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
+
+        MainFragment.showDialog(
+            subject,
+            SubjectTIDDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
+    }
+
+    private fun showBISSubjectDialog(){
+
+        subject                     = SubjectBasicListParcel()
+        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
+        subject.classes             = listOf("iit.uvip.psysuite.core.tests.bis.TestBIS")
+
+        MainFragment.showDialog(
+            subject,
+            SubjectBasicDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
+    }
+
+    //================================================================================================================
+    // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
+    //================================================================================================================
+    // subject info !
+    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+
+        isSubjectDFopening = false
+        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
+            return
+
+        when(requestCode){
+            MainFragment.TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE  -> {
+                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
+                subject.device          = Device().setRam(requireContext())
+                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
+                subject.stimuliDelays   = MainApplication.delaysAligner
+                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            }
+        }
+        MainFragment.startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
+    }
+}
