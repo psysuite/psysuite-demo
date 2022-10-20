@@ -3,6 +3,7 @@
 buildscript {
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven {
             url = uri("https://dl.bintray.com/kyonifer/maven")
@@ -20,6 +21,7 @@ buildscript {
 allprojects {
     repositories {
         google()
+        mavenCentral()
         jcenter()
         maven { url = uri("https://jitpack.io") }
     }

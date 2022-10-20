@@ -5,7 +5,6 @@ plugins {
     id(Plugins.androidApplication)
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
-    id("name.remal.check-dependency-updates") version "1.5.0"
 }
 
 android {
@@ -17,7 +16,7 @@ android {
         try {
             props.load(FileInputStream(rootProject.file("${folder}/password.properties")))
         } catch (e: java.io.IOException) {
-            println("File con password non esiste. non puoi continuare, " + e)
+            println("File con password non esiste. non puoi continuare, $e")
         }
 
         create("release") {
@@ -30,6 +29,13 @@ android {
     compileSdkVersion(Configs.compileSdkVersion)
 
     defaultConfig {
+
+
+        configurations.all {
+            resolutionStrategy { force("androidx.core:core-ktx:1.7.0") }
+        }
+
+
         applicationId = Configs.applicationId
         minSdkVersion(Configs.minSdkVersion)
         targetSdkVersion(Configs.targetSdkVersion)
@@ -82,7 +88,10 @@ dependencies {
 
     implementation("com.intentfilter:android-permissions:2.0.54")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.fragment:fragment:1.4.0")
+    implementation("androidx.fragment:fragment:1.5.3")
+
+    // added to prevent double class definition 19/10/2022
+    api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
 
 
     debugImplementation ("androidx.fragment:fragment-testing:1.1.0"){

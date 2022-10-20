@@ -12,6 +12,7 @@ import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.android.synthetic.main.fragment_bindings.*
 import org.albaspazio.core.accessory.Device
+import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.updater.UpdateManager
@@ -33,6 +34,14 @@ class BindingsFragment  : BaseFragment(
         // findNavController().previousBackStackEntry?.savedStateHandle?.set(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
             observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
+
+        val hasVibrator = VibrationManager.sysHasVibrator(requireContext())
+        if(!hasVibrator){
+            bt_start_atb_test.visibility    = View.INVISIBLE
+            bt_start_atvb_test.visibility   = View.INVISIBLE
+            bt_start_tvb_test.visibility    = View.INVISIBLE
+        }
+
     }
 
     override fun onResume() {

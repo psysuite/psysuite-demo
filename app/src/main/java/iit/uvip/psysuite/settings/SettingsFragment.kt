@@ -41,7 +41,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 //            }
     }
 
-    override fun onPreferenceChange(preference: Preference?, value: Any?): Boolean {
+    override fun onPreferenceChange(preference: Preference, value: Any?): Boolean {
         val stringValue = value.toString()
 
         return true

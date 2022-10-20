@@ -1,18 +1,21 @@
 object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
-    const val compileSdkVersion = 31
-    const val minSdkVersion     = 24
+    const val versionCode       = 52
+    const val versionName       = "1.3.0.52"
+
+    const val compileSdkVersion = 32
+    const val minSdkVersion     = 26
     const val targetSdkVersion  = 26
-    const val versionCode       = 51
-    const val versionName       = "1.2.0.51"
+
 }
 
 object Versions {
 
     const val kotlin = "1.6.10"
-    const val ktx = "1.7.0"
+    const val ktx = "1.8.0"
     const val gradlePlugin = "4.1.1"
+    const val appCompat = "1.5.1"
 
     const val navVersion = "2.3.5"
     const val navSafeArgsGradlePlugin = "1.0.0"
@@ -27,10 +30,11 @@ object Dependencies {
         const val navFragment   = "androidx.navigation:navigation-fragment-ktx:${Versions.navVersion}"
         const val navUi         = "androidx.navigation:navigation-ui-ktx:${Versions.navVersion}"
         const val ktxCore       = "androidx.core:core-ktx:${Versions.ktx}"
+        const val appCompat     = "androidx.appcompat:appcompat:${Versions.appCompat}"
     }
 
     object Kotlin {
-        const val stdLib    = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
+        const val stdLib    = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
         const val reflect   = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
 
     }
@@ -51,6 +55,7 @@ object ClassPaths {
 object Plugins {
 
     const val androidApplication    = "com.android.application"
+
     const val androidLibrary        = "com.android.library"
     const val kotlinAndroid         = "android"
     const val kotlinExtensions      = "android.extensions"
