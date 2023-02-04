@@ -1,8 +1,8 @@
 object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
-    const val versionCode       = 52
-    const val versionName       = "1.3.0.52"
+    const val versionCode       = 53
+    const val versionName       = "1.4.0.53"
 
     const val compileSdkVersion = 32
     const val minSdkVersion     = 26
