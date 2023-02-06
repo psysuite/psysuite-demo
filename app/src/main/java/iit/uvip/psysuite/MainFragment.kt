@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
+import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.updater.UpdateManager
 
 
@@ -185,23 +186,29 @@ class MainFragment : BaseFragment(
     // subject info !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent?) {
 
-        isSubjectDFopening = false
-        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-            return
+        try {
+            isSubjectDFopening = false
+            if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
+                return
 
-        when(requestCode){
-            TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE,
-            TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE,
-            TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE,
-            TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE -> {
-                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device          = Device().setRam(requireContext())
-                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            when (requestCode) {
+                TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE,
+                TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE,
+                TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE,
+                TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE -> {
+                    subject = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
+                    subject.device = Device().setRam(requireContext())
+                    subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+                    subject.stimuliDelays = MainApplication.delaysAligner
+                    subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+                }
             }
+            startTest(subject, requireView())
+        }catch (e:Exception){
+            showAlert(requireActivity(), resources.getString(iit.uvip.psysuite.core.R.string.critical_error), resources.getString(
+                iit.uvip.psysuite.core.R.string.contact_developer))
+            showAlert(requireActivity(), resources.getString(iit.uvip.psysuite.core.R.string.critical_error), e.toString())
         }
-        startTest(subject, requireView())
     }
 
 
