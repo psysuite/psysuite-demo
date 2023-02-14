@@ -89,6 +89,8 @@ dependencies {
     implementation("com.intentfilter:android-permissions:2.0.54")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.fragment:fragment:1.5.3")
+    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation("androidx.preference:preference:1.2.0")
 
     // added to prevent double class definition 19/10/2022
     api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")

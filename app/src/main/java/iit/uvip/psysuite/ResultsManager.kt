@@ -9,13 +9,12 @@ import iit.uvip.psysuite.core.utility.TestResult
 import kotlinx.coroutines.*
 import org.albaspazio.core.accessory.SingletonHolder
 import org.albaspazio.core.accessory.getCompanionObjectMethod
+import org.albaspazio.core.accessory.isEmailValid
 import org.albaspazio.core.filesystem.createFolder
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
 import org.albaspazio.core.mail.MailIntent
-import org.albaspazio.core.ui.show1MethodDialog
-import org.albaspazio.core.ui.show2ChoisesDialog
-import org.albaspazio.core.ui.showAlert
+import org.albaspazio.core.ui.*
 
 // SINGLETON
 class ResultsManager private constructor(private val activity: Activity) {
@@ -38,7 +37,7 @@ class ResultsManager private constructor(private val activity: Activity) {
         //create PsySuite results folder in /Downloads
 
 //        if() {
-            createFolder(activity, Environment.DIRECTORY_DOWNLOADS + "/psysuite_data")
+        createFolder(activity, Environment.DIRECTORY_DOWNLOADS + "/psysuite_data")
 //        }
     }
 
@@ -46,13 +45,9 @@ class ResultsManager private constructor(private val activity: Activity) {
     // verify whether send results. if result.res_files is not empty and yes and abort ask whether sending anyway or not
     fun onTestFinished(result: TestResult){
 
-        // check whether test defined specific recipients. otherwise use the default one(s)
-        val ci          = getCompanionObjectMethod(result.testClass, "getEmailRecipients")
-        if(ci.first != null)    emailRecipients = ci.first?.call(ci.second) as Array<String>
-
         if(sendResult && result.res_files.isNotEmpty()){
 
-            if(result.code == TestBasic.TEST_COMPLETED) sendResult(result)          // test concluded
+            if(result.code == TestBasic.TEST_COMPLETED) getRecipients(result, true)       // test concluded
             else                                        askWhetherSending(result)   // test aborted or block ended. ask whether anyway submit results
         }
         else{
@@ -67,10 +62,28 @@ class ResultsManager private constructor(private val activity: Activity) {
 
     private fun askWhetherSending(result: TestResult){
         show2ChoisesDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no),
-            { /* pressed YES */ sendResult(result) },{})
+            { /* pressed YES */ getRecipients(result, true) },{})
+    }
+
+    private fun getRecipients(result:TestResult, promptuser:Boolean=false){
+        if(!promptuser){
+            // check whether test defined specific recipients. otherwise use the default one(s)
+            val ci          = getCompanionObjectMethod(result.testClass, "getEmailRecipients")
+            if(ci.first != null)    emailRecipients = ci.first?.call(ci.second) as Array<String>
+        }
+        else{
+            showInputDialog(activity, "Alert", "Insert recipient email address", "","", okclb= {
+                    email:String -> emailRecipients = arrayOf(email)
+                if(email.isEmailValid())
+                    sendResult(result)
+                else
+                    showToast("the email is not valid", activity)
+            })
+        }
     }
 
     private fun sendResult(result: TestResult) {
+
         mailJob = GlobalScope.launch {
             try {
 //                MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)
