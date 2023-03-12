@@ -3,7 +3,7 @@ import java.util.*
 
 plugins {
     id(Plugins.androidApplication)
-    kotlin(Plugins.kotlinAndroid)
+    id(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
 }
 
