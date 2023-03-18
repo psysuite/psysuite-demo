@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">PsySuite</string>
-    
-    
-    
+
+
+
     <string name="yes">si</string>
     <string name="no">no</string>
     <string name="abort">interrompi</string>
@@ -35,18 +35,16 @@
     <string name="show_manual_error">Il manuale non è disponibile</string>
 
 
-    <string-array name="tid_sessions_array">
-        <item>seleziona...</item>
-        <item>test iniziale</item>
-        <item>sessione 1</item>
-        <item>sessione 2</item>
-        <item>sessione 3</item>
-        <item>sessione 4</item>
-        <item>sessione 5</item>
-        <item>test finale</item>
-    </string-array>
-    
-    
 
+    <string-array name="tid_sessions_array">
+        <item>select...</item>
+        <item>initial test</item>
+        <item>session 1</item>
+        <item>session 2</item>
+        <item>session 3</item>
+        <item>session 4</item>
+        <item>session 5</item>
+        <item>final test</item>
+    </string-array>
 
 </resources>

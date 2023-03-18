@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">PsySuite</string>
-    
-    
-    
+
+
+
     <string name="yes">si</string>
     <string name="no">no</string>
     <string name="abort">interrompi</string>
@@ -45,8 +45,4 @@
         <item>sessione 5</item>
         <item>test finale</item>
     </string-array>
-    
-    
-
-
 </resources>

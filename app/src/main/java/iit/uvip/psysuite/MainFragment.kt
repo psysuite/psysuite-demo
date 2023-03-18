@@ -3,7 +3,10 @@ package iit.uvip.psysuite
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.observe
@@ -16,7 +19,7 @@ import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
-import kotlinx.android.synthetic.main.fragment_main.*
+import iit.uvip.psysuite.databinding.FragmentMainBinding
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
@@ -24,14 +27,16 @@ import org.albaspazio.core.updater.UpdateManager
 
 
 class MainFragment : BaseFragment(
-    layout = R.layout.fragment_main,
-    landscape = false,
+    layout              = R.layout.fragment_main,
+    landscape           = false,
     hideAndroidControls = false
-)
-{
-
+) {
     private lateinit var subject: SubjectBasicParcel
     override val LOG_TAG:String = MainFragment::class.java.simpleName
+
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
     private var isSubjectDFopening:Boolean = false
 
     companion object {
@@ -49,7 +54,7 @@ class MainFragment : BaseFragment(
         @JvmStatic val TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE: Int    = 9
         @JvmStatic val TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE: Int    = 10
 
-        fun showDialog(subj:SubjectBasicParcel, df:SubjectBasicDialogFragment, rc:Int, frg:Fragment, pfm:FragmentManager){
+        fun showDialog(subj:SubjectBasicParcel, df: DialogFragment, rc:Int, frg:Fragment, pfm:FragmentManager){
 
             subj.isDebug    = isDebug
 
@@ -78,6 +83,16 @@ class MainFragment : BaseFragment(
 
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -94,30 +109,29 @@ class MainFragment : BaseFragment(
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
-        labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
+        binding.labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
 
-
-        bt_start_temporal_test.setOnClickListener {
+        binding.btStartTemporalTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_temporaltestsFragment)
             }
         }
 
-        bt_start_musicalmeter.setOnClickListener {
+        binding.btStartMusicalmeter.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showMMDSubjectDialog()
             }
         }
 
-        bt_start_tfi_test.setOnClickListener {
+        binding.btStartTfiTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showTFISubjectDialog()
             }
         }
 
-        bt_start_figure_ground_illusion_test.setOnClickListener {
+        binding.btStartFigureGroundIllusionTest.setOnClickListener {
 //            debugStart()
 //            return@setOnClickListener
 
@@ -127,7 +141,7 @@ class MainFragment : BaseFragment(
             }
         }
 
-        bt_start_sample_test.setOnClickListener {
+        binding.btStartSampleTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showSampleSubjectDialog()
@@ -138,7 +152,6 @@ class MainFragment : BaseFragment(
     //================================================================================================================
     // 1 - SHOW SUBJECT DATA INSERTION DIALOG
     //================================================================================================================
-
 
     private fun showFGISubjectDialog(){
 
