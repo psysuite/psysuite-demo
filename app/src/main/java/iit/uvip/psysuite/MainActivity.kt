@@ -22,7 +22,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
-import kotlinx.android.synthetic.main.activity_main.*
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.pdf.PdfViewActivity
 import java.util.*
@@ -65,7 +64,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         menuInflater.inflate(R.menu.menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
-
 
     // Handle action bar item clicks here. The action bar will
     // automatically handle clicks on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
@@ -132,7 +130,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
 
     fun refreshNavigationVisibility() {
-        val currentFragment = my_nav_host_fragment.childFragmentManager.fragments.firstOrNull() as? BaseFragment
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment)?.childFragmentManager?.fragments?.firstOrNull()  as? BaseFragment
 
         if (currentFragment?.hideAndroidControls == true) {
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -148,7 +146,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
 
     override fun onBackPressed() {
-        val currentFragment = my_nav_host_fragment.childFragmentManager.fragments.firstOrNull() as? BaseFragment
+
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment)?.childFragmentManager?.fragments?.firstOrNull()  as? BaseFragment
 
         when(currentFragment?.LOG_TAG){
             "AnswerDialogFragment", "TestFragment"  -> {}

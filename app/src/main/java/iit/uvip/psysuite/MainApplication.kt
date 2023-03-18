@@ -4,6 +4,8 @@ package iit.uvip.psysuite
 import android.app.Application
 import android.os.Build
 import android.util.Log
+import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.model.preferences.ProjectPreferencesManager
 import iit.uvip.psysuite.core.model.preferences.ProjectPreferences
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 
@@ -12,20 +14,24 @@ import iit.uvip.psysuite.core.stimuli.DelaysAligner
 // HERE SHOULD GO ONLY IMMUTABLE DATA !!!! (since system may re-create this instance silently)
 // now it manage SharedPreference and DelaysAligner
 //
-// if pref file does not exist  => fill it with values taken from defaultDelays (devicesDelays[Build.MODEL]),
+// if pref file does not exist  => fill it with values taken from defaultDelays (devicesDelays["${Build.MODEL}_${Build.VERSION.RELEASE}"]),
 // otherwise                    =>
 // I need delaysAligner to be :
 // - Parcelable (thus must have to-be-parceled properties in the costructor)
 // - a static property of MainApplication to be accessed by everywhere
 
+
 class MainApplication : Application(){
 
+    // define the list of validated devices and their delays
     private var devicesDelays:HashMap<String, DelaysAligner> = hashMapOf(
-        "Mi A2 Lite"  to DelaysAligner(4L,  40L, 4L, 0L, 5L, 5L, 30L, 53L),
-        "SM-A405FN"   to DelaysAligner(0L, 165L, 4L, 0L,28L, 28L, 20L,  0L),
+        "Mi A2 Lite"  to DelaysAligner(4L,  40L, 4L, 0L, 5L, 0L, 30L, 53L),
+        "SM-A405FN"   to DelaysAligner(0L, 165L, 4L, 0L,28L, 0L, 20L,  0L),
+        "UNKNOWN"     to DelaysAligner(0L,   0L, 0L, 0L, 0L, 0L, 0L,   0L),
     )
 
-    private val defaultDelays:DelaysAligner = devicesDelays[Build.MODEL] ?: devicesDelays["SM-A405FN"]!!
+    // set the default device's delays accessing current device model or setting a default model
+    private val defaultDelays:DelaysAligner = devicesDelays[Build.MODEL] ?: devicesDelays["UNKNOWN"]!!
 
     companion object {
         @JvmStatic var delaysAligner = DelaysAligner()
@@ -35,8 +41,8 @@ class MainApplication : Application(){
         super.onCreate()
 
         // create preference file (if not exist), init preferences
-        ProjectPreferences.init(applicationContext, defaultDelays)
-        delaysAligner = ProjectPreferences.getSystemDelays()
+        ProjectPreferencesManager.init(applicationContext, ProjectPreferences(defaultDelays, resources.getString(R.string.main_email)), overwrite = true)
+        delaysAligner = ProjectPreferencesManager.preferences.delaysAligner
         Log.d("MainApplication", "OnCreate: SYSTEM DELAYS=> $delaysAligner")
     }
 }

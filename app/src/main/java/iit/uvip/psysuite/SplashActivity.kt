@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import org.albaspazio.core.ui.show1MethodDialog
 import org.albaspazio.core.updater.Constants
 import org.albaspazio.core.updater.UpdateManager
-
+import org.albaspazio.core.R
 
 class SplashActivity : AppCompatActivity() {
 
