@@ -1,4 +1,7 @@
 <resources>
+    <string name="app_name">PsySuite</string>
+
+
 
     <string name="yes">si</string>
     <string name="no">no</string>
@@ -9,6 +12,7 @@
     <string name="success">Operazione eseguita con successo</string>
     <string name="failure">Operazione Fallita</string>
     <string name="error">Errore</string>
+    <string name="warning">Attenzione</string>
 
 
     <string name="test_completed_success">Il Test è stato completato con successo</string>
@@ -27,9 +31,18 @@
 
     <string name="settings">Settings</string>
     <string name="manage_results">Gestisci Risultati</string>
-    <string name="show_manual">consulta la guida utente</string>
+    <string name="show_manual">Consulta il manuale</string>
     <string name="show_manual_error">Il manuale non è disponibile</string>
 
 
-
+    <string-array name="tid_sessions_array">
+        <item>seleziona...</item>
+        <item>test iniziale</item>
+        <item>sessione 1</item>
+        <item>sessione 2</item>
+        <item>sessione 3</item>
+        <item>sessione 4</item>
+        <item>sessione 5</item>
+        <item>test finale</item>
+    </string-array>
 </resources>

@@ -2,7 +2,10 @@ package iit.uvip.psysuite
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
@@ -10,22 +13,36 @@ import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsDialogFragment
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
-import kotlinx.android.synthetic.main.fragment_bindings.*
+import iit.uvip.psysuite.databinding.FragmentBindingsBinding
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.updater.UpdateManager
 
+
 class BindingsFragment  : BaseFragment(
-    layout = R.layout.fragment_bindings,
-    landscape = false,
+    layout              = R.layout.fragment_bindings,
+    landscape           = false,
     hideAndroidControls = false
-)
-{
+) {
     override val LOG_TAG:String = BindingsFragment::class.java.simpleName
+
+    private var _binding: FragmentBindingsBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var subject: SubjectBasicParcel
     private var isSubjectDFopening:Boolean = false
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
+        _binding = FragmentBindingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,9 +54,9 @@ class BindingsFragment  : BaseFragment(
 
         val hasVibrator = VibrationManager.sysHasVibrator(requireContext())
         if(!hasVibrator){
-            bt_start_atb_test.visibility    = View.INVISIBLE
-            bt_start_atvb_test.visibility   = View.INVISIBLE
-            bt_start_tvb_test.visibility    = View.INVISIBLE
+            binding.btStartAtbTest.visibility    = View.INVISIBLE
+            binding.btStartAtvbTest.visibility   = View.INVISIBLE
+            binding.btStartTvbTest.visibility    = View.INVISIBLE
         }
 
     }
@@ -48,28 +65,28 @@ class BindingsFragment  : BaseFragment(
         super.onResume()
         isSubjectDFopening = false
 
-        bt_start_atb_test.setOnClickListener {
+        binding.btStartAtbTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showATBSubjectDialog()
             }
         }
 
-        bt_start_atvb_test.setOnClickListener {
+        binding.btStartAtvbTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showATVBSubjectDialog()
             }
         }
 
-        bt_start_tvb_test.setOnClickListener {
+        binding.btStartTvbTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showTVBSubjectDialog()
             }
         }
 
-        bt_start_avb_test.setOnClickListener {
+        binding.btStartAvbTest.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showAVBSubjectDialog()

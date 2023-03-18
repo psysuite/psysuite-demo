@@ -1,7 +1,6 @@
 *.iml
 .gradle
 /local.properties
-.idea/
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -12,10 +11,13 @@
 /build
 /captures
 .externalNativeBuild
-/app/.idea/
+.cxx
+local.properties
+/buildSrc/build/
+/.idea/
+/.signing/
+/gradle/
+/gradle/wrapper/
 
-/buildSrc/build
-APK/
-OT/
-/nativeaudio/build
-.signing/
+/nativeaudio/build/
+

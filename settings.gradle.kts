@@ -1,4 +1,29 @@
+pluginManagement {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven {
+            url = uri("https://dl.bintray.com/kyonifer/maven")
+        }
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
+}
+
+
 include(":nativeaudio")
+
+include(":psysuitepython")
+project(":psysuitepython").projectDir = File(settingsDir, "../modules/psysuitepython/psysuitepython")
+
 include(":psysuitecore")
 project(":psysuitecore").projectDir = File(settingsDir, "../modules/psysuitecore/psysuitecore")
 

@@ -1,23 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="yes">yes</string>
+    <string name="app_name">PsySuite</string>
+    
+    
+    
+    <string name="yes">si</string>
     <string name="no">no</string>
-    <string name="abort">abort</string>
-    <string name="onend_test">test completed</string>
-    <string name="success">successful operation</string>
-    <string name="failure">operation failed</string>
-    <string name="error">Error</string>
-    <string name="test_completed_success">Test completed</string>
-    <string name="test_completed_abort">Test stopped</string>
-    <string name="test_partially_completed">One test block has been completed</string>
-    <string name="ask_send_results">Do you want to send your results?</string>
-    <string name="ask_send_results_intent">Do you want to send your results with your preferred email client?</string>
-    <string name="email_account_error">Error with your email account</string>
-    <string name="email_generic_error">Generic error while submitting your results: %1$s</string>
-    <string name="sending_results">I\'m sending your results</string>
-    <string name="results_sent">Test results have been sent succesfully</string>
+    <string name="abort">interrompi</string>
+
+
+    <string name="onend_test">Test completato</string>
+    <string name="success">Operazione eseguita con successo</string>
+    <string name="failure">Operazione Fallita</string>
+    <string name="error">Errore</string>
+    <string name="warning">Attenzione</string>
+
+
+    <string name="test_completed_success">Il Test è stato completato con successo</string>
+    <string name="test_completed_abort">Il Test è stato interrotto </string>
+    <string name="test_partially_completed">Un blocco del Test è stato completato </string>
+
+
+    <string name="ask_send_results">Vuoi inviare i risultati del test?</string>
+
+    <string name="ask_send_results_intent">Vuoi riprovare ad inviare i risultati del test usando il tuo programma di posta elettronica?</string>
+    <string name="email_account_error">Errore con l\'account usato per inviare i risultati</string>
+    <string name="email_generic_error">Errore generico durante l\'invio dei risultati: %1$s</string>
+
+    <string name="sending_results">Sto inviando i risultati</string>
+    <string name="results_sent">I Risultati del test sono stati inviati correttamente</string>
+
     <string name="settings">Settings</string>
-    <string name="manage_results">Manage results</string>
-    <string name="show_manual">open user guide</string>
-    <string name="show_manual_error">the user guide is not available</string>
+    <string name="manage_results">Gestisci Risultati</string>
+    <string name="show_manual">Consulta il manuale</string>
+    <string name="show_manual_error">Il manuale non è disponibile</string>
+
+
+    <string-array name="tid_sessions_array">
+        <item>seleziona...</item>
+        <item>test iniziale</item>
+        <item>sessione 1</item>
+        <item>sessione 2</item>
+        <item>sessione 3</item>
+        <item>sessione 4</item>
+        <item>sessione 5</item>
+        <item>test finale</item>
+    </string-array>
+    
+    
+
+
 </resources>

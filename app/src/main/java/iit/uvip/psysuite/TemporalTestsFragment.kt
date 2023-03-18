@@ -2,7 +2,9 @@ package iit.uvip.psysuite
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -13,21 +15,34 @@ import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
-import kotlinx.android.synthetic.main.fragment_temporaltests.*
+import iit.uvip.psysuite.databinding.FragmentTemporaltestsBinding
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.updater.UpdateManager
 
-class TemporalTestsFragment  : BaseFragment(
-    layout = R.layout.fragment_temporaltests,
-    landscape = false,
+class TemporalTestsFragment  :  BaseFragment(
+    layout              = R.layout.fragment_temporaltests,
+    landscape           = false,
     hideAndroidControls = false
-)
-{
+){
     override val LOG_TAG:String = TemporalTestsFragment::class.java.simpleName
+
+    private var _binding: FragmentTemporaltestsBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var subject: SubjectBasicParcel
     private var isSubjectDFopening:Boolean = false
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
+        _binding = FragmentTemporaltestsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,20 +56,20 @@ class TemporalTestsFragment  : BaseFragment(
     override fun onResume() {
         super.onResume()
 
-        bt_start_tid_test.setOnClickListener{
+        binding.btStartTidTest.setOnClickListener{
             if(!isSubjectDFopening){
                 isSubjectDFopening = true
                 showTIDSubjectDialog()
             }
         }
 
-        bt_start_bindings.setOnClickListener {
+        binding.btStartBindings.setOnClickListener {
             if(!isSubjectDFopening) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_temporalTestsFragment_to_bindingsFragment)
             }
         }
 
-        bt_start_bis.setOnClickListener {
+        binding.btStartBis.setOnClickListener {
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showBISSubjectDialog()

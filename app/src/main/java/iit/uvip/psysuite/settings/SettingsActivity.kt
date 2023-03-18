@@ -33,4 +33,5 @@ class SettingsActivity  : AppCompatActivity(), PreferenceFragmentCompat.OnPrefer
             .commit()
         return true
     }
+
 }
