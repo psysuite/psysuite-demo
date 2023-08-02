@@ -1,16 +1,22 @@
-package iit.uvip.psysuite
+package iit.uvip.psysuite.view
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import iit.uvip.psysuite.MainApplication
+import iit.uvip.psysuite.R
+import iit.uvip.psysuite.ResultsManager
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsDialogFragment
+import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.atvb.SubjectATVBParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.avb.SubjectAVBParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.SubjectTVBParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentBindingsBinding
@@ -96,37 +102,48 @@ class BindingsFragment  : BaseFragment(
 
     private fun showATBSubjectDialog(){
 
-        subject                 = SubjectBasicParcel()
-        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB")
-
-        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
+        subject                 = SubjectATBParcel()
+        MainFragment.showDialog(
+            subject,
+            SubjectBindingsDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
     }
 
     private fun showATVBSubjectDialog() {
-        subject                 = SubjectBasicParcel()
-        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB")
-
-        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
+        subject                 = SubjectATVBParcel()
+        MainFragment.showDialog(
+            subject,
+            SubjectBindingsDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
     }
 
     private fun showTVBSubjectDialog() {
-        subject                 = SubjectBasicParcel()
-        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB")
-
-        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
+        subject                 = SubjectTVBParcel()
+        MainFragment.showDialog(
+            subject,
+            SubjectBindingsDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
     }
 
     private fun showAVBSubjectDialog(){
 
-        subject                 = SubjectBasicParcel()
-        subject.canRecordAudio  = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB")
-        subject.whitenoise      = TestBasic.TEST_WNOISE_DISABLED
-
-        MainFragment.showDialog(subject, SubjectBindingsDialogFragment(), MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
+        subject                 = SubjectAVBParcel()
+        MainFragment.showDialog(
+            subject,
+            SubjectBindingsDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
     }
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE

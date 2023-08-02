@@ -1,8 +1,8 @@
 object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
-    const val versionCode       = 53
-    const val versionName       = "2.0.0.beta53"
+    const val versionCode       = 54
+    const val versionName       = "2.0.0.beta54"
 
     // iit.uvip.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
@@ -85,7 +85,6 @@ object Dependencies {
     object Kotlin {
         const val stdLib    = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
         const val reflect   = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
-
     }
 
     object Moshi {

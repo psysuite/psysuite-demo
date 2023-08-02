@@ -1,4 +1,4 @@
-package iit.uvip.psysuite
+package iit.uvip.psysuite.view
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -6,20 +6,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicListParcel
+import iit.uvip.psysuite.BuildConfig
+import iit.uvip.psysuite.MainApplication
+import iit.uvip.psysuite.R
+import iit.uvip.psysuite.ResultsManager
+
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.tests.bis.SubjectBISParcel
+import iit.uvip.psysuite.core.tests.fgi.SubjectFGIParcel
+import iit.uvip.psysuite.core.tests.mmd.SubjectMMDParcel
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
+import iit.uvip.psysuite.core.tests.tfi.SubjectTFIParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentMainBinding
+
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
@@ -41,7 +51,6 @@ class MainFragment : BaseFragment(
 
     companion object {
         @JvmStatic val isDebug:Boolean = false
-
 
         @JvmStatic val TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE: Int    = 1
         @JvmStatic val TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE:Int    = 2
@@ -74,18 +83,19 @@ class MainFragment : BaseFragment(
         }
 
         fun startTest(subj:SubjectBasicParcel, v:View, nav_action:Int = R.id.action_mainFragment_to_testFragment){
-            subj.stimuliDelays  = MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
+            subj.stimuliDelays  =
+                MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
 
             val bundle = Bundle()
             bundle.putParcelable(TestBasic.TESTINFO_BUNDLE_LABEL, subj)
             Navigation.findNavController(v).navigate(nav_action, bundle)
         }
-
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View{
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        return binding.root
+        mMainView = binding.root
+        return mMainView
     }
 
     override fun onDestroyView() {
@@ -155,40 +165,25 @@ class MainFragment : BaseFragment(
 
     private fun showFGISubjectDialog(){
 
-        subject                     = SubjectBasicListParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.fgi.TestFGI")
-        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED    // white noise UI flag is invisible
-
+        subject                     = SubjectFGIParcel()
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_FGI_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showMMDSubjectDialog() {
 
-        subject                     = SubjectBasicParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.mmd.TestMMD")
-        subject.whitenoise          = TestBasic.TEST_WNOISE_DISABLED    // white noise UI flag is invisible
-
+        subject                     = SubjectMMDParcel()
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_MMD_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showTFISubjectDialog() {
 
-        subject                     = SubjectBasicParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tfi.TestTFI",
-                                             "iit.uvip.psysuite.core.tests.tfi.AnswerDialogFragmentTFI")
-
+        subject                     = SubjectTFIParcel()
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_TFI_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
     private fun showSampleSubjectDialog(){
 
         subject                     = SubjectSampleParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.sample.TestSample")
-
         showDialog(subject, SubjectSampleDialogFragment(), TARGET_FRAGMENT_SAMPLE_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
@@ -219,19 +214,22 @@ class MainFragment : BaseFragment(
 
 
     // =====================================================================
-    private fun debugStart() {
-        subject                     = SubjectBasicParcel()
-        subject.label               = "a"
-        subject.age                 = 1
-        subject.gender              = 1
-        subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_NOCHOOSE
-        subject.device              = Device().setRam(requireContext())
+    fun debugStart() {
 
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.fgi.TestFGI")
-        subject.type                = TestBasic.TEST_FGI_1_UNSCRAMBLED
+        val subject = SubjectBISParcel().apply {
+            label               = "a"
+            age                 = 1
+            gender              = 1
+            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_NOCHOOSE
+            device              = Device().setRam(requireContext())
+            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
+            stimuliDelays       = MainApplication.delaysAligner
+            type                = TestBasic.TEST_BISECTION_AUDIO
+            trman_type          = TestBasic.TEST_TRMAN_ADAPTIVE
+//            isDebug             = true
 
-        subject.writeJson(requireContext())
+            writeJson(requireContext())
+        }
         startTest(subject, requireView())
     }
     // =====================================================================

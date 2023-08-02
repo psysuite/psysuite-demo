@@ -3,9 +3,6 @@ pluginManagement {
         google()
         jcenter()
         mavenCentral()
-        maven {
-            url = uri("https://dl.bintray.com/kyonifer/maven")
-        }
         gradlePluginPortal()
     }
 }
