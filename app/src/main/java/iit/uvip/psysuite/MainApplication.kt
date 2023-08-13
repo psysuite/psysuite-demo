@@ -4,10 +4,12 @@ package iit.uvip.psysuite
 import android.app.Application
 import android.os.Build
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.preferences.ProjectPreferencesManager
 import iit.uvip.psysuite.core.model.preferences.ProjectPreferences
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
+import iit.uvip.psysuite.python.SPython
 
 // this is called before any activity onCreate
 
@@ -43,6 +45,9 @@ class MainApplication : Application(){
         // create preference file (if not exist), init preferences
         ProjectPreferencesManager.init(applicationContext, ProjectPreferences(defaultDelays, resources.getString(R.string.main_email)), overwrite = true)
         delaysAligner = ProjectPreferencesManager.preferences.delaysAligner
+
+        SPython.getInstance(applicationContext)   // init python here that we have a context. in Test Classes we get the instance created here
+
         Log.d("MainApplication", "OnCreate: SYSTEM DELAYS=> $delaysAligner")
     }
 }

@@ -31,10 +31,6 @@ android {
     compileSdkVersion(Configs.compileSdkVersion)
     defaultConfig {
 
-//        configurations.all {
-//            resolutionStrategy { force("androidx.core:core-ktx:1.7.0") }
-//        }
-
         applicationId = Configs.applicationId
         versionCode = Configs.versionCode
         versionName = Configs.versionName
@@ -56,6 +52,27 @@ android {
             isDebuggable = true
         }
     }
+
+//    // This flavor distinguish when App is used by the experimenter that can thus set all the task params or
+//    // when App is given to an user that will manage it alone. Many options won't be visible
+//    flavorDimensions("user")
+//    productFlavors {
+//        // Tests are started by the experimenter
+//        create("etero") {
+//            dimension = "version"
+//            applicationIdSuffix = ".etero"
+//            versionNameSuffix = "-etero"
+//            buildConfigField("String", "server_url", "\"https://luda.nixo.xyz/api/app/\"")
+//        }
+//        // App is given to subject which must not change many parameters
+//        create("auto") {
+//            dimension = "user"
+//            applicationIdSuffix = ".auto"
+//            versionNameSuffix = "-auto"
+//            buildConfigField("String", "server_url", "\"http://192.168.1.250:80/luda01/api/app/\"")
+//        }
+//    }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

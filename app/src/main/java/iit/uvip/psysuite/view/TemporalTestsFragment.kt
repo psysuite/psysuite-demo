@@ -1,4 +1,4 @@
-package iit.uvip.psysuite
+package iit.uvip.psysuite.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,9 +8,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicListParcel
+import iit.uvip.psysuite.MainApplication
+import iit.uvip.psysuite.R
+import iit.uvip.psysuite.ResultsManager
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.tests.bis.SubjectBISParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
@@ -75,19 +78,13 @@ class TemporalTestsFragment  :  BaseFragment(
                 showBISSubjectDialog()
             }
         }
-
-
     }
-
     //================================================================================================================
     // 1 - SHOW SUBJECT DATA INSERTION DIALOG
     //================================================================================================================
-
     private fun showTIDSubjectDialog(){
 
-        subject                     = SubjectTIDParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.tid.TestTID")
+        subject = SubjectTIDParcel()
         (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
 
         MainFragment.showDialog(
@@ -101,10 +98,7 @@ class TemporalTestsFragment  :  BaseFragment(
 
     private fun showBISSubjectDialog(){
 
-        subject                     = SubjectBasicListParcel()
-        subject.canRecordAudio      = (activity as MainActivity).haveAudioRecordPermission
-        subject.classes             = listOf("iit.uvip.psysuite.core.tests.bis.TestBIS")
-
+        subject = SubjectBISParcel()
         MainFragment.showDialog(
             subject,
             SubjectBasicDialogFragment(),
@@ -114,6 +108,27 @@ class TemporalTestsFragment  :  BaseFragment(
         )
     }
 
+    private fun debugStart() {
+
+        val subject = SubjectTIDParcel().apply {
+            label               = "a"
+            age                 = 1
+            gender              = 1
+            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+            device              = Device().setRam(requireContext())
+            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
+            stimuliDelays       = MainApplication.delaysAligner
+            type                = TestBasic.TEST_TID_SHORT_AUDIO
+            trman_type          = TestBasic.TEST_TRMAN_ADAPTIVE
+            session             = 1
+            group               = 1
+            showResult          = TestBasic.TEST_SWITCH_ENABLED
+//            isDebug             = true
+
+            writeJson(requireContext())
+        }
+        MainFragment.startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
+    }
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
@@ -126,7 +141,7 @@ class TemporalTestsFragment  :  BaseFragment(
 
         when(requestCode){
             MainFragment.TARGET_FRAGMENT_TID_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE  -> {
+            MainFragment.TARGET_FRAGMENT_BIS_SUBJECT_REQUEST_CODE -> {
                 subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
                 subject.device          = Device().setRam(requireContext())
                 subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
@@ -134,6 +149,10 @@ class TemporalTestsFragment  :  BaseFragment(
                 subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
             }
         }
-        MainFragment.startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
+        MainFragment.startTest(
+            subject,
+            requireView(),
+            R.id.action_temporalTestsFragment_to_testFragment
+        )
     }
 }

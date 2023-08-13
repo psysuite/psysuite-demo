@@ -23,7 +23,7 @@ class ResultsManager private constructor(private val activity: Activity) {
     companion object : SingletonHolder<ResultsManager, Activity>(::ResultsManager)
 
 
-    private var sendResult:Boolean = true
+    private var sendResult:Boolean = false
 
     private val resources: Resources = activity.resources
 
@@ -33,15 +33,12 @@ class ResultsManager private constructor(private val activity: Activity) {
     private lateinit var mailJob: Job
     private var mailAD: AlertDialog? = null
 
-
-    fun createResultsFolder() {
-        //create PsySuite results folder in /Downloads
-
-//        if() {
-            createFolder(activity, Environment.DIRECTORY_DOWNLOADS + "/psysuite_data")
-//        }
-    }
-
+//    fun createResultsFolder() {
+//        //create PsySuite results folder in /Downloads
+////        if() {
+//            createFolder(activity, Environment.DIRECTORY_DOWNLOADS + "/psysuite_data")
+////        }
+//    }
 
     // verify whether send results. if result.res_files is not empty and yes and abort ask whether sending anyway or not
     fun onTestFinished(result: TestResult){
@@ -58,7 +55,8 @@ class ResultsManager private constructor(private val activity: Activity) {
         else{
             when(result.code){
                 TestBasic.TEST_COMPLETED            -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
-                TestBasic.TEST_ABORTED,
+                TestBasic.TEST_ABORTED_DEL_RESULT,
+                TestBasic.TEST_ABORTED_KEEP_RESULT,
                 TestBasic.TEST_ABORTED_WITH_ERROR   -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
                 TestBasic.BLOCK_COMPLETED           -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_partially_completed))
             }
