@@ -83,8 +83,7 @@ class MainFragment : BaseFragment(
         }
 
         fun startTest(subj:SubjectBasicParcel, v:View, nav_action:Int = R.id.action_mainFragment_to_testFragment){
-            subj.stimuliDelays  =
-                MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
+            subj.stimuliDelays  = MainApplication.delaysAligner   // these values were obtained with the oscilloscope and are device-dependent
 
             val bundle = Bundle()
             bundle.putParcelable(TestBasic.TESTINFO_BUNDLE_LABEL, subj)

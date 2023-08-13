@@ -93,6 +93,12 @@ class BindingsFragment  : BaseFragment(
         }
 
         binding.btStartAvbTest.setOnClickListener {
+
+
+//            debugStart()
+//            return@setOnClickListener
+
+
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showAVBSubjectDialog()
@@ -166,6 +172,26 @@ class BindingsFragment  : BaseFragment(
                 subject.stimuliDelays   = MainApplication.delaysAligner
                 subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
             }
+        }
+        MainFragment.startTest(subject, requireView(), R.id.action_bindingsFragment_to_testFragment)
+    }
+
+    private fun debugStart() {
+
+        val subject = SubjectAVBParcel().apply {
+            label               = "a"
+            age                 = 1
+            gender              = 1
+            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+            device              = Device().setRam(requireContext())
+            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
+            stimuliDelays       = MainApplication.delaysAligner
+            type                = TestBasic.TEST_AVB_TIME_SINGLESTIM
+            trman_type          = TestBasic.TEST_TRMAN_ADAPTIVE
+            showResult          = TestBasic.TEST_SWITCH_ENABLED
+//            isDebug             = true
+
+            writeJson(requireContext())
         }
         MainFragment.startTest(subject, requireView(), R.id.action_bindingsFragment_to_testFragment)
     }
