@@ -2,6 +2,7 @@ package iit.uvip.psysuite
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import org.albaspazio.core.ui.show1MethodDialog
 import org.albaspazio.core.updater.Constants
@@ -16,23 +17,24 @@ class SplashActivity : AppCompatActivity() {
         val url = "https://api.allspeak.eu/psysuitestableupdate.xml"
 //        val url = "http://192.168.1.14:8095/psysuitestableupdate.xml"     // localhost @home
 
-        UpdateManager(this, url,
-            {
-                // onSuccess
-                when(it){
-                    Constants.VERSION_UP_TO_UPDATE,
-                    Constants.UPDATE_CANCELLED,
-                    Constants.NETWORK_ABSENT          -> go2main()
-                }
-            },
-            {
-                // onError
-                show1MethodDialog(this, resources.getString(R.string.error), resources.getString(R.string.update_error_message, it), "OK"){
-                    go2main()
-                }
-
-            }
-        ).checkUpdate()
+//        UpdateManager(this, url,
+//            {
+//                // onSuccess
+//                when(it){
+//                    Constants.VERSION_UP_TO_UPDATE,
+//                    Constants.UPDATE_CANCELLED,
+//                    Constants.NETWORK_ABSENT          -> go2main()
+//                }
+//            },
+//            {
+//                // onError
+//                show1MethodDialog(this, resources.getString(R.string.error), resources.getString(R.string.update_error_message, it), "OK"){
+//                    go2main()
+//                }
+//
+//            }
+//        ).checkUpdate()
+        Handler().postDelayed({go2main()},1000L)
     }
 
     private fun go2main(){
