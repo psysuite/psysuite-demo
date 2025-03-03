@@ -112,7 +112,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -123,7 +123,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -134,7 +134,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -146,7 +146,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -162,10 +162,7 @@ class BindingsFragment  : BaseFragment(
             return
 
         when(requestCode){
-            MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE -> {
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
                 subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
                 subject.device          = Device().setRam(requireContext())
                 subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first

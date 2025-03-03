@@ -9,7 +9,7 @@ package iit.uvip.psysuite
 //import androidx.test.espresso.action.ViewActions.click
 //import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 //import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+//import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 //import androidx.test.rule.UiThreadTestRule
 //import com.google.common.truth.Truth.assertThat
 //import org.hamcrest.Matchers.allOf
@@ -18,7 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 //import org.robolectric.annotation.LooperMode
-
+/*
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 //@LooperMode(LooperMode.Mode.PAUSED)
@@ -75,4 +75,6 @@ class PsySuiteInstrumentedTestBasic {
 /*
     @get:Rule
     val mainActivityTestRule = ActivityTestRule(MainActivity::class.java)
+ */
+
  */

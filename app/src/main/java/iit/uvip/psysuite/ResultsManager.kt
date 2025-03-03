@@ -13,6 +13,9 @@ import org.albaspazio.core.filesystem.createFolder
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
 import org.albaspazio.core.mail.MailIntent
+//import org.albaspazio.core.mail.EMailAccount
+//import org.albaspazio.core.mail.Mail
+//import org.albaspazio.core.mail.MailIntent
 import org.albaspazio.core.ui.show1MethodDialog
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
@@ -27,8 +30,8 @@ class ResultsManager private constructor(private val activity: Activity) {
 
     private val resources: Resources = activity.resources
 
-    private val emailAccount: EMailAccount      = EMailAccount("uvip.apptester@gmail.com", "uvipapptester19", "uvip.apptester@gmail.com")
-    private var emailRecipients:Array<String>   = arrayOf("uvip.apptester@gmail.com")
+    private val emailAccount: EMailAccount = EMailAccount("antares.psysuite@gmail.com", "uvipapptester19", "antares.psysuite@gmail.com")
+    private var emailRecipients:Array<String>   = arrayOf("antares.psysuite@gmail.com")
 
     private lateinit var mailJob: Job
     private var mailAD: AlertDialog? = null
