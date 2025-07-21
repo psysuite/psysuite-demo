@@ -1,7 +1,6 @@
 package iit.uvip.psysuite.view
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import iit.uvip.psysuite.BuildConfig
@@ -22,9 +20,7 @@ import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
-
 import iit.uvip.psysuite.databinding.FragmentMainBinding
-
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
@@ -80,6 +76,7 @@ class MainFragment : BaseFragment(
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View{
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         mMainView = binding.root
+        setupFragmentResultListener()
         return mMainView
     }
 
@@ -129,7 +126,6 @@ class MainFragment : BaseFragment(
             }
         }
     }
-
     //================================================================================================================
     // 1 - SHOW SUBJECT DATA INSERTION DIALOG
     //================================================================================================================
@@ -143,25 +139,22 @@ class MainFragment : BaseFragment(
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
     // subject info !
-    override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent?) {
 
-        isSubjectDFopening = false
-        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-            return
+    private fun setupFragmentResultListener() {
+        // Listener for answer results
+        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
+            isSubjectDFopening = false
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            if (subj == null) return@setFragmentResultListener
 
-        when(requestCode){
-
-            TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
-                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device          = Device().setRam(requireContext())
-                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            }
+            subject = subj
+            subject.device = Device().setRam(requireContext())
+            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+            subject.stimuliDelays = MainApplication.delaysAligner
+            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            startTest(subject, requireView())
         }
-        startTest(subject, requireView())
     }
-
 
     // =====================================================================
     fun debugStart() {
