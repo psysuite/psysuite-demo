@@ -11,12 +11,14 @@ import iit.uvip.psysuite.R
 import iit.uvip.psysuite.ResultsManager
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.tests.tsp.SubjectTSPParcel
 import iit.uvip.psysuite.core.tests.ttc.SubjectTTCParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentPredictiontestsBinding
 import iit.uvip.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
 import iit.uvip.psysuite.view.MainFragment.Companion.showDialog
+import iit.uvip.psysuite.view.MainFragment.Companion.startTest
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
@@ -37,6 +39,7 @@ class PredictionTestsFragment  :  BaseFragment(
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         _binding = FragmentPredictiontestsBinding.inflate(inflater, container, false)
+        setupFragmentResultListener()
         return binding.root
     }
 
@@ -63,6 +66,12 @@ class PredictionTestsFragment  :  BaseFragment(
             }
         }
 
+        binding.btStartTspTest.setOnClickListener{
+            if(!isSubjectDFopening){
+                isSubjectDFopening = true
+                showTSPSubjectDialog()
+            }
+        }
     }
     //================================================================================================================
     // 1 - SHOW SUBJECT DATA INSERTION DIALOG
@@ -72,29 +81,47 @@ class PredictionTestsFragment  :  BaseFragment(
         showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
     }
 
+    private fun showTSPSubjectDialog(){
+//        debugStart()
+//        return
+        subject                     = SubjectTSPParcel()
+        showDialog(subject, SubjectBasicDialogFragment(), TARGET_FRAGMENT_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
+    }
+
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
-    //================================================================================================================
-    // subject info !
-    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+    private fun setupFragmentResultListener() {
+        // Listener for answer results
+        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
+            isSubjectDFopening = false
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            if (subj == null) return@setFragmentResultListener
 
-        isSubjectDFopening = false
-        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-            return
-
-        when(requestCode){
-            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
-                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device          = Device().setRam(requireContext())
-                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            }
+            subject = subj
+            subject.device = Device().setRam(requireContext())
+            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+            subject.stimuliDelays = MainApplication.delaysAligner
+            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            startTest(subject, requireView(), R.id.action_predictionTestsFragment_to_testFragment)
         }
-        MainFragment.startTest(
-            subject,
-            requireView(),
-            R.id.action_predictionTestsFragment_to_testFragment
-        )
+    }
+
+    fun debugStart() {
+        val subject = SubjectTSPParcel().apply {
+            label = "a"
+            age = 1
+            gender = 1
+            nextTrailModality = TestBasic.TEST_NEXTTRIAL_NOCHOOSE
+            device = Device().setRam(requireContext())
+            vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+            stimuliDelays = MainApplication.delaysAligner
+            type = TestBasic.TEST_TSP_A_SUPRA
+            trman_type = TestBasic.TEST_TRMAN_FIXED
+//            isDebug             = true
+
+            writeJson(requireContext())
+        }
+        startTest(subject, requireView(), R.id.action_predictionTestsFragment_to_testFragment)
+
     }
 }
