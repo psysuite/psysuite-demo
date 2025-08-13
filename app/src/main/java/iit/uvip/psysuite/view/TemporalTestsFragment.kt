@@ -19,6 +19,8 @@ import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentTemporaltestsBinding
+import iit.uvip.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
+import iit.uvip.psysuite.view.MainFragment.Companion.startTest
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
@@ -39,6 +41,7 @@ class TemporalTestsFragment  :  BaseFragment(
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         _binding = FragmentTemporaltestsBinding.inflate(inflater, container, false)
+        setupFragmentResultListener()
         return binding.root
     }
 
@@ -133,25 +136,41 @@ class TemporalTestsFragment  :  BaseFragment(
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
     // subject info !
-    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+    private fun setupFragmentResultListener() {
+        // Listener for answer results
+        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
+            isSubjectDFopening = false
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            if (subj == null) return@setFragmentResultListener
 
-        isSubjectDFopening = false
-        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-            return
-
-        when(requestCode){
-            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
-                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device          = Device().setRam(requireContext())
-                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            }
+            subject = subj
+            subject.device = Device().setRam(requireContext())
+            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+            subject.stimuliDelays = MainApplication.delaysAligner
+            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
         }
-        MainFragment.startTest(
-            subject,
-            requireView(),
-            R.id.action_temporalTestsFragment_to_testFragment
-        )
     }
+
+//    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+//
+//        isSubjectDFopening = false
+//        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
+//            return
+//
+//        when(requestCode){
+//            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
+//                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
+//                subject.device          = Device().setRam(requireContext())
+//                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
+//                subject.stimuliDelays   = MainApplication.delaysAligner
+//                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+//            }
+//        }
+//        MainFragment.startTest(
+//            subject,
+//            requireView(),
+//            R.id.action_temporalTestsFragment_to_testFragment
+//        )
+//    }
 }

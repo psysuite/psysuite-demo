@@ -139,7 +139,6 @@ class MainFragment : BaseFragment(
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
     // subject info !
-
     private fun setupFragmentResultListener() {
         // Listener for answer results
         parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->

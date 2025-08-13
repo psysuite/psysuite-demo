@@ -17,6 +17,7 @@ import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentVarioustestsBinding
 import iit.uvip.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
 import iit.uvip.psysuite.view.MainFragment.Companion.showDialog
+import iit.uvip.psysuite.view.MainFragment.Companion.startTest
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam
 import org.albaspazio.core.fragments.BaseFragment
@@ -37,6 +38,7 @@ class VariousTestsFragment  :  BaseFragment(
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         _binding = FragmentVarioustestsBinding.inflate(inflater, container, false)
+        setupFragmentResultListener()
         return binding.root
     }
 
@@ -75,25 +77,19 @@ class VariousTestsFragment  :  BaseFragment(
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
     // subject info !
-    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+    private fun setupFragmentResultListener() {
+        // Listener for answer results
+        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
+            isSubjectDFopening = false
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            if (subj == null) return@setFragmentResultListener
 
-        isSubjectDFopening = false
-        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-            return
-
-        when(requestCode){
-            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
-                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device          = Device().setRam(requireContext())
-                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            }
+            subject = subj
+            subject.device = Device().setRam(requireContext())
+            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+            subject.stimuliDelays = MainApplication.delaysAligner
+            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            startTest(subject, requireView(), R.id.action_variousTestsFragment_to_testFragment)
         }
-        MainFragment.startTest(
-            subject,
-            requireView(),
-            R.id.action_variousTestsFragment_to_testFragment
-        )
     }
 }
