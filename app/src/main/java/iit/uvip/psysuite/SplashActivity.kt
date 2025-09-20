@@ -34,7 +34,7 @@ class SplashActivity : AppCompatActivity() {
 //
 //            }
 //        ).checkUpdate()
-        Handler().postDelayed({go2main()},1000L)
+        Handler().postDelayed({go2main()},0L)
     }
 
     private fun go2main(){

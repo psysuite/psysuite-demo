@@ -101,6 +101,8 @@ class TemporalTestsFragment  :  BaseFragment(
 
     private fun showBISSubjectDialog(){
 
+//        debugStart()
+//        return
         subject = SubjectBISParcel()
         MainFragment.showDialog(
             subject,
@@ -113,24 +115,54 @@ class TemporalTestsFragment  :  BaseFragment(
 
     private fun debugStart() {
 
-        val subject = SubjectTIDParcel().apply {
-            label               = "a"
-            age                 = 1
-            gender              = 1
-            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
-            device              = Device().setRam(requireContext())
-            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
-            stimuliDelays       = MainApplication.delaysAligner
-            type                = TestBasic.TEST_TID_SHORT_AUDIO
-            trman_type          = TestBasic.TEST_TRMAN_ADAPTIVE
-            session             = 1
-            group               = 1
-            showResult          = TestBasic.TEST_SWITCH_ENABLED
-//            isDebug             = true
-
-            writeJson(requireContext())
-        }
-        MainFragment.startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
+//        val subject = SubjectAVBParcel().apply {
+//            label               = "a"
+//            age                 = 1
+//            gender              = 1
+//            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+//            device              = Device().setRam(requireContext())
+//            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
+//            stimuliDelays       = MainApplication.delaysAligner
+//            type                = TestBasic.TEST_AVB_TIME_SINGLESTIM
+//            trman_type          = TestBasic.TEST_TRMAN_FIXED
+//            showResult          = TestBasic.TEST_SWITCH_ENABLED
+//            isDebug             = false
+//
+//            writeJson(requireContext())
+//        }
+//        val subject = SubjectBISParcel().apply {
+//            label               = "a"
+//            age                 = 1
+//            gender              = 1
+//            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+//            device              = Device().setRam(requireContext())
+//            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
+//            stimuliDelays       = MainApplication.delaysAligner
+//            type                = TestBasic.TEST_BISECTION_AUDIO
+//            trman_type          = TestBasic.TEST_TRMAN_FIXED
+//            showResult          = TestBasic.TEST_SWITCH_ENABLED
+//            isDebug             = false
+//
+//            writeJson(requireContext())
+//        }
+//        val subject = SubjectTIDParcel().apply {
+//            label               = "a"
+//            age                 = 1
+//            gender              = 1
+//            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_ANSWER
+//            device              = Device().setRam(requireContext())
+//            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
+//            stimuliDelays       = MainApplication.delaysAligner
+//            type                = TestBasic.TEST_TID_SHORT_AUDIO
+//            trman_type          = TestBasic.TEST_TRMAN_FIXED
+//            session             = 1
+//            group               = 1
+//            showResult          = TestBasic.TEST_SWITCH_ENABLED
+//            isDebug             = false
+//
+//            writeJson(requireContext())
+//        }
+        startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
     }
     //================================================================================================================
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
