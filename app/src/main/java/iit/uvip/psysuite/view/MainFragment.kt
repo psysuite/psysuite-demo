@@ -89,8 +89,15 @@ class MainFragment : BaseFragment(
         super.onViewCreated(view, savedInstanceState)
 
         // in the fragment going back here I call: setNavigationResult(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
-            observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it) }
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
+
+        resultLiveData?.observe(viewLifecycleOwner) { result ->
+            if (result != null) {
+                ResultsManager.getInstance(requireActivity()).onTestFinished(result)
+                savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -120,6 +127,9 @@ class MainFragment : BaseFragment(
         }
 
         binding.btStartSampleTest.setOnClickListener {
+
+//            debugStart()
+//            return@setOnClickListener
             if(!isSubjectDFopening) {
                 isSubjectDFopening = true
                 showSampleSubjectDialog()
@@ -158,21 +168,21 @@ class MainFragment : BaseFragment(
     // =====================================================================
     fun debugStart() {
 
-//        val subject = SubjectBISParcel().apply {
+//        val subject = SubjectTSPParcel().apply {
 //            label               = "a"
 //            age                 = 1
 //            gender              = 1
-//            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_NOCHOOSE
+//            nextTrailModality   = TestBasic.TEST_NEXTTRIAL_AUTO
 //            device              = Device().setRam(requireContext())
 //            vercode             = UpdateManager.getVersionCodeLocal(requireContext()).first
 //            stimuliDelays       = MainApplication.delaysAligner
-//            type                = TestBasic.TEST_BISECTION_AUDIO
-//            trman_type          = TestBasic.TEST_TRMAN_ADAPTIVE
+//            type                = TestBasic.TEST_TSP_A_SUB
+//            trman_type          = TestBasic.TEST_TRMAN_FIXED
 ////            isDebug             = true
 //
 //            writeJson(requireContext())
 //        }
-        startTest(subject, requireView())
+//        startTest(subject, requireView())
     }
     // =====================================================================
 }

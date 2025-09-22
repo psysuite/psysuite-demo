@@ -111,7 +111,7 @@ class PredictionTestsFragment  :  BaseFragment(
             label = "a"
             age = 1
             gender = 1
-            nextTrailModality = TestBasic.TEST_NEXTTRIAL_NOCHOOSE
+            nextTrailModality = TestBasic.TEST_NEXTTRIAL_AUTO
             device = Device().setRam(requireContext())
             vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
             stimuliDelays = MainApplication.delaysAligner
