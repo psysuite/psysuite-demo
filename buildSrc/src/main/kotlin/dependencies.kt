@@ -2,7 +2,7 @@ object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
     const val versionCode       = 61
-    const val versionName       = "2.2.0.${versionCode}"
+    const val versionName       = "2.3.0.${versionCode}"
 
     // iit.uvip.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"

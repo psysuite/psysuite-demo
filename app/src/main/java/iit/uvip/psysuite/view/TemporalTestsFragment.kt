@@ -16,6 +16,7 @@ import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.bis.SubjectBISParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
+import iit.uvip.psysuite.core.tests.tir.SubjectTIRParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentTemporaltestsBinding
@@ -81,6 +82,13 @@ class TemporalTestsFragment  :  BaseFragment(
                 showBISSubjectDialog()
             }
         }
+
+        binding.btStartTirTest.setOnClickListener{
+            if(!isSubjectDFopening){
+                isSubjectDFopening = true
+                showTIRSubjectDialog()
+            }
+        }
     }
     //================================================================================================================
     // 1 - SHOW SUBJECT DATA INSERTION DIALOG
@@ -93,6 +101,18 @@ class TemporalTestsFragment  :  BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectTIDDialogFragment(),
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
+            this,
+            parentFragmentManager
+        )
+    }
+
+    private fun showTIRSubjectDialog(){
+
+        subject = SubjectTIRParcel()
+        MainFragment.showDialog(
+            subject,
+            SubjectBasicDialogFragment(),
             MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
