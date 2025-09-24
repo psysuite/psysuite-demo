@@ -1,14 +1,14 @@
 object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
-    const val versionCode       = 56
-    const val versionName       = "2.0.0"
+    const val versionCode       = 61
+    const val versionName       = "2.3.0.${versionCode}"
 
     // iit.uvip.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
 
-    const val compileSdkVersion = 33
+    const val compileSdkVersion = 34
     const val minSdkVersion     = 26
     const val targetSdkVersion  = 26
 }
@@ -27,39 +27,52 @@ object Plugins {
 
 object Versions {
 
-    const val androidApplication = "7.3.0"
+    const val androidApplication = "7.4.2"
     const val gradlePlugin = "4.1.1"
     const val navVersion = "2.3.5"
     const val navSafeArgsGradlePlugin = "1.0.0"
     const val fragment = "1.4.0"
 
+    const val permissions = "2.0.54"
+    const val legacy_support = "1.0.0"
+
+
     // iit.uvip.psysuite.core
-    const val chaquopy          = "14.0.2"
+    const val chaquopy          = "16.0.0"
     const val legacySupport     = "1.0.0"
     const val preference        = "1.2.0"
     const val recycleView       = "1.2.1"
 
     // org.albaspazio.core
     const val kotlin = "1.6.10"
-    const val ktxCore = "1.7.0"
+    const val ktxCore = "1.13.1"
     const val appCompat = "1.5.1"
     const val androidLibrary = "7.2.0"
     const val kparcelablePlugin = "1.7.0"
     const val constraintLayout = "2.1.4"
-    const val material = "1.6.1"
+    const val material = "1.12.0"
     const val lifecycle = "2.5.1"
     const val localbroadcastmanager = "1.1.0"
     const val navFragment = "2.3.5"
     const val moshi = "1.12.0"
+    const val rxkotlin = "2.4.0"
+    const val rxandroid = "2.1.1"
+//    const val sunmail = "1.6.7"
 
     const val junit = "4.13.2"
     const val testRunner = "1.5.2"
-    const val testEspressoCore = "3.5.1"
+    const val testEspressoCore = "3.6.1"
 }
 
 object Dependencies {
 
+    const val permissions       = "io.github.nishkarsh:android-permissions:${Versions.permissions}"
+
     object AndroidX {
+
+        const val localbroadcastmanager   = "androidx.localbroadcastmanager:localbroadcastmanager:${Versions.localbroadcastmanager}"
+        const val legacy_support    = "androidx.legacy:legacy-support-v4:${Versions.legacy_support}"
+        const val fragment          = "androidx.fragment:fragment:${Versions.fragment}"
 
         // iit.uvip.psysuite.core
         const val preference        = "androidx.preference:preference-ktx:${Versions.preference}"
@@ -67,6 +80,7 @@ object Dependencies {
         const val legacySupport     = "androidx.legacy:legacy-support-v4:${Versions.legacySupport}"
 
         // org.albaspazio.core
+        const val livecycleviewmodel= "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
         const val navFragment       = "androidx.navigation:navigation-fragment-ktx:${Versions.navFragment}"
         const val navUi             = "androidx.navigation:navigation-ui-ktx:${Versions.navFragment}"
         const val ktxCore           = "androidx.core:core-ktx:${Versions.ktxCore}"
@@ -76,7 +90,6 @@ object Dependencies {
 
         const val livecycledataKtx  = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
         const val livecyclecommon   = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
-        const val localbroadcastmanager   = "androidx.localbroadcastmanager:localbroadcastmanager:${Versions.localbroadcastmanager}"
 
         const val testRunner        = "androidx.test:runner:${Versions.testRunner}"
         const val testEspressoCore  = "androidx.test.espresso:espresso-core:${Versions.testEspressoCore}"
@@ -91,6 +104,18 @@ object Dependencies {
         const val moshi     = "com.squareup.moshi:moshi:${Versions.moshi}"
         const val moshiKt   = "com.squareup.moshi:moshi-kotlin:${Versions.moshi}"
     }
+
+    object rx {
+        const val rxandroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxandroid}"
+        const val rxrelay   = "com.jakewharton.rxrelay2:rxrelay:${Versions.rxandroid}"
+        const val rxkotlin  = "io.reactivex.rxjava2:rxkotlin:${Versions.rxkotlin}"
+    }
+
+//    object sunmail {
+//        const val mail          = "com.sun.mail:android-mail:${Versions.sunmail}"
+//        const val activation    = "com.sun.mail:android-activation:${Versions.sunmail}"
+//    }
+
 
     const val junit         = "junit:junit:${Versions.junit}"
 }

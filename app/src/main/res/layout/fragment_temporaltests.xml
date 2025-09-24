@@ -36,6 +36,19 @@
 
 
     <Button
+        android:id="@+id/bt_start_tir_test"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="360dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/tir_label"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_bis" />
+
+    <Button
         android:id="@+id/bt_start_bis"
         style="@style/Base.Widget.AppCompat.Button.Colored"
         android:layout_width="360dp"

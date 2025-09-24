@@ -53,27 +53,6 @@ android {
         }
     }
 
-//    // This flavor distinguish when App is used by the experimenter that can thus set all the task params or
-//    // when App is given to an user that will manage it alone. Many options won't be visible
-//    flavorDimensions("user")
-//    productFlavors {
-//        // Tests are started by the experimenter
-//        create("etero") {
-//            dimension = "version"
-//            applicationIdSuffix = ".etero"
-//            versionNameSuffix = "-etero"
-//            buildConfigField("String", "server_url", "\"https://luda.nixo.xyz/api/app/\"")
-//        }
-//        // App is given to subject which must not change many parameters
-//        create("auto") {
-//            dimension = "user"
-//            applicationIdSuffix = ".auto"
-//            versionNameSuffix = "-auto"
-//            buildConfigField("String", "server_url", "\"http://192.168.1.250:80/luda01/api/app/\"")
-//        }
-//    }
-
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -87,62 +66,19 @@ android {
         viewBinding = true
     }
 
-    packagingOptions {
-        pickFirst("META-INF/NOTICE*")
-        pickFirst("META-INF/LICENSE*")
-    }
-
-//    testOptions {
-//        // include the android resources in local tests. See http://robolectric.org/migrating/#migrating-to-40
-//        unitTests.isIncludeAndroidResources = true
-//    }
 }
 
 dependencies {
 
-    implementation("com.intentfilter:android-permissions:2.0.54")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.fragment:fragment:1.5.5")
-
-    // added to prevent double class definition 19/10/2022
-    api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-
-
-//    debugImplementation ("androidx.fragment:fragment-testing:1.1.0"){
-//        exclude("androidx.test", "core-ktx")
-//    }
-//    debugImplementation("androidx.test:core-ktx:1.4.0")
-
-
     implementation(project(":core"))
     implementation(project(":psysuitepython"))
     implementation(project(":psysuitecore"))
-    implementation("androidx.test.ext:junit-ktx:1.1.5")
 
-    testImplementation("junit:junit:4.13.2")
-//    testImplementation("org.robolectric:robolectric:4.6.1")
-//    testImplementation("androidx.test:core:1.4.0")
-    testImplementation("androidx.test:runner:1.4.0")
-    testImplementation("androidx.test.ext:junit:1.1.3")
-//    testImplementation("androidx.test.ext:truth:1.4.0")
-//    testImplementation("androidx.test.espresso:espresso-core:3.4.0")
-//    testImplementation("androidx.test.espresso:espresso-intents:3.4.0")
-//    testImplementation("org.mockito:mockito-core:4.0.0")
-//    androidTestImplementation("androidx.navigation:navigation-testing:${Versions.navVersion}")
-//    androidTestImplementation("org.mockito:mockito-android:4.0.0")
-//    androidTestImplementation("androidx.test:core:1.4.0")
-    androidTestImplementation("androidx.test:runner:1.4.0")
-//    androidTestImplementation("androidx.test:rules:1.4.0")
-//    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-//    androidTestImplementation("androidx.test.ext:truth:1.4.0")
-//    androidTestImplementation("com.google.truth:truth:1.1.3")
-//    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-//    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0")
-//    androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
-//    androidTestImplementation("androidx.test.espresso.idling:idling-concurrent:3.4.0")
-//    androidTestImplementation("org.robolectric:annotations:4.6.1")
-
-    // The following Espresso dependency can be either "implementation" or "androidTestImplementation", depending on whether you want the
-    // dependency to appear on your APK's compile classpath or the test APK classpath.
-//    androidTestImplementation("androidx.test.espresso:espresso-idling-resource:3.4.0")
+    implementation(Dependencies.permissions)
+    implementation(Dependencies.AndroidX.legacy_support)
+    implementation(Dependencies.AndroidX.fragment)
+    implementation(Dependencies.AndroidX.livecycleviewmodel)
+    implementation("androidx.test:monitor:1.7.1")
+    implementation("androidx.test.ext:junit-ktx:1.2.1")
+    implementation("androidx.navigation:navigation-testing:2.7.7")
 }

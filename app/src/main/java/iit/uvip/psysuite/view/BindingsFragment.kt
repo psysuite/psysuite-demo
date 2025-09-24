@@ -20,6 +20,8 @@ import iit.uvip.psysuite.core.tests.temporalbinding.tvb.SubjectTVBParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentBindingsBinding
+import iit.uvip.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
+import iit.uvip.psysuite.view.MainFragment.Companion.startTest
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.setRam
@@ -42,6 +44,7 @@ class BindingsFragment  : BaseFragment(
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         _binding = FragmentBindingsBinding.inflate(inflater, container, false)
+        setupFragmentResultListener()
         return binding.root
     }
 
@@ -112,7 +115,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -123,7 +126,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -134,7 +137,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -146,7 +149,7 @@ class BindingsFragment  : BaseFragment(
         MainFragment.showDialog(
             subject,
             SubjectBindingsDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE,
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
             this,
             parentFragmentManager
         )
@@ -155,27 +158,21 @@ class BindingsFragment  : BaseFragment(
     // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
     //================================================================================================================
     // subject info !
-    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+    private fun setupFragmentResultListener() {
+        // Listener for answer results
+        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
+            isSubjectDFopening = false
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            if (subj == null) return@setFragmentResultListener
 
-        isSubjectDFopening = false
-        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-            return
-
-        when(requestCode){
-            MainFragment.TARGET_FRAGMENT_ATB_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_ATVB_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_AVB_SUBJECT_REQUEST_CODE,
-            MainFragment.TARGET_FRAGMENT_TVB_SUBJECT_REQUEST_CODE -> {
-                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-                subject.device          = Device().setRam(requireContext())
-                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-                subject.stimuliDelays   = MainApplication.delaysAligner
-                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            }
+            subject = subj
+            subject.device = Device().setRam(requireContext())
+            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+            subject.stimuliDelays = MainApplication.delaysAligner
+            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            startTest(subject, requireView(), R.id.action_bindingsFragment_to_testFragment)
         }
-        MainFragment.startTest(subject, requireView(), R.id.action_bindingsFragment_to_testFragment)
     }
-
     private fun debugStart() {
 
         val subject = SubjectAVBParcel().apply {
