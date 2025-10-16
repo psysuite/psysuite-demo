@@ -153,11 +153,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 val newUrl = newValue.toString().trim()
                 resultsManager.setWebApiUrl(newUrl)
                 updateWebUploadStatus()
-                summary = if (newUrl.isBlank() || newUrl == "https://your-server.com/api") {
-                    "Not configured - tap to set server URL"
-                } else {
-                    "Current URL: $newUrl"
-                }
+                summary =   if (newUrl.isBlank() || newUrl == "https://your-server.com/api")    "Not configured - tap to set server URL"
+                            else                                                                "Current URL: $newUrl"
                 true
             }
         }

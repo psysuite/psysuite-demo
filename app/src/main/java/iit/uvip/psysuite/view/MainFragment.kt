@@ -18,27 +18,21 @@ import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
-import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentMainBinding
-import org.albaspazio.core.accessory.Device
-import org.albaspazio.core.accessory.setRam
-import org.albaspazio.core.fragments.BaseFragment
-import org.albaspazio.core.updater.UpdateManager
 
 
-class MainFragment : BaseFragment(
-    layout              = R.layout.fragment_main,
-    landscape           = false,
+class MainFragment : TestLaunchFragment(
+    layout = R.layout.fragment_main,
+    landscape = false,
     hideAndroidControls = false
 ) {
-    private lateinit var subject: SubjectBasicParcel
-    override val LOG_TAG:String = MainFragment::class.java.simpleName
+    override val LOG_TAG: String = MainFragment::class.java.simpleName
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private var isSubjectDFopening:Boolean = false
+    override fun getTestFragmentNavigationAction(): Int = R.id.action_mainFragment_to_testFragment
 
     companion object {
         @JvmStatic val isDebug:Boolean = false
@@ -73,10 +67,9 @@ class MainFragment : BaseFragment(
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View{
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         mMainView = binding.root
-        setupFragmentResultListener()
         return mMainView
     }
 
@@ -88,7 +81,7 @@ class MainFragment : BaseFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // in the fragment going back here I call: setNavigationResult(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
+        // MainFragment has additional logic to remove the result after processing
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
 
@@ -127,41 +120,9 @@ class MainFragment : BaseFragment(
         }
 
         binding.btStartSampleTest.setOnClickListener {
-
 //            debugStart()
 //            return@setOnClickListener
-            if(!isSubjectDFopening) {
-                isSubjectDFopening = true
-                showSampleSubjectDialog()
-            }
-        }
-    }
-    //================================================================================================================
-    // 1 - SHOW SUBJECT DATA INSERTION DIALOG
-    //================================================================================================================
-
-    private fun showSampleSubjectDialog(){
-        subject                     = SubjectSampleParcel()
-        showDialog(subject, SubjectSampleDialogFragment(), TARGET_FRAGMENT_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
-    }
-
-    //================================================================================================================
-    // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
-    //================================================================================================================
-    // subject info !
-    private fun setupFragmentResultListener() {
-        // Listener for answer results
-        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
-            isSubjectDFopening = false
-            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
-            if (subj == null) return@setFragmentResultListener
-
-            subject = subj
-            subject.device = Device().setRam(requireContext())
-            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
-            subject.stimuliDelays = MainApplication.delaysAligner
-            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            startTest(subject, requireView())
+            showSubjectDialog(SubjectSampleParcel(), SubjectSampleDialogFragment())
         }
     }
 
