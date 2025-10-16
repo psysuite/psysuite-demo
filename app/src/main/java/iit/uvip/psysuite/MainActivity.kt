@@ -22,6 +22,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
+import iit.uvip.psysuite.settings.SettingsActivity
+import iit.uvip.psysuite.device.DeviceIdentificationManager
+import iit.uvip.psysuite.device.DeviceIdBackupManager
+import iit.uvip.psysuite.device.DeviceRegistrationDialog
+import android.widget.Toast
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.pdf.PdfViewActivity
 import java.util.*
@@ -34,6 +39,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private val TEST_PERMISSIONS_REQUEST_INTERNET = 2
 
     private var dialog: AlertDialog? = null
+    private lateinit var deviceManager: DeviceIdentificationManager
 
     // This will be called whenever an Intent with an action named "NAVIGATION_UPDATE" is broadcasted.
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -43,6 +49,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -58,11 +65,15 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET),TEST_PERMISSIONS_REQUEST_INTERNET)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        
+        // Check device registration after permissions
+        deviceManager = DeviceIdentificationManager.getInstance(this)
+        checkDeviceRegistration()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
     // Handle action bar item clicks here. The action bar will
@@ -71,11 +82,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         //TODO hide menu_action_results when already in resultsFragment
         return when(item.itemId) {
-//            R.id.menu_action_settings -> {
-//                val intent = Intent(this, SettingsActivity::class.java)
-//                startActivity(intent)
-//                true
-//            }
+
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
 //            R.id.menu_action_results -> {
 //                findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsFragment)
 //                true
@@ -104,6 +116,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             .registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
     }
 
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        dialog?.dismiss()
+        findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
+        super.onDestroy()
+    }
+
+    // region NAVIGATION
     override fun onSupportNavigateUp() = findNavController(R.id.my_nav_host_fragment).navigateUp()
 
     override fun onDestinationChanged(controller: NavController, destination: NavDestination,arguments: Bundle?) {}
@@ -112,21 +132,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus)
             refreshNavigationVisibility()
-    }
-
-    private fun checkPermissions(perm: String) {
-        val permissionManager: PermissionManager = PermissionManager.getInstance(applicationContext)
-        permissionManager.checkPermissions(
-            Collections.singleton(perm),
-            object : PermissionManager.PermissionRequestListener {
-                override fun onPermissionGranted() {
-                    haveAudioRecordPermission = true
-                }
-
-                override fun onPermissionDenied(deniedPermissions: DeniedPermissions) {
-                    haveAudioRecordPermission = false
-                }
-            })
     }
 
     fun refreshNavigationVisibility() {
@@ -144,6 +149,42 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             supportActionBar?.show()
         }
     }
+    // endregion
+
+    // region DEVICE REGISTRATION
+
+    private fun checkDeviceRegistration() {
+        if (deviceManager.isFirstLaunch) {
+            // Try to restore from backup first
+            val backupManager = DeviceIdBackupManager(this)
+            val restoredId = backupManager.restoreDeviceId()
+            
+            if (restoredId != null)     deviceManager.setDeviceId(restoredId)
+            else                        showFirstLaunchRegistrationDialog()
+        }
+    }
+    
+    private fun showFirstLaunchRegistrationDialog() {
+        val dialog = DeviceRegistrationDialog.newInstance(isFirstLaunch = true, allowSkip = true)
+        dialog.setOnDeviceRegisteredListener(object : DeviceRegistrationDialog.OnDeviceRegisteredListener {
+            override fun onDeviceRegistered(deviceId: String) {
+                DeviceIdBackupManager(this@MainActivity).backupDeviceId(deviceId)   // Backup the device ID
+                Toast.makeText(this@MainActivity, "Device registered as: $deviceId", Toast.LENGTH_LONG).show()
+            }
+            
+            override fun onRegistrationSkipped() {                  // User chose to skip registration
+                Toast.makeText(this@MainActivity, "Device registration skipped. You can register later from the menu.", Toast.LENGTH_LONG).show()
+            }
+            
+            override fun onRegistrationCancelled() {                // On first launch, treat cancel as skip
+                deviceManager.skipRegistration()
+            }
+        })
+        
+        dialog.show(supportFragmentManager, "device_registration")
+    }
+
+    // endregion
 
     override fun onBackPressed() {
 
@@ -152,24 +193,31 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         when(currentFragment?.LOG_TAG){
             "AnswerDialogFragment", "TestFragment"  -> {}
             "MainFragment"      -> {
-                                AlertDialog.Builder(this)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setTitle("Chiudi ?")
-                                .setMessage("Vuoi uscire dall'applicazione ??")
-                                .setCancelable(false)
-                                .setPositiveButton("SI"){ _, _ -> finish() }
-                                .setNegativeButton("NO", null)
-                                .show()
+                AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(resources.getString(R.string.warning))
+                    .setMessage(resources.getString(R.string.want_to_quit_app))
+                    .setCancelable(false)
+                    .setPositiveButton(resources.getString(R.string.yes)){ _, _ -> finish() }
+                    .setNegativeButton(resources.getString(R.string.no), null)
+                    .show()
             }
             else                -> super.onBackPressed()
         }
     }
 
+    private fun checkPermissions(perm: String) {
+        val permissionManager: PermissionManager = PermissionManager.getInstance(applicationContext)
+        permissionManager.checkPermissions(
+            Collections.singleton(perm),
+            object : PermissionManager.PermissionRequestListener {
+                override fun onPermissionGranted() {
+                    haveAudioRecordPermission = true
+                }
 
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-        dialog?.dismiss()
-        findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
-        super.onDestroy()
+                override fun onPermissionDenied(deniedPermissions: DeniedPermissions) {
+                    haveAudioRecordPermission = false
+                }
+            })
     }
 }

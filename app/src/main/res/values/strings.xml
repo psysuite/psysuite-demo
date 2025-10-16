@@ -7,7 +7,7 @@
     <string name="no">no</string>
     <string name="abort">interrompi</string>
 
-
+    <string name="want_to_quit_app">Vuoi uscire dall\applicazione?</string>
     <string name="onend_test">Test completato</string>
     <string name="success">Operazione eseguita con successo</string>
     <string name="failure">Operazione Fallita</string>
