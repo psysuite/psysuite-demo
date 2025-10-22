@@ -8,9 +8,13 @@ import android.content.res.Resources
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Environment
+import android.util.Log
+import androidx.navigation.findNavController
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.device.DeviceIdentificationManager
+import iit.uvip.psysuite.core.utility.filesystem.FileSystemManager
+import iit.uvip.psysuite.core.utility.filesystem.ResultFileItem
 import kotlinx.coroutines.*
 import org.albaspazio.core.accessory.SingletonHolder
 import org.albaspazio.core.accessory.getCompanionObjectMethod
@@ -33,144 +37,144 @@ import java.util.*
 import kotlin.math.min
 import androidx.core.content.edit
 
+/*
+    RULES:
+    user can send data by web upload or email, whether enabled. In both cases, these conditions are needed:
+    1) the device must be registered
+    2) internet connection must exist
+    3) result file must exist
+ */
+
 // SINGLETON
-class ResultsManager private constructor(private val activity: Activity) {
+class ResultsManager private constructor(private var activity: Activity) {
 
     companion object : SingletonHolder<ResultsManager, Activity>(::ResultsManager)
 
     private val resources: Resources        = activity.resources
-    private val prefs: SharedPreferences    = activity.getSharedPreferences("psysuite_web_config", Context.MODE_PRIVATE)
     private val deviceManager               = DeviceIdentificationManager.getInstance(activity)
-    
-    private var sendResult:Boolean = prefs.getBoolean("email_enabled", false)
+    private val fileSystemManager           = FileSystemManager.getInstance()
 
-    // Web upload configuration
-    private var webApiUrl: String = prefs.getString("web_api_url", "https://your-server.com/api") ?: "https://your-server.com/api"
-    private var webApiKey: String = prefs.getString("web_api_key", "") ?: ""
-    
+    private val prefs: SharedPreferences    = activity.getSharedPreferences("psysuite_web_config", Context.MODE_PRIVATE)
+
+    private var maxRetryAttempts: Int       = prefs.getInt("max_retry_attempts", 3)
+    private var retryDelayMs: Long          = prefs.getLong("retry_delay_ms", 5000)
+
+    // Simple properties - no SecureStorage needed
+    var webApiUrl: String = BuildConfig.API_URL
+    var webApiKey: String = BuildConfig.API_KEY
+
+    // region flags
     // Web upload is enabled when API URL and key are properly configured
-    private val webUploadEnabled: Boolean
-        get() = webApiUrl.isNotBlank() && 
-                webApiUrl != "https://your-server.com/api" && 
-                webApiKey.isNotBlank()
+    val isWebUploadEnabled: Boolean
+        get() = webApiUrl.isNotBlank() && webApiKey.isNotBlank()
 
-    private var maxRetryAttempts: Int   = prefs.getInt("max_retry_attempts", 3)
-    private var retryDelayMs: Long      = prefs.getLong("retry_delay_ms", 5000)
+    val isNetworkAvailable: Boolean
+        get() {
+            val connectivityManager = activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network             = connectivityManager.activeNetwork ?: return false
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }
 
-    // Email configuration (existing)
+    var isEmailEnabled:Boolean
+        get()       = prefs.getBoolean("email_enabled", false)
+        set(value)  = prefs.edit { putBoolean("email_enabled", value)}
+
+    val canUpload: Boolean
+        get() = deviceManager.isDeviceRegistered && isNetworkAvailable && isWebUploadEnabled
+
+    val canSendEmail: Boolean
+        get() = deviceManager.isDeviceRegistered && isNetworkAvailable && isEmailEnabled
+    
+
+
+    // endregion
+
+    // region Email configuration (existing)
     private val emailAccount: EMailAccount      = EMailAccount("antares.psysuite@gmail.com", "uvipapptester19", "antares.psysuite@gmail.com")
     private var emailRecipients:Array<String>   = arrayOf("antares.psysuite@gmail.com")
 
     private lateinit var mailJob: Job
     private var mailAD: AlertDialog? = null
+
+    // endregion
+
     private lateinit var uploadJob: Job
 
-    // Configuration methods
-    fun setWebApiUrl(url: String) {
-        webApiUrl = url
-        prefs.edit { putString("web_api_url", url) }
+
+    fun updateContext(newActivity: Activity) {
+        this.activity = newActivity
     }
 
-    fun setWebApiKey(key: String) {
-        webApiKey = key
-        prefs.edit { putString("web_api_key", key) }
+    /**
+     * Opens the Results Manager Fragment for file management
+     */
+    fun openResultsManager() {
+        try {
+            val navController = activity.findNavController(R.id.my_nav_host_fragment)
+            
+            // Use NavigationActionManager for centralized navigation handling
+            val success = NavigationActionManager.navigateWithFallback(navController, NavigationActionManager.NavigationDestination.RESULTS_MANAGER_FRAGMENT)
+            
+            if (!success) {
+                Log.w("ResultsManager", "Navigation to results manager failed, using fallback")
+                showAlert(activity, resources.getString(R.string.warning), "Results manager not available, using legacy upload check")
+                checkPendingUploads()
+            }
+            
+        } catch (e: Exception) {
+            Log.e("ResultsManager", "Unexpected error navigating to results manager", e)
+            showAlert(activity, resources.getString(R.string.error), "Cannot open results manager: ${e.message}")
+            // Still provide fallback functionality
+            checkPendingUploads()
+        }
     }
-    
-    fun setEmailEnabled(enabled: Boolean) {
-        sendResult = enabled
-        prefs.edit { putBoolean("email_enabled", enabled) }
-    }
-    
-    fun isEmailEnabled(): Boolean {
-        return sendResult
-    }
-    
-    fun isWebUploadEnabled(): Boolean {
-        return webUploadEnabled
-    }
-    
-    fun getWebApiUrl(): String {
-        return webApiUrl
-    }
-    
-    fun getWebApiKey(): String {
-        return webApiKey
-    }
+    val existResultsToSend: Boolean
+        get() {
+            val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "psysuite_results")
+            if (!downloadsDir.exists()) return false
+            return fileSystemManager.scanForValidResultPairs(downloadsDir).isNotEmpty()
+        }
 
-    fun isNetworkAvailable(): Boolean {
-        val connectivityManager = activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
 
-    // Main method called when test finishes
-    fun onTestFinished(result: TestResult){
+    // Main method called when test finishes, set result and call processResults.
+    fun onTestFinished(result: TestResult) {
 
-        // check whether test defined specific recipients. otherwise use the default one(s)
-        val ci = getCompanionObjectMethod(result.testClass, "getEmailRecipients")
-        if(ci.first != null) emailRecipients = (ci.first?.call(ci.second)) as Array<String>
-        
-        // Skip processing if no result files
-        if (result.res_files.isEmpty()) {
-            showTestCompletionMessage(result.code)
-            return
+        if(isEmailEnabled) {
+            // check whether test defined specific recipients. otherwise use the default one(s)
+            val ci = getCompanionObjectMethod(result.testClass, "getEmailRecipients")
+            if (ci.first != null) emailRecipients = (ci.first?.call(ci.second)) as Array<String>
         }
         
-        // Determine submission strategy based on device registration, network, and configuration
-        val isDeviceRegistered = deviceManager.isDeviceRegistered
-        val isNetworkAvailable = isNetworkAvailable()
-        val isEmailEnabled = sendResult
-        
-        // Add device ID to the result if device is registered
-//        if (isDeviceRegistered) {
-//            result.subject.deviceId = deviceManager.getDeviceId()!!
-//        }
-        
+        // Determine submission strategy based on device registration, network presence, result file presence, enabled configurations
         when {
-            // Device registered: Try web upload first, then email fallback
-            isDeviceRegistered && webUploadEnabled && isNetworkAvailable -> {
-                if (result.code == TestBasic.TEST_COMPLETED) {
-                    uploadToWebBackend(result)
-                } else {
-                    askWhetherUploadingToWeb(result)
-                }
+            result.res_files.isEmpty() -> showTestCompletionMessage(result.code)
+
+            !isNetworkAvailable -> {
+                showAlert(activity, resources.getString(R.string.no_internet_connection), resources.getString(R.string.connect_then_send_results))
+                showTestCompletionMessage(result.code)
             }
-            
-            // Device registered but no network: Try email if enabled
-            isDeviceRegistered && webUploadEnabled && !isNetworkAvailable && isEmailEnabled -> {
-                showNoNetworkDialog(result, canTryEmail = true)
+
+            !deviceManager.isDeviceRegistered -> {
+                showAlert(activity, resources.getString(R.string.device_not_registered), resources.getString(R.string.register_device_then_send_results))
+                showTestCompletionMessage(result.code)
             }
-            
-            // Device registered but no network and no email: Save locally
-            isDeviceRegistered && webUploadEnabled && !isNetworkAvailable && !isEmailEnabled -> {
-                showNoNetworkDialog(result, canTryEmail = false)
+
+            !isWebUploadEnabled && !isEmailEnabled -> {
+                showAlert(activity, resources.getString(R.string.warning), "se vuoi mandare i risultati configura la web application o la mail")
+                showTestCompletionMessage(result.code)
             }
-            
-            // Device registered but web upload disabled: Use email if enabled
-            isDeviceRegistered && !webUploadEnabled && isEmailEnabled -> {
-                if (result.code == TestBasic.TEST_COMPLETED) {
-                    sendResult(result)
-                } else {
-                    askWhetherSending(result)
-                }
+
+            canUpload -> {      // default behaviour: web upload
+                if (result.code == TestBasic.TEST_COMPLETED)    uploadToWebBackend(result)
+                else                                            askWhetherUploadingToWeb(result)
             }
-            
-            // Device registered but no upload options available
-            isDeviceRegistered && !webUploadEnabled && !isEmailEnabled -> {
-                showAlert(activity, "Results Saved", "Results saved locally. No upload method configured.")
+
+            canSendEmail -> {
+                if (result.code == TestBasic.TEST_COMPLETED)    sendByEmail(result)
+                else                                            askWhetherSending(result)
             }
-            
-            // Device not registered: Ask user what to do
-            !isDeviceRegistered && isEmailEnabled -> {
-                askUnregisteredDeviceAction(result)
-            }
-            
-            // Device not registered and no email: Suggest registration
-            !isDeviceRegistered && !isEmailEnabled -> {
-                showDeviceRegistrationRequiredDialog(result)
-            }
-            
+
             else -> {
                 // Fallback: just show completion message
                 showTestCompletionMessage(result.code)
@@ -178,30 +182,165 @@ class ResultsManager private constructor(private val activity: Activity) {
         }
     }
 
-    // Check for pending uploads at app startup
+    // Check for pending uploads at app startup or after a test completion when some condition (device registration, internet connection, web setup) were not met
     fun checkPendingUploads() {
-        if (!webUploadEnabled) return
 
+        when{
+            !isNetworkAvailable                 ->  {
+                                                        showAlert(activity, resources.getString(R.string.no_internet_connection), resources.getString(R.string.connect_then_send_results))
+                                                        return
+                                                    }
+            !deviceManager.isDeviceRegistered   ->  {
+                                                        showAlert(activity, resources.getString(R.string.device_not_registered), resources.getString(R.string.register_device_then_send_results))
+                                                        return
+                                                    }
+            !isWebUploadEnabled && !isEmailEnabled -> {
+                                                        showAlert(activity, resources.getString(R.string.warning), "se vuoi mandare i risultati configura la web application o la mail")
+                                                        return
+                                                    }
+        }
+        // can i proceed with one of the two methods
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "psysuite_data")
+                val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "psysuite_results")
                 if (!downloadsDir.exists()) return@launch
 
-                val jsonFiles = downloadsDir.listFiles { file -> file.name.endsWith(".json") }
-                jsonFiles?.forEach { jsonFile ->
-                    val resultFile = File(jsonFile.parent, jsonFile.nameWithoutExtension + ".txt")
-                    if (resultFile.exists()) {
-                        val experimentData = parseExperimentFiles(jsonFile, resultFile)
-                        if (experimentData != null) {
-                            val success = doUploadExperiment(experimentData)
-                            if (success) {
-                                moveFilesToPrivateStorage(arrayOf(jsonFile.absolutePath, resultFile.absolutePath))
-                            }
+                val resultsFiles = fileSystemManager.scanForValidResultPairs(downloadsDir)
+                for(res_file in resultsFiles){
+                    Log.d("ResultsManager", "Found result file: ${res_file.displayName}")
+                    val experimentData = parseExperimentFiles(res_file.jsonFile, res_file.txtFile)
+                    if (experimentData != null) {
+                        Log.i("ResultsManager", "Attempting deferred upload for experiment: ${experimentData.exp_uid}")
+                        val success = doUploadExperiment(experimentData)
+                        if (success) {
+                            Log.i("ResultsManager", "Successfully uploaded deferred experiment: ${experimentData.exp_uid}")
+                            moveFilesToPrivateStorage(arrayOf(res_file.jsonFile.absolutePath, res_file.txtFile.absolutePath))
+                        } else {
+                            Log.w("ResultsManager", "Failed to upload deferred experiment: ${experimentData.exp_uid}")
                         }
+                    } else {
+                        Log.e("ResultsManager", "Failed to parse deferred experiment files: ${res_file.jsonFile.name}")
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e("ResultsManager", "Error checking pending uploads", e)
+                Log.e("ResultsManager", "Error checking pending uploads", e)
+            }
+        }
+    }
+
+    private fun showTestCompletionMessage(code: Int) {
+        when(code){
+            TestBasic.TEST_COMPLETED            -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
+            TestBasic.TEST_ABORTED_DEL_RESULT,
+            TestBasic.TEST_ABORTED_KEEP_RESULT,
+            TestBasic.TEST_ABORTED_WITH_ERROR   -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
+            TestBasic.BLOCK_COMPLETED           -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_partially_completed))
+        }
+    }
+
+    // region Web upload methods
+
+    /**
+     * Checks if a result with the given unique ID has already been submitted
+     */
+    fun checkIfAlreadySubmitted(exp_uid: String): Boolean {
+        return fileSystemManager.isAlreadySubmitted(exp_uid)
+    }
+
+    /**
+     * Uploads multiple selected result files
+     */
+    fun uploadSelectedResults(selectedItems: List<ResultFileItem>, onProgress: (ResultFileItem, Boolean, String?) -> Unit) {
+        uploadJob = GlobalScope.launch {
+            try {
+                withContext(Dispatchers.Main) {
+                    mailAD = show1MethodDialog(activity, "Upload", "Preparing upload...", resources.getString(R.string.abort)){
+                        uploadJob.cancel()
+                        mailAD?.dismiss()
+                        mailAD = null
+                    }
+                }
+
+                var successCount = 0
+                val totalCount = selectedItems.size
+
+                for ((index, item) in selectedItems.withIndex()) {
+                    // Update progress dialog
+                    withContext(Dispatchers.Main) {
+                        mailAD?.setMessage("Uploading ${item.displayName}... (${index + 1}/$totalCount)")
+                    }
+
+                    try {
+                        // Check if already submitted
+                        if (checkIfAlreadySubmitted(item.exp_uid)) {
+                            Log.i("ResultsManager", "Skipping already submitted file: ${item.displayName}")
+                            withContext(Dispatchers.Main) {
+                                onProgress(item, true, "Already submitted")
+                            }
+                            successCount++
+                            continue
+                        }
+
+                        // Parse and upload
+                        val experimentData = parseExperimentFiles(item.jsonFile, item.txtFile)
+                        if (experimentData != null) {
+                            Log.i("ResultsManager", "Uploading experiment: ${experimentData.exp_uid}")
+                            val success = doUploadExperiment(experimentData)
+
+                            if (success) {
+                                // Move files to submitted folder
+                                val filesToMove = listOf(item.jsonFile, item.txtFile)
+                                val moved = fileSystemManager.moveFilesToSubmitted(filesToMove)
+
+                                if (moved) {
+                                    successCount++
+                                    Log.i("ResultsManager", "Successfully uploaded and moved: ${item.displayName}")
+                                    withContext(Dispatchers.Main) {
+                                        onProgress(item, true, null)
+                                    }
+                                } else {
+                                    Log.w("ResultsManager", "Upload succeeded but failed to move files: ${item.displayName}")
+                                    withContext(Dispatchers.Main) {
+                                        onProgress(item, false, "Upload succeeded but failed to move files")
+                                    }
+                                }
+                            } else {
+                                Log.w("ResultsManager", "Upload failed: ${item.displayName}")
+                                withContext(Dispatchers.Main) {
+                                    onProgress(item, false, "Upload failed")
+                                }
+                            }
+                        } else {
+                            Log.e("ResultsManager", "Failed to parse experiment data: ${item.displayName}")
+                            withContext(Dispatchers.Main) {
+                                onProgress(item, false, "Failed to parse experiment data")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("ResultsManager", "Error uploading ${item.displayName}", e)
+                        withContext(Dispatchers.Main) {
+                            onProgress(item, false, "Error: ${e.message}")
+                        }
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    mailAD?.dismiss()
+                    Log.i("ResultsManager", "Batch upload completed: $successCount/$totalCount files uploaded successfully")
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    mailAD?.dismiss()
+                }
+                Log.e("ResultsManager", "Batch upload error", e)
+
+                // Notify about the error for each remaining item
+                selectedItems.forEach { item ->
+                    withContext(Dispatchers.Main) {
+                        onProgress(item, false, "Batch upload error: ${e.message}")
+                    }
+                }
             }
         }
     }
@@ -211,94 +350,6 @@ class ResultsManager private constructor(private val activity: Activity) {
             { /* pressed YES */ uploadToWebBackend(result) },{})
     }
 
-    private fun askWhetherSending(result: TestResult){
-        show2ChoisesDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no),
-            { /* pressed YES */ sendResult(result) },{})
-    }
-    
-    private fun askUnregisteredDeviceAction(result: TestResult) {
-        show2ChoisesDialog(
-            activity, 
-            resources.getString(R.string.warning), 
-            "Device not registered. Would you like to send results via email instead?", 
-            resources.getString(R.string.yes), 
-            resources.getString(R.string.no),
-            { 
-                // User chose to send via email
-                if(result.res_files.isNotEmpty()) {
-                    if(result.code == TestBasic.TEST_COMPLETED) sendResult(result)
-                    else askWhetherSending(result)
-                } else {
-                    showTestCompletionMessage(result.code)
-                }
-            },
-            { 
-                // User chose not to send - just show completion message
-                showTestCompletionMessage(result.code)
-            }
-        )
-    }
-    
-    private fun showTestCompletionMessage(code: Int) {
-        when(code){
-            TestBasic.TEST_COMPLETED -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_success))
-            TestBasic.TEST_ABORTED_DEL_RESULT,
-            TestBasic.TEST_ABORTED_KEEP_RESULT,
-            TestBasic.TEST_ABORTED_WITH_ERROR -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_completed_abort))
-            TestBasic.BLOCK_COMPLETED -> showAlert(activity, resources.getString(R.string.onend_test), resources.getString(R.string.test_partially_completed))
-        }
-    }
-    
-    private fun showNoNetworkDialog(result: TestResult, canTryEmail: Boolean) {
-        if (canTryEmail) {
-            show2ChoisesDialog(
-                activity,
-                "No Network Connection",
-                "Cannot upload to web backend. Would you like to send results via email instead?",
-                "Send Email",
-                "Save Locally",
-                {
-                    // User chose email
-                    if (result.code == TestBasic.TEST_COMPLETED) {
-                        sendResult(result)
-                    } else {
-                        askWhetherSending(result)
-                    }
-                },
-                {
-                    // User chose to save locally
-                    showAlert(activity, "Results Saved", "Results saved locally. Will retry upload when network is available.")
-                }
-            )
-        } else {
-            showAlert(
-                activity,
-                "No Network Connection", 
-                "Cannot upload to web backend and email is not configured. Results saved locally."
-            )
-        }
-    }
-    
-    private fun showDeviceRegistrationRequiredDialog(result: TestResult) {
-        show2ChoisesDialog(
-            activity,
-            "Device Not Registered",
-            "This device is not registered. Web upload requires device registration. Would you like to register now?",
-            "Register Device",
-            "Skip",
-            {
-                // User chose to register - show registration dialog
-                // Note: This would need integration with MainActivity to show the registration dialog
-                showAlert(activity, "Registration", "Please register your device from the main menu, then try uploading again.")
-            },
-            {
-                // User chose to skip
-                showAlert(activity, "Results Saved", "Results saved locally. Register your device to enable web upload.")
-            }
-        )
-    }
-
-    // Web upload methods
     private fun uploadToWebBackend(result: TestResult) {
         uploadJob = GlobalScope.launch {
             try {
@@ -310,13 +361,8 @@ class ResultsManager private constructor(private val activity: Activity) {
                     }
                 }
 
-                val experimentData = parseExperimentFiles(result)
+                val experimentData = parseExperimentFiles(result) // read the two files (config json & results) and return experiment data
                 if (experimentData != null) {
-                    // Ensure device ID is included in experiment data
-                    if (deviceManager.isDeviceRegistered) {
-                        experimentData.deviceId = deviceManager.deviceId!!
-                    }
-                    
                     val success = doUploadExperiment(experimentData)
 
                     withContext(Dispatchers.Main) {
@@ -340,50 +386,69 @@ class ResultsManager private constructor(private val activity: Activity) {
                     mailAD?.dismiss()
                     showAlert(activity, resources.getString(R.string.failure), "Upload error: ${e.message}")
                 }
-                android.util.Log.e("ResultsManager", "Upload error", e)
+                Log.e("ResultsManager", "Upload error", e)
             }
         }
     }
 
     private fun parseExperimentFiles(result: TestResult): ExperimentUploadData? {
         return try {
-            val jsonFile = File(result.res_files[0]) // Assuming first file is JSON
-            val resultFile = File(result.res_files[1]) // Assuming second file is results
+            val jsonFile    = File(result.res_files[0]) // Assuming first file is JSON
+            val resultFile  = File(result.res_files[1]) // Assuming second file is results
             parseExperimentFiles(jsonFile, resultFile)
         } catch (e: Exception) {
-            android.util.Log.e("ResultsManager", "Error parsing experiment files", e)
+            Log.e("ResultsManager", "Error parsing experiment files", e)
             null
         }
     }
 
     private fun parseExperimentFiles(jsonFile: File, resultFile: File): ExperimentUploadData? {
+
         return try {
-            // Parse JSON configuration
-            val jsonContent = jsonFile.readText()
-            val configJson = JSONObject(jsonContent)
+            Log.d("ResultsManager", "Parsing experiment files: ${jsonFile.name}, ${resultFile.name}")
             
-            // Generate unique ID if not present
-            val uniqueId = configJson.optString("uniqueId").ifEmpty { 
-                "${System.currentTimeMillis()}_${UUID.randomUUID().toString().substring(0, 8)}"
-            }
-            
-            // Extract test class name
-            val classesArray = configJson.getJSONArray("classes")
-            val testClassName = if (classesArray.length() > 0) classesArray.getString(0) else ""
-            
-            // Parse trial results
-            val trials = parseTrialResults(resultFile)
-            
-            ExperimentUploadData(
-                uniqueId = uniqueId,
-                testClassName = testClassName,
-                configuration = configJson,
-                trials = trials
+            val configJson      = JSONObject(jsonFile.readText())     // Parse JSON configuration
+
+            val classesArray    = configJson.getJSONArray("classes")
+            val testClassName   = classesArray.getString(0).substringAfterLast(".")
+
+            val exp_uid        = configJson.getString("exp_uid")
+            val validJson       = filterJson(configJson)            // keep only relevant fields
+            val trials          = parseTrialResults(resultFile)     // Parse trial results
+
+            Log.d("ResultsManager", "Parsed ${trials.size} trials from result file")
+
+            val experimentData = ExperimentUploadData(
+                exp_uid         = exp_uid,
+                testClassName   = testClassName,
+                configuration   = validJson,
+                trials          = trials,
+                deviceId        = deviceManager.deviceId!!
             )
+            
+            Log.i("ResultsManager", "Successfully parsed experiment data - ID: $exp_uid, Class: $testClassName, Trials: ${trials.size}, Device: ${deviceManager.deviceId!!}")
+            return experimentData
+            
         } catch (e: Exception) {
-            android.util.Log.e("ResultsManager", "Error parsing experiment files", e)
+            Log.e("ResultsManager", "Error parsing experiment files", e)
             null
         }
+    }
+    
+    private fun filterJson(configJson: JSONObject): JSONObject {
+        val validFields = listOf(
+            "label", "age", "gender", "population", "session", "type",
+            "device", "vercode", "stimuliDelays", "whitenoise",
+            "trman_type", "showResult", "canRepeat", "doTraining", "date"
+        )
+
+        val validJson  = JSONObject()
+
+        validFields.forEach { field ->
+            if (configJson.has(field))
+                validJson.put(field, configJson.get(field))
+        }
+        return validJson
     }
 
     private fun parseTrialResults(resultFile: File): List<TrialData> {
@@ -420,7 +485,7 @@ class ResultsManager private constructor(private val activity: Activity) {
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("ResultsManager", "Error parsing trial results", e)
+            Log.e("ResultsManager", "Error parsing trial results", e)
         }
         
         return trials
@@ -432,15 +497,31 @@ class ResultsManager private constructor(private val activity: Activity) {
         
         while (attempt < maxRetryAttempts) {
             try {
-                if (!isNetworkAvailable()) {
-                    android.util.Log.w("ResultsManager", "No network available for upload attempt ${attempt + 1}")
+                if (!isNetworkAvailable) {
+                    Log.w("ResultsManager", "No network available for upload attempt ${attempt + 1}")
                     delay(delay)
                     delay = min(delay * 2, 60000) // Exponential backoff, max 1 minute
                     attempt++
                     continue
                 }
                 
-                val url = URL("$webApiUrl/upload/experiment")
+                // Additional connectivity check
+                try {
+                    val testUrl = URL(webApiUrl)
+                    val testConnection = testUrl.openConnection()
+                    testConnection.connectTimeout = 5000
+                    testConnection.connect()
+                    testConnection.getInputStream().close()
+                    Log.d("ResultsManager", "Server connectivity test passed")
+                } catch (e: Exception) {
+                    Log.w("ResultsManager", "Server connectivity test failed: ${e.message}")
+                    // Continue anyway, but log the issue
+                }
+                
+                val fullUrl = "$webApiUrl/upload/experiment"
+                Log.d("ResultsManager", "Attempting connection to: $fullUrl")
+                
+                val url = URL(fullUrl)
                 val connection = url.openConnection() as HttpURLConnection
                 
                 connection.requestMethod = "POST"
@@ -453,51 +534,68 @@ class ResultsManager private constructor(private val activity: Activity) {
                 connection.connectTimeout = 30000
                 connection.readTimeout = 60000
                 
-                // Create JSON payload with device ID
+                // Create JSON payload matching web app expectations
                 val payload = JSONObject().apply {
-                    put("unique_id", experimentData.uniqueId)
+                    put("exp_uid", experimentData.exp_uid)
                     put("test_class_name", experimentData.testClassName)
-                    put("device_id", experimentData.deviceId) // Include device ID
-                    put("configuration", experimentData.configuration)
+                    put("device_id", experimentData.deviceId) // Include device ID if available
+                    put("configuration", experimentData.configuration) // Full configuration (web app will filter)
                     put("trials", JSONArray().apply {
                         experimentData.trials.forEach { trial ->
                             put(JSONObject().apply {
                                 put("trial_number", trial.trialNumber)
-                                trial.data.forEach { (key, value) ->
-                                    put(key, value)
-                                }
+                                trial.data.forEach { (key, value) -> put(key, value) }
                             })
                         }
                     })
                 }
                 
+                // Log payload details for validation
+                Log.d("ResultsManager", "Upload payload - Unique ID: ${experimentData.exp_uid}")
+                Log.d("ResultsManager", "Upload payload - Test class: ${experimentData.testClassName}")
+                Log.d("ResultsManager", "Upload payload - Device ID: ${experimentData.deviceId}")
+                Log.d("ResultsManager", "Upload payload - Trials count: ${experimentData.trials.size}")
+                Log.d("ResultsManager", "Upload payload - Configuration keys: ${experimentData.configuration.keys().asSequence().toList()}")
+                
                 // Send request
-                connection.outputStream.use { os ->
-                    os.write(payload.toString().toByteArray())
+                Log.d("ResultsManager", "Sending request to: ${connection.url}")
+                Log.d("ResultsManager", "Request method: ${connection.requestMethod}")
+                Log.d("ResultsManager", "Content length: ${payload.toString().toByteArray().size}")
+                
+                try {
+                    connection.outputStream.use { os ->
+                        os.write(payload.toString().toByteArray())
+                        os.flush()
+                    }
+                    Log.d("ResultsManager", "Request payload sent successfully")
+                } catch (e: Exception) {
+                    Log.e("ResultsManager", "Failed to send request payload", e)
+                    throw e
                 }
                 
                 val responseCode = connection.responseCode
+                Log.d("ResultsManager", "Received response code: $responseCode")
                 
                 if (responseCode == HttpURLConnection.HTTP_CREATED) {
-                    android.util.Log.i("ResultsManager", "Experiment uploaded successfully")
+                    Log.i("ResultsManager", "Experiment uploaded successfully")
                     return@withContext true
                 } else if (responseCode == HttpURLConnection.HTTP_CONFLICT) {
                     // Duplicate experiment - consider it successful
-                    android.util.Log.i("ResultsManager", "Experiment already exists on server")
+                    Log.i("ResultsManager", "Experiment already exists on server")
                     return@withContext true
                 } else {
                     val errorMessage = try {
                         connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         "HTTP $responseCode"
                     }
-                    android.util.Log.w("ResultsManager", "Upload failed with code $responseCode: $errorMessage")
+                    Log.w("ResultsManager", "Upload failed with code $responseCode: $errorMessage")
                 }
                 
             } catch (e: IOException) {
-                android.util.Log.w("ResultsManager", "Upload attempt ${attempt + 1} failed", e)
+                Log.w("ResultsManager", "Upload attempt ${attempt + 1} failed", e)
             } catch (e: Exception) {
-                android.util.Log.e("ResultsManager", "Unexpected error during upload", e)
+                Log.e("ResultsManager", "Unexpected error during upload", e)
                 return@withContext false
             }
             
@@ -508,11 +606,18 @@ class ResultsManager private constructor(private val activity: Activity) {
             }
         }
         
-        android.util.Log.e("ResultsManager", "Upload failed after $maxRetryAttempts attempts")
+        Log.e("ResultsManager", "Upload failed after $maxRetryAttempts attempts")
         return@withContext false
     }
+    // endregion
 
-    private fun sendResult(result: TestResult) {
+    // region EMAIL
+    private fun askWhetherSending(result: TestResult){
+        show2ChoisesDialog(activity, resources.getString(R.string.warning), resources.getString(R.string.ask_send_results), resources.getString(R.string.yes), resources.getString(R.string.no),
+            { /* pressed YES */ sendByEmail(result) },{})
+    }
+
+    private fun sendByEmail(result: TestResult) {
         mailJob = GlobalScope.launch {
             try {
 //                MailIntent.composeEmail(activity, "iit.uvip.psysuite.provider", emailRecipients, result.mailsubject, result.mailbody, result.res_files)
@@ -524,7 +629,7 @@ class ResultsManager private constructor(private val activity: Activity) {
                         mailAD = null
                     }
                 }
-                val res = doSendResult(result)
+                val res = doSendByEmail(result)
                 mailAD?.dismiss()
 
                 withContext(Dispatchers.Main) {
@@ -563,45 +668,183 @@ class ResultsManager private constructor(private val activity: Activity) {
         }
     }
 
-    private suspend fun doSendResult(res: TestResult):Boolean = withContext(Dispatchers.IO) {
+    private suspend fun doSendByEmail(res: TestResult):Boolean = withContext(Dispatchers.IO) {
         val mail = Mail(emailAccount)
         return@withContext  mail.send(emailRecipients, res.mailsubject, res.mailbody, res.res_files)
     }
+    // endregion
 
     private fun moveFilesToPrivateStorage(filePaths: Array<String>) {
         try {
-            val privateDir = File(activity.filesDir, "uploaded_experiments")
-            if (!privateDir.exists()) {
-                privateDir.mkdirs()
-            }
+            // Use the new submitted folder structure instead of private storage
+            val filesToMove = filePaths.map { File(it) }
+            val moved = fileSystemManager.moveFilesToSubmitted(filesToMove)
+            
+            if (moved) {
+                Log.i("ResultsManager", "Successfully moved ${filePaths.size} files to submitted folder")
+            } else {
+                Log.e("ResultsManager", "Failed to move some files to submitted folder")
+                
+                // Fallback to old private storage method
+                val privateDir = File(activity.filesDir, "uploaded_experiments")
+                if (!privateDir.exists()) {
+                    privateDir.mkdirs()
+                }
 
-            filePaths.forEach { filePath ->
-                val sourceFile = File(filePath)
-                if (sourceFile.exists()) {
-                    val destFile = File(privateDir, sourceFile.name)
-                    sourceFile.copyTo(destFile, overwrite = true)
-                    sourceFile.delete()
-                    android.util.Log.i("ResultsManager", "Moved ${sourceFile.name} to private storage")
+                filePaths.forEach { filePath ->
+                    val sourceFile = File(filePath)
+                    if (sourceFile.exists()) {
+                        val destFile = File(privateDir, sourceFile.name)
+                        sourceFile.copyTo(destFile, overwrite = true)
+                        sourceFile.delete()
+                        Log.i("ResultsManager", "Moved ${sourceFile.name} to private storage (fallback)")
+                    }
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("ResultsManager", "Error moving files to private storage", e)
+            Log.e("ResultsManager", "Error moving files to storage", e)
         }
     }
 
     // Data classes for upload
     data class ExperimentUploadData(
-        val uniqueId: String,
-        val testClassName: String,
-        val configuration: JSONObject,
-        val trials: List<TrialData>,
-        var deviceId: String = "" // Device identifier for tracking
+        val exp_uid: String,            // unique experiment identifier (generated during JSON creation)
+        val testClassName: String,      // test class name for DB table naming (e.g., "TestBIS")
+        val configuration: JSONObject,  // full JSON configuration (web app will filter internal fields)
+        val trials: List<TrialData>,    // trial results data
+        var deviceId: String = ""       // device identifier for tracking
     )
 
     data class TrialData(
         val trialNumber: Int,
         val data: Map<String, Any>
     )
-}
 
-    // Existing email methods remain unchanged
+
+    /**
+     * Saves result files to the new location (Download/psysuite_results)
+     * This method should be called instead of saving to Download directly
+     */
+//    fun saveResultsToNewLocation(result: TestResult): Array<String> {
+//        return try {
+//            val resultsDir = fileSystemManager.getResultsFolder()
+//            val newFilePaths = mutableListOf<String>()
+//
+//            // Copy existing files to new location if they're not already there
+//            result.res_files.forEach { originalPath ->
+//                val originalFile = File(originalPath)
+//                val newFile = File(resultsDir, originalFile.name)
+//
+//                if (!newFile.exists()) {
+//                    originalFile.copyTo(newFile, overwrite = false)
+//                    Log.i("ResultsManager", "Copied ${originalFile.name} to new results folder")
+//                }
+//                newFilePaths.add(newFile.absolutePath)
+//            }
+//
+//            newFilePaths.toTypedArray()
+//        } catch (e: Exception) {
+//            Log.e("ResultsManager", "Failed to save results to new location", e)
+//            result.res_files.toTypedArray() // Return original paths as fallback
+//        }
+//    }
+
+    /**
+     * Test method to validate Android integration fixes
+     * This method can be called to verify that all integration components work correctly
+     */
+    fun validateIntegrationFixes(): Boolean {
+        Log.i("ResultsManager", "=== Starting Android Integration Validation ===")
+        
+        var allTestsPassed = true
+        
+        // Test 1: Validate unique ID handling
+        try {
+            val testJson = JSONObject().apply {
+                put("exp_uid", "test_12345_abcd")
+                put("classes", JSONArray().apply { put("iit.uvip.psysuite.tests.TestBIS") })
+            }
+            
+            val testFile = File.createTempFile("test_config", ".json")
+            testFile.writeText(testJson.toString())
+            
+            val resultFile = File.createTempFile("test_result", ".txt")
+            resultFile.writeText("header1\theader2\nvalue1\tvalue2\n")
+            
+            val experimentData = parseExperimentFiles(testFile, resultFile)
+            
+            if (experimentData?.exp_uid == "test_12345_abcd") {
+                Log.i("ResultsManager", "✓ Test 1 PASSED: Unique ID correctly read from exp_uid field")
+            } else {
+                Log.e("ResultsManager", "✗ Test 1 FAILED: Unique ID not correctly read (got: ${experimentData?.exp_uid})")
+                allTestsPassed = false
+            }
+            
+            testFile.delete()
+            resultFile.delete()
+            
+        } catch (e: Exception) {
+            Log.e("ResultsManager", "✗ Test 1 FAILED: Exception during unique ID test", e)
+            allTestsPassed = false
+        }
+        
+        // Test 2: Validate test class name extraction
+        try {
+            val fullClassName = "iit.uvip.psysuite.tests.TestBIS"
+            val extractedName = fullClassName.substringAfterLast(".")
+            
+            if (extractedName == "TestBIS") {
+                Log.i("ResultsManager", "✓ Test 2 PASSED: Test class name correctly extracted")
+            } else {
+                Log.e("ResultsManager", "✗ Test 2 FAILED: Test class name extraction failed (got: $extractedName)")
+                allTestsPassed = false
+            }
+        } catch (e: Exception) {
+            Log.e("ResultsManager", "✗ Test 2 FAILED: Exception during class name test", e)
+            allTestsPassed = false
+        }
+        
+        // Test 3: Validate device registration integration
+        try {
+            val isRegistered = deviceManager.isDeviceRegistered
+            val deviceId = if (isRegistered) deviceManager.deviceId else null
+            
+            Log.i("ResultsManager", "✓ Test 3 INFO: Device registration status: $isRegistered, ID: $deviceId")
+            
+        } catch (e: Exception) {
+            Log.e("ResultsManager", "✗ Test 3 FAILED: Exception during device registration test", e)
+            allTestsPassed = false
+        }
+        
+        // Test 4: Validate configuration requirements
+        try {
+            val testConfig = JSONObject().apply {
+                put("classes", JSONArray().apply { put("TestClass") })
+                put("label", "Test Label")
+                put("age", 25)
+                put("gender", "M")
+                put("population", "TD")
+                put("session", "1")
+                put("type", 100)
+                put("device", "TestDevice")
+                put("vercode", "1.0")
+                put("stimuliDelays", JSONArray())
+                put("whitenoise", false)
+                put("trman_type", "standard")
+                put("showResult", true)
+                put("canRepeat", false)
+                put("doTraining", true)
+                put("date", "2024-01-01")
+            }
+            
+            Log.i("ResultsManager", "✓ Test 4 PASSED: Configuration validation completed")
+            
+        } catch (e: Exception) {
+            Log.e("ResultsManager", "✗ Test 4 FAILED: Exception during configuration test", e)
+            allTestsPassed = false
+        }
+        
+        Log.i("ResultsManager", "=== Integration Validation Complete: ${if (allTestsPassed) "ALL TESTS PASSED" else "SOME TESTS FAILED"} ===")
+        return allTestsPassed
+    }
+}

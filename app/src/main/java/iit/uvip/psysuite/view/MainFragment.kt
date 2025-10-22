@@ -14,10 +14,9 @@ import iit.uvip.psysuite.BuildConfig
 import iit.uvip.psysuite.MainApplication
 import iit.uvip.psysuite.R
 import iit.uvip.psysuite.ResultsManager
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
-import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
+
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentMainBinding
 
@@ -42,7 +41,6 @@ class MainFragment : TestLaunchFragment(
         fun showDialog(subj:SubjectBasicParcel, df: DialogFragment, rc:Int, frg:Fragment, pfm:FragmentManager){
 
             subj.isDebug    = isDebug
-
             if(isDebug){
                 subj.label  = "a"
                 subj.age    = 1
@@ -117,12 +115,6 @@ class MainFragment : TestLaunchFragment(
 
         binding.btStartPredictionTest.setOnClickListener {
             if(!isSubjectDFopening) Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_predictiontestsFragment)
-        }
-
-        binding.btStartSampleTest.setOnClickListener {
-//            debugStart()
-//            return@setOnClickListener
-            showSubjectDialog(SubjectSampleParcel(), SubjectSampleDialogFragment())
         }
     }
 

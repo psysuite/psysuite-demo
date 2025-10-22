@@ -12,6 +12,7 @@ import iit.uvip.psysuite.ResultsManager
 import iit.uvip.psysuite.device.DeviceIdentificationManager
 import iit.uvip.psysuite.device.DeviceIdBackupManager
 import iit.uvip.psysuite.device.DeviceRegistrationDialog
+import androidx.core.content.edit
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
 
@@ -40,43 +41,50 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     
     private fun clearProblematicPreferences() {
         val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val editor = prefs.edit()
-        
-        // Clear delay preferences that might have type conflicts
-        val delayKeys = arrayOf("pref_delay_a1", "pref_delay_a2", "pref_delay_a3", 
-                               "pref_delay_t1", "pref_delay_t2", "pref_delay_v1", "pref_delay_v2")
-        
-        delayKeys.forEach { key ->
-            try {
-                // Try to read as string first
-                prefs.getString(key, null)
-            } catch (e: ClassCastException) {
-                // Try to migrate from Long to String
+        prefs.edit {
+
+            // Clear delay preferences that might have type conflicts
+            val delayKeys = arrayOf(
+                "pref_delay_a1", "pref_delay_a2", "pref_delay_a3",
+                "pref_delay_t1", "pref_delay_t2", "pref_delay_v1", "pref_delay_v2"
+            )
+
+            delayKeys.forEach { key ->
                 try {
-                    val longValue = prefs.getLong(key, 0L)
-                    editor.remove(key)
-                    editor.putString(key, longValue.toString())
-                    android.util.Log.d("SettingsFragment", "Migrated preference $key from Long ($longValue) to String")
-                } catch (e2: Exception) {
-                    // If migration fails, just remove the key
-                    editor.remove(key)
-                    android.util.Log.d("SettingsFragment", "Cleared problematic preference key: $key")
+                    // Try to read as string first
+                    prefs.getString(key, null)
+                } catch (_: ClassCastException) {
+                    // Try to migrate from Long to String
+                    try {
+                        val longValue = prefs.getLong(key, 0L)
+                        remove(key)
+                        putString(key, longValue.toString())
+                        android.util.Log.d(
+                            "SettingsFragment",
+                            "Migrated preference $key from Long ($longValue) to String"
+                        )
+                    } catch (_: Exception) {
+                        // If migration fails, just remove the key
+                        remove(key)
+                        android.util.Log.d(
+                            "SettingsFragment",
+                            "Cleared problematic preference key: $key"
+                        )
+                    }
                 }
             }
+
         }
-        
-        editor.apply()
     }
     
     private fun setupDevicePreferences() {
         // Device status preference (read-only)
-        deviceStatusPreference = findPreference<Preference>("device_status")
+        deviceStatusPreference = findPreference("device_status")
         deviceStatusPreference?.apply {
             title = "Device Registration Status"
             summary = deviceManager.registrationStatus
             isSelectable = false
         }
-        
 
         // Register device preference (button)
         val registerDevicePreference = findPreference<Preference>("register_device")
@@ -139,51 +147,51 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     }
     
     private fun setupWebUploadPreferences() {
-        // Web API URL preference
-        val webApiUrlPreference = findPreference<EditTextPreference>("web_api_url")
-        webApiUrlPreference?.apply {
-            text = resultsManager.getWebApiUrl()
-            summary = if (text.isNullOrBlank() || text == "https://your-server.com/api") {
-                "Not configured - tap to set server URL"
-            } else {
-                "Current URL: $text"
-            }
-            
-            setOnPreferenceChangeListener { _, newValue ->
-                val newUrl = newValue.toString().trim()
-                resultsManager.setWebApiUrl(newUrl)
-                updateWebUploadStatus()
-                summary =   if (newUrl.isBlank() || newUrl == "https://your-server.com/api")    "Not configured - tap to set server URL"
-                            else                                                                "Current URL: $newUrl"
-                true
-            }
-        }
-        
-        // Web API Key preference
-        val webApiKeyPreference = findPreference<EditTextPreference>("web_api_key")
-        webApiKeyPreference?.apply {
-            text = resultsManager.getWebApiKey()
-            summary = if (text.isNullOrBlank()) {
-                "Not configured - tap to set API key"
-            } else {
-                "API key configured (${text?.length} characters)"
-            }
-            
-            setOnPreferenceChangeListener { _, newValue ->
-                val newKey = newValue.toString().trim()
-                resultsManager.setWebApiKey(newKey)
-                updateWebUploadStatus()
-                summary = if (newKey.isBlank()) {
-                    "Not configured - tap to set API key"
-                } else {
-                    "API key configured (${newKey.length} characters)"
-                }
-                true
-            }
-        }
+//        // Web API URL preference
+//        val webApiUrlPreference = findPreference<EditTextPreference>("web_api_url")
+//        webApiUrlPreference?.apply {
+//            text = resultsManager.webApiUrl
+//            summary = if (text.isNullOrBlank() || text == "https://your-server.com/api") {
+//                "Not configured - tap to set server URL"
+//            } else {
+//                "Current URL: $text"
+//            }
+//
+//            setOnPreferenceChangeListener { _, newValue ->
+//                val newUrl = newValue.toString().trim()
+//                resultsManager.webApiUrl = newUrl
+//                updateWebUploadStatus()
+//                summary =   if (newUrl.isBlank() || newUrl == "https://your-server.com/api")    "Not configured - tap to set server URL"
+//                            else                                                                "Current URL: $newUrl"
+//                true
+//            }
+//        }
+//
+//        // Web API Key preference
+//        val webApiKeyPreference = findPreference<EditTextPreference>("web_api_key")
+//        webApiKeyPreference?.apply {
+//            text = resultsManager.webApiKey
+//            summary = if (text.isNullOrBlank()) {
+//                "Not configured - tap to set API key"
+//            } else {
+//                "API key configured (${text?.length} characters)"
+//            }
+//
+//            setOnPreferenceChangeListener { _, newValue ->
+//                val newKey = newValue.toString().trim()
+//                resultsManager.webApiKey = newKey
+//                updateWebUploadStatus()
+//                summary = if (newKey.isBlank()) {
+//                    "Not configured - tap to set API key"
+//                } else {
+//                    "API key configured (${newKey.length} characters)"
+//                }
+//                true
+//            }
+//        }
         
         // Web upload status preference (read-only)
-        webUploadStatusPreference = findPreference<Preference>("web_upload_status")
+        webUploadStatusPreference = findPreference("web_upload_status")
         updateWebUploadStatus()
     }
     
@@ -191,10 +199,10 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         // Email enabled switch
         val emailEnabledPreference = findPreference<SwitchPreferenceCompat>("email_enabled")
         emailEnabledPreference?.apply {
-            isChecked = resultsManager.isEmailEnabled()
+            isChecked = resultsManager.isEmailEnabled
             setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
-                resultsManager.setEmailEnabled(enabled)
+                resultsManager.isEmailEnabled = enabled
                 true
             }
         }
@@ -202,7 +210,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     
     private fun updateWebUploadStatus() {
         webUploadStatusPreference?.apply {
-            val isConfigured = resultsManager.isWebUploadEnabled()
+            val isConfigured = resultsManager.isWebUploadEnabled
             summary = if (isConfigured) {
                 "✓ Web upload is properly configured"
             } else {
@@ -211,11 +219,11 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         }
     }
     
-    private fun showValidationError() {
-        Toast.makeText(context, 
-            "Device ID must be 3-50 characters, letters, numbers, hyphens and underscores only", 
-            Toast.LENGTH_LONG).show()
-    }
+//    private fun showValidationError() {
+//        Toast.makeText(context,
+//            "Device ID must be 3-50 characters, letters, numbers, hyphens and underscores only",
+//            Toast.LENGTH_LONG).show()
+//    }
 
     override fun onPreferenceChange(preference: Preference, value: Any?): Boolean {
         return true

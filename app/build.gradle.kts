@@ -1,5 +1,17 @@
 import java.io.FileInputStream
-import java.util.*
+import java.util.Properties
+
+// Read from local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
+// Helper function to get properties with fallbacks
+fun getLocalProperty(key: String, defaultValue: String = ""): String {
+    return localProperties.getProperty(key) ?: System.getenv(key) ?: defaultValue
+}
 
 plugins {
     id(Plugins.androidApplication)
@@ -46,10 +58,15 @@ android {
             isDebuggable = false
             proguardFiles(getDefaultProguardFile(ProGuards.proguardTxt), ProGuards.androidDefault)
             signingConfig = signingConfigs.getByName("release")
+            buildConfigField("String", "API_URL", "\"${getLocalProperty("PSYSUITE_API_URL_RELEASE", "https://your-server.com/api")}\"")
+            buildConfigField("String", "API_KEY", "\"${getLocalProperty("PSYSUITE_API_KEY_RELEASE", "release-key-not-configured")}\"")
+
         }
 
         getByName("debug") {
             isDebuggable = true
+            buildConfigField("String", "API_URL", "\"${getLocalProperty("PSYSUITE_API_URL_DEBUG", "http://localhost:5000/api")}\"")
+            buildConfigField("String", "API_KEY", "\"${getLocalProperty("PSYSUITE_API_KEY_DEBUG", "debug-key-not-configured")}\"")
         }
     }
 

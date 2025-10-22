@@ -33,25 +33,25 @@
         android:title="Web Upload Configuration"
         android:key="web_upload_category">
         
-        <EditTextPreference
-            android:key="web_api_url"
-            android:title="Web API URL"
-            android:summary="Server URL for uploading results"
-            android:dialogTitle="Web API URL"
-            android:dialogMessage="Enter the server URL for uploading experiment results"
-            android:inputType="textUri"
-            android:selectAllOnFocus="true"
-            android:singleLine="true" />
+<!--        <EditTextPreference-->
+<!--            android:key="web_api_url"-->
+<!--            android:title="Web API URL"-->
+<!--            android:summary="Server URL for uploading results"-->
+<!--            android:dialogTitle="Web API URL"-->
+<!--            android:dialogMessage="Enter the server URL for uploading experiment results"-->
+<!--            android:inputType="textUri"-->
+<!--            android:selectAllOnFocus="true"-->
+<!--            android:singleLine="true" />-->
             
-        <EditTextPreference
-            android:key="web_api_key"
-            android:title="API Key"
-            android:summary="Authentication key for web uploads"
-            android:dialogTitle="API Key"
-            android:dialogMessage="Enter the API key for authentication"
-            android:inputType="textPassword"
-            android:selectAllOnFocus="true"
-            android:singleLine="true" />
+<!--        <EditTextPreference-->
+<!--            android:key="web_api_key"-->
+<!--            android:title="API Key"-->
+<!--            android:summary="Authentication key for web uploads"-->
+<!--            android:dialogTitle="API Key"-->
+<!--            android:dialogMessage="Enter the API key for authentication"-->
+<!--            android:inputType="textPassword"-->
+<!--            android:selectAllOnFocus="true"-->
+<!--            android:singleLine="true" />-->
             
         <Preference
             android:key="web_upload_status"

@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_mainFragment_to_resultsFragment"
             app:destination="@id/resultsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_resultsManagerFragment"
+            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 
@@ -45,6 +48,9 @@
         <action
             android:id="@+id/action_bindingsFragment_to_testFragment"
             app:destination="@id/testFragment" />
+        <action
+            android:id="@+id/action_bindingsFragment_to_resultsManagerFragment"
+            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 
@@ -52,6 +58,15 @@
         android:id="@+id/resultsFragment"
         android:name="iit.uvip.psysuite.core.ui.fragments.ResultsFragment"
         android:label="Manage Test Results" />
+
+    <fragment
+        android:id="@+id/resultsManagerFragment"
+        android:name="iit.uvip.psysuite.view.ResultsManagerFragment"
+        android:label="@string/send_results">
+        <action
+            android:id="@+id/action_resultsManagerFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
 
 
     <fragment
@@ -64,6 +79,9 @@
         <action
             android:id="@+id/action_temporalTestsFragment_to_testFragment"
             app:destination="@id/testFragment" />
+        <action
+            android:id="@+id/action_temporalTestsFragment_to_resultsManagerFragment"
+            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
     <fragment
@@ -73,6 +91,9 @@
         <action
             android:id="@+id/action_illusionTestsFragment_to_testFragment"
             app:destination="@id/testFragment" />
+        <action
+            android:id="@+id/action_illusionTestsFragment_to_resultsManagerFragment"
+            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 
@@ -83,6 +104,9 @@
         <action
             android:id="@+id/action_variousTestsFragment_to_testFragment"
             app:destination="@id/testFragment" />
+        <action
+            android:id="@+id/action_variousTestsFragment_to_resultsManagerFragment"
+            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 
@@ -93,6 +117,9 @@
         <action
             android:id="@+id/action_predictionTestsFragment_to_testFragment"
             app:destination="@id/testFragment" />
+        <action
+            android:id="@+id/action_predictionTestsFragment_to_resultsManagerFragment"
+            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 </navigation>

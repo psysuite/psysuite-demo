@@ -38,17 +38,13 @@ class TemporalTestsFragment : TestLaunchFragment(
     override fun onResume() {
         super.onResume()
 
-        binding.btStartTidTest.setOnClickListener {
-            val tidSubject = SubjectTIDParcel().apply { spinner_data_resource = R.array.tid_sessions_array  }
-            showSubjectDialog(tidSubject, SubjectTIDDialogFragment())
-        }
-
         binding.btStartBindings.setOnClickListener {
             if (!isSubjectDFopening) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_temporalTestsFragment_to_bindingsFragment)
             }
         }
 
+        binding.btStartTidTest.setOnClickListener { showSubjectDialog(SubjectTIDParcel(), SubjectTIDDialogFragment())   }
         binding.btStartBis.setOnClickListener {     showSubjectDialog(SubjectBISParcel())   }
         binding.btStartTirTest.setOnClickListener { showSubjectDialog(SubjectTIRParcel())   }
     }

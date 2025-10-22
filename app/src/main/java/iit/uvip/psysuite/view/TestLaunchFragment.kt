@@ -5,9 +5,9 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import iit.uvip.psysuite.MainApplication
 import iit.uvip.psysuite.ResultsManager
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
 import org.albaspazio.core.accessory.Device
@@ -46,13 +46,20 @@ abstract class TestLaunchFragment(
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
             observe(viewLifecycleOwner) { result ->
                 if (result != null) {
+
+
+//                    subject.device = Device().setRam(requireContext())
+//                    subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
+//                    subject.stimuliDelays = MainApplication.delaysAligner
+//                    subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+
                     ResultsManager.getInstance(requireActivity()).onTestFinished(result)
                 }
             }
     }
 
     /**
-     * Sets up the fragment result listener for subject dialog
+     * Sets up the fragment result listener for subject dialog. here I start each test with the user filled subject parcel
      */
     private fun setupSubjectDialogResultListener() {
         parentFragmentManager.setFragmentResultListener(

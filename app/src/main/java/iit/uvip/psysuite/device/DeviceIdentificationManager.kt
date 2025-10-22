@@ -59,8 +59,8 @@ class DeviceIdentificationManager private constructor(private val context: Conte
     fun skipRegistration() {
         sharedPrefs.edit {
             putBoolean(KEY_REGISTRATION_SKIPPED, true)
-                .putBoolean(KEY_FIRST_LAUNCH_HANDLED, true)
-                .putBoolean(KEY_IS_REGISTERED, false)
+            .putBoolean(KEY_FIRST_LAUNCH_HANDLED, true)
+            .putBoolean(KEY_IS_REGISTERED, false)
         }
     }
 
