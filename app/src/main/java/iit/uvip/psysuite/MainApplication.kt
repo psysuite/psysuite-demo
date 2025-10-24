@@ -4,12 +4,11 @@ package iit.uvip.psysuite
 import android.app.Application
 import android.os.Build
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.preferences.ProjectPreferencesManager
 import iit.uvip.psysuite.core.model.preferences.ProjectPreferences
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
-import iit.uvip.psysuite.python.SPython
+import org.albaspazio.psysuite.python.SPython
 
 // this is called before any activity onCreate
 

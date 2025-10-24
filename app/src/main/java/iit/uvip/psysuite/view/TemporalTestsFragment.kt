@@ -1,48 +1,32 @@
 package iit.uvip.psysuite.view
 
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
-import iit.uvip.psysuite.MainApplication
 import iit.uvip.psysuite.R
-import iit.uvip.psysuite.ResultsManager
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
-import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.bis.SubjectBISParcel
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDDialogFragment
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tir.SubjectTIRParcel
-import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
-import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentTemporaltestsBinding
-import iit.uvip.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
-import iit.uvip.psysuite.view.MainFragment.Companion.startTest
-import org.albaspazio.core.accessory.Device
-import org.albaspazio.core.accessory.setRam
-import org.albaspazio.core.fragments.BaseFragment
-import org.albaspazio.core.updater.UpdateManager
 
-class TemporalTestsFragment  :  BaseFragment(
-    layout              = R.layout.fragment_temporaltests,
-    landscape           = false,
+class TemporalTestsFragment : TestLaunchFragment(
+    layout = R.layout.fragment_temporaltests,
+    landscape = false,
     hideAndroidControls = false
-){
-    override val LOG_TAG:String = TemporalTestsFragment::class.java.simpleName
+) {
+    override val LOG_TAG: String = TemporalTestsFragment::class.java.simpleName
 
     private var _binding: FragmentTemporaltestsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var subject: SubjectBasicParcel
-    private var isSubjectDFopening:Boolean = false
+    override fun getTestFragmentNavigationAction(): Int = R.id.action_temporalTestsFragment_to_testFragment
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentTemporaltestsBinding.inflate(inflater, container, false)
-        setupFragmentResultListener()
         return binding.root
     }
 
@@ -51,88 +35,23 @@ class TemporalTestsFragment  :  BaseFragment(
         _binding = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // in the fragment going back here I call:
-        // findNavController().previousBackStackEntry?.savedStateHandle?.set(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
-            observe(viewLifecycleOwner) {   ResultsManager.getInstance(requireActivity()).onTestFinished(it)        }
-    }
-
     override fun onResume() {
         super.onResume()
 
-        binding.btStartTidTest.setOnClickListener{
-            if(!isSubjectDFopening){
-                isSubjectDFopening = true
-                showTIDSubjectDialog()
-            }
-        }
-
         binding.btStartBindings.setOnClickListener {
-            if(!isSubjectDFopening) {
+            if (!isSubjectDFopening) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_temporalTestsFragment_to_bindingsFragment)
             }
         }
 
-        binding.btStartBis.setOnClickListener {
-            if(!isSubjectDFopening) {
-                isSubjectDFopening = true
-                showBISSubjectDialog()
-            }
-        }
-
-        binding.btStartTirTest.setOnClickListener{
-            if(!isSubjectDFopening){
-                isSubjectDFopening = true
-                showTIRSubjectDialog()
-            }
-        }
+        binding.btStartTidTest.setOnClickListener { showSubjectDialog(SubjectTIDParcel(), SubjectTIDDialogFragment())   }
+        binding.btStartBis.setOnClickListener {     showSubjectDialog(SubjectBISParcel())   }
+        binding.btStartTirTest.setOnClickListener { showSubjectDialog(SubjectTIRParcel())   }
     }
-    //================================================================================================================
-    // 1 - SHOW SUBJECT DATA INSERTION DIALOG
-    //================================================================================================================
-    private fun showTIDSubjectDialog(){
+}
 
-        subject = SubjectTIDParcel()
-        (subject as SubjectTIDParcel).spinner_data_resource = R.array.tid_sessions_array
 
-        MainFragment.showDialog(
-            subject,
-            SubjectTIDDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
-            this,
-            parentFragmentManager
-        )
-    }
-
-    private fun showTIRSubjectDialog(){
-
-        subject = SubjectTIRParcel()
-        MainFragment.showDialog(
-            subject,
-            SubjectBasicDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
-            this,
-            parentFragmentManager
-        )
-    }
-
-    private fun showBISSubjectDialog(){
-
-//        debugStart()
-//        return
-        subject = SubjectBISParcel()
-        MainFragment.showDialog(
-            subject,
-            SubjectBasicDialogFragment(),
-            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
-            this,
-            parentFragmentManager
-        )
-    }
-
+/*
     private fun debugStart() {
 
 //        val subject = SubjectAVBParcel().apply {
@@ -184,45 +103,5 @@ class TemporalTestsFragment  :  BaseFragment(
 //        }
         startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
     }
-    //================================================================================================================
-    // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
-    //================================================================================================================
-    // subject info !
-    private fun setupFragmentResultListener() {
-        // Listener for answer results
-        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
-            isSubjectDFopening = false
-            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
-            if (subj == null) return@setFragmentResultListener
 
-            subject = subj
-            subject.device = Device().setRam(requireContext())
-            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
-            subject.stimuliDelays = MainApplication.delaysAligner
-            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            startTest(subject, requireView(), R.id.action_temporalTestsFragment_to_testFragment)
-        }
-    }
-
-//    override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
-//
-//        isSubjectDFopening = false
-//        if (data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT) as SubjectBasicParcel? == null)
-//            return
-//
-//        when(requestCode){
-//            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE -> {
-//                subject                 = data?.getParcelableExtra(SubjectBasicDialogFragment.EVENT_SUBJECT)!!
-//                subject.device          = Device().setRam(requireContext())
-//                subject.vercode         = UpdateManager.getVersionCodeLocal(requireContext()).first
-//                subject.stimuliDelays   = MainApplication.delaysAligner
-//                subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-//            }
-//        }
-//        MainFragment.startTest(
-//            subject,
-//            requireView(),
-//            R.id.action_temporalTestsFragment_to_testFragment
-//        )
-//    }
-}
+ */

@@ -21,3 +21,9 @@ local.properties
 
 /nativeaudio/build/
 
+/APK
+/OT
+/.vscode
+
+*.keystore
+/psysuite_web/

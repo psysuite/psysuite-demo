@@ -14,31 +14,27 @@ import iit.uvip.psysuite.BuildConfig
 import iit.uvip.psysuite.MainApplication
 import iit.uvip.psysuite.R
 import iit.uvip.psysuite.ResultsManager
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
-import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
-import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment.Companion.PROJECTS_PARCEL
+import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment.Companion.SUBJECT_PARCEL
+
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentMainBinding
-import org.albaspazio.core.accessory.Device
-import org.albaspazio.core.accessory.setRam
-import org.albaspazio.core.fragments.BaseFragment
-import org.albaspazio.core.updater.UpdateManager
+import iit.uvip.psysuite.device.DeviceIdentificationManager
 
 
-class MainFragment : BaseFragment(
-    layout              = R.layout.fragment_main,
-    landscape           = false,
+class MainFragment : TestLaunchFragment(
+    layout = R.layout.fragment_main,
+    landscape = false,
     hideAndroidControls = false
 ) {
-    private lateinit var subject: SubjectBasicParcel
-    override val LOG_TAG:String = MainFragment::class.java.simpleName
+    override val LOG_TAG: String = MainFragment::class.java.simpleName
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private var isSubjectDFopening:Boolean = false
+    override fun getTestFragmentNavigationAction(): Int = R.id.action_mainFragment_to_testFragment
 
     companion object {
         @JvmStatic val isDebug:Boolean = false
@@ -48,7 +44,6 @@ class MainFragment : BaseFragment(
         fun showDialog(subj:SubjectBasicParcel, df: DialogFragment, rc:Int, frg:Fragment, pfm:FragmentManager){
 
             subj.isDebug    = isDebug
-
             if(isDebug){
                 subj.label  = "a"
                 subj.age    = 1
@@ -56,7 +51,12 @@ class MainFragment : BaseFragment(
             }
 
             val bundle = Bundle()
-            bundle.putParcelable("subject", subj)
+            bundle.putParcelable(SUBJECT_PARCEL, subj)
+            
+            // Get available projects and pass them to the dialog
+            val projectManager = iit.uvip.psysuite.project.ProjectManager.getInstance(frg.requireContext())
+            val availableProjects = projectManager.getAllProjects()
+            bundle.putStringArrayList(PROJECTS_PARCEL, ArrayList(availableProjects))
 
             df.arguments    = bundle
             df.setTargetFragment(frg, rc)
@@ -73,31 +73,15 @@ class MainFragment : BaseFragment(
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View{
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         mMainView = binding.root
-        setupFragmentResultListener()
         return mMainView
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // in the fragment going back here I call: setNavigationResult(TestResult(...), TestBasic.TEST_BUNDLE_RESULT_LABEL) and then Navigation.findNavController(requireView()).popBackStack()
-        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
-
-        resultLiveData?.observe(viewLifecycleOwner) { result ->
-            if (result != null) {
-                ResultsManager.getInstance(requireActivity()).onTestFinished(result)
-                savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
-            }
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -108,6 +92,7 @@ class MainFragment : BaseFragment(
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
+        binding.labRegName.text = DeviceIdentificationManager.getInstance(requireContext()).deviceId
         binding.labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
 
         binding.btStartTemporalTest.setOnClickListener {
@@ -124,44 +109,6 @@ class MainFragment : BaseFragment(
 
         binding.btStartPredictionTest.setOnClickListener {
             if(!isSubjectDFopening) Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_predictiontestsFragment)
-        }
-
-        binding.btStartSampleTest.setOnClickListener {
-
-//            debugStart()
-//            return@setOnClickListener
-            if(!isSubjectDFopening) {
-                isSubjectDFopening = true
-                showSampleSubjectDialog()
-            }
-        }
-    }
-    //================================================================================================================
-    // 1 - SHOW SUBJECT DATA INSERTION DIALOG
-    //================================================================================================================
-
-    private fun showSampleSubjectDialog(){
-        subject                     = SubjectSampleParcel()
-        showDialog(subject, SubjectSampleDialogFragment(), TARGET_FRAGMENT_SUBJECT_REQUEST_CODE, this, parentFragmentManager)
-    }
-
-    //================================================================================================================
-    // 2 - CALLBACK FROM DATA INSERTION DIALOG CLOSE
-    //================================================================================================================
-    // subject info !
-    private fun setupFragmentResultListener() {
-        // Listener for answer results
-        parentFragmentManager.setFragmentResultListener(TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),viewLifecycleOwner) { _, result ->
-            isSubjectDFopening = false
-            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
-            if (subj == null) return@setFragmentResultListener
-
-            subject = subj
-            subject.device = Device().setRam(requireContext())
-            subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
-            subject.stimuliDelays = MainApplication.delaysAligner
-            subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
-            startTest(subject, requireView())
         }
     }
 

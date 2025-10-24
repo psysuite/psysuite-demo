@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,9 +23,25 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.intentfilter.androidpermissions.PermissionManager
 import com.intentfilter.androidpermissions.models.DeniedPermissions
+import iit.uvip.psysuite.settings.SettingsActivity
+import iit.uvip.psysuite.device.DeviceIdentificationManager
+import iit.uvip.psysuite.device.DeviceIdBackupManager
+import iit.uvip.psysuite.device.DeviceRegistrationDialog
+import android.widget.Toast
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.pdf.PdfViewActivity
+
+import iit.uvip.psysuite.core.model.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.sample.SubjectSampleDialogFragment
+import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
+import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment
+import iit.uvip.psysuite.core.utility.filesystem.FileSystemManager
+import iit.uvip.psysuite.view.MainFragment
+import iit.uvip.psysuite.project.ProjectManagementDialog
+import org.albaspazio.core.ui.show2ChoisesDialog
+import org.albaspazio.core.ui.showAlert
 import java.util.*
+
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
 
@@ -35,6 +52,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private var dialog: AlertDialog? = null
 
+    private lateinit var deviceManager: DeviceIdentificationManager
+    private lateinit var resultsManager: ResultsManager
+    private lateinit var fileSystemManager: FileSystemManager
+
+    var isSubjectDFopening: Boolean = false
+
     // This will be called whenever an Intent with an action named "NAVIGATION_UPDATE" is broadcasted.
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -43,6 +66,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -58,11 +82,28 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET),TEST_PERMISSIONS_REQUEST_INTERNET)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        Log.d("BuildConfig", "API_URL: ${BuildConfig.API_URL}")
+        Log.d("BuildConfig", "API_KEY: ${BuildConfig.API_KEY}")
+
+        try {
+            // Initialize managers
+            deviceManager       = DeviceIdentificationManager.getInstance(this)
+            fileSystemManager   = FileSystemManager.getInstance()
+            resultsManager      = ResultsManager.getInstance(this)
+            resultsManager.updateContext(this)
+
+            startInitializationFlow()
+        }
+        catch (e: Exception) {
+            showAlert(this, resources.getString(iit.uvip.psysuite.core.R.string.critical_error), e.toString())
+        }
     }
 
+    // region SYSTEM MENU
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
     // Handle action bar item clicks here. The action bar will
@@ -71,15 +112,16 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         //TODO hide menu_action_results when already in resultsFragment
         return when(item.itemId) {
-//            R.id.menu_action_settings -> {
-//                val intent = Intent(this, SettingsActivity::class.java)
-//                startActivity(intent)
-//                true
-//            }
-//            R.id.menu_action_results -> {
-//                findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsFragment)
-//                true
-//            }
+
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.menu_send_results -> {
+                resultsManager.openResultsManager()
+                true
+            }
             R.id.menu_action_manual ->{
                 val intent = Intent(this, PdfViewActivity::class.java)
                 intent.putExtra("pdfAssetName", "PsySuite_manual.pdf")
@@ -88,22 +130,20 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 startActivity(intent)
                 true
             }
+            R.id.menu_sample_test -> {
+                handleSampleTestFromMenu()
+                true
+            }
+            R.id.menu_manage_projects -> {
+                showProjectManagementDialog()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
+    // endregion
 
-    override fun onPause() {
-        super.onPause()
-        // Unregister since the activity is paused.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
-    }
-
+    // region NAVIGATION
     override fun onSupportNavigateUp() = findNavController(R.id.my_nav_host_fragment).navigateUp()
 
     override fun onDestinationChanged(controller: NavController, destination: NavDestination,arguments: Bundle?) {}
@@ -112,21 +152,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus)
             refreshNavigationVisibility()
-    }
-
-    private fun checkPermissions(perm: String) {
-        val permissionManager: PermissionManager = PermissionManager.getInstance(applicationContext)
-        permissionManager.checkPermissions(
-            Collections.singleton(perm),
-            object : PermissionManager.PermissionRequestListener {
-                override fun onPermissionGranted() {
-                    haveAudioRecordPermission = true
-                }
-
-                override fun onPermissionDenied(deniedPermissions: DeniedPermissions) {
-                    haveAudioRecordPermission = false
-                }
-            })
     }
 
     fun refreshNavigationVisibility() {
@@ -144,6 +169,114 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             supportActionBar?.show()
         }
     }
+    // endregion
+
+    // region SAMPLE TEST HANDLING
+    private fun handleSampleTestFromMenu() {
+        if (!isSubjectDFopening) {
+            isSubjectDFopening = true
+            val navigationAction = NavigationActionManager.resolveNavigationAction(this, NavigationActionManager.NavigationDestination.TEST_FRAGMENT) ?: R.id.action_mainFragment_to_testFragment
+            
+            // Create a temporary fragment to act as the target for the dialog
+            val tempFragment = SampleTestDialogFragment.newInstance(navigationAction)
+            
+            // Add the temporary fragment
+            supportFragmentManager.beginTransaction()
+                .add(tempFragment, "temp_sample_test_fragment")
+                .commit()
+            
+            // Create subject parcel and show dialog using MainFragment's method
+            val subjectParcel = SubjectSampleParcel()
+            val dialogFragment = SubjectSampleDialogFragment()
+            
+            MainFragment.showDialog(
+                subjectParcel,
+                dialogFragment,
+                MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE,
+                tempFragment,
+                supportFragmentManager
+            )
+        }
+    }
+    // endregion
+
+    // region INITIALIZATION FLOW
+    private fun startInitializationFlow() {
+        // Step 1: Check device registration
+        checkDeviceRegistration()
+    }
+
+    private fun checkDeviceRegistration() {
+        when {
+            deviceManager.isDeviceRegistered    ->  checkPendingResults()
+            deviceManager.isRegistrationSkipped ->  checkPendingResults()
+            deviceManager.isFirstLaunch         -> {
+                                                    // First launch and not registered, try to restore from backup
+                                                    val backupManager = DeviceIdBackupManager(this)
+                                                    val restoredId = backupManager.restoreDeviceId()
+
+                                                    if (restoredId != null) {
+                                                        deviceManager.setDeviceId(restoredId)
+                                                        checkPendingResults()
+                                                    } else {
+                                                        // No backup found, show registration dialog
+                                                        showRegistrationDialog()
+                                                    }
+                                                }
+            
+            else -> {
+                // Not first launch but not registered and not skipped, show registration dialog
+                showRegistrationDialog()
+            }
+        }
+    }
+
+    private fun checkPendingResults() {
+        // Step 2: Check for valid files and upload capability
+        if (resultsManager.canUpload && resultsManager.existResultsToSend) {
+            show2ChoisesDialog(this, resources.getString(R.string.warning), "There are pending results to send. do you want to send them?", resources.getString(R.string.yes), resources.getString(R.string.no),
+                { /* pressed YES */ resultsManager.openResultsManager() },{})
+        }
+        // If no results to send or can't upload or don't want to upload, do nothing (stay on main screen)
+    }
+
+    private fun showRegistrationDialog() {
+        val dialog = DeviceRegistrationDialog.newInstance(isFirstLaunch = deviceManager.isFirstLaunch, allowSkip = true)
+        dialog.setOnDeviceRegisteredListener(object : DeviceRegistrationDialog.OnDeviceRegisteredListener {
+
+            override fun onDeviceRegistered(deviceId: String) {
+                DeviceIdBackupManager(this@MainActivity).backupDeviceId(deviceId)
+                deviceManager.setDeviceId(deviceId)
+                Toast.makeText(this@MainActivity, resources.getString(R.string.device_registered, deviceId), Toast.LENGTH_LONG).show()
+                
+                // After registration, proceed to step 2
+                checkPendingResults()
+            }
+            
+            override fun onRegistrationSkipped() {
+                Toast.makeText(this@MainActivity, resources.getString(R.string.registration_skipped), Toast.LENGTH_LONG).show()
+                deviceManager.skipRegistration()
+                
+                // After skipping, proceed to step 2
+                checkPendingResults()
+            }
+            
+            override fun onRegistrationCancelled() {
+                Toast.makeText(this@MainActivity, resources.getString(R.string.registration_cancelled), Toast.LENGTH_LONG).show()
+                // On cancel, still proceed to step 2 (don't block the user)
+                checkPendingResults()
+            }
+        })
+        dialog.show(supportFragmentManager, "device_registration")
+    }
+    // endregion
+
+    // region PROJECT MANAGEMENT
+    private fun showProjectManagementDialog() {
+        val dialog = ProjectManagementDialog.newInstance()
+        dialog.show(supportFragmentManager, ProjectManagementDialog.TAG)
+    }
+    // endregion
 
     override fun onBackPressed() {
 
@@ -152,24 +285,91 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         when(currentFragment?.LOG_TAG){
             "AnswerDialogFragment", "TestFragment"  -> {}
             "MainFragment"      -> {
-                                AlertDialog.Builder(this)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setTitle("Chiudi ?")
-                                .setMessage("Vuoi uscire dall'applicazione ??")
-                                .setCancelable(false)
-                                .setPositiveButton("SI"){ _, _ -> finish() }
-                                .setNegativeButton("NO", null)
-                                .show()
+                AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(resources.getString(R.string.warning))
+                    .setMessage(resources.getString(R.string.want_to_quit_app))
+                    .setCancelable(false)
+                    .setPositiveButton(resources.getString(R.string.yes)){ _, _ -> finish() }
+                    .setNegativeButton(resources.getString(R.string.no), null)
+                    .show()
             }
             else                -> super.onBackPressed()
         }
     }
 
+    private fun checkPermissions(perm: String) {
+        val permissionManager: PermissionManager = PermissionManager.getInstance(applicationContext)
+        permissionManager.checkPermissions(
+            Collections.singleton(perm),
+            object : PermissionManager.PermissionRequestListener {
+                override fun onPermissionGranted() {
+                    haveAudioRecordPermission = true
+                }
+
+                override fun onPermissionDenied(deniedPermissions: DeniedPermissions) {
+                    haveAudioRecordPermission = false
+                }
+            })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Unregister since the activity is paused.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
+    }
 
     override fun onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         dialog?.dismiss()
         findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
         super.onDestroy()
+    }
+
+}
+
+/**
+ * Temporary fragment to handle sample test dialog results from MainActivity
+ */
+class SampleTestDialogFragment : androidx.fragment.app.Fragment() {
+
+    companion object {
+        private const val ARG_NAVIGATION_ACTION = "navigation_action"
+
+        fun newInstance(navigationAction: Int): SampleTestDialogFragment {
+            val fragment = SampleTestDialogFragment()
+            val args = Bundle()
+            args.putInt(ARG_NAVIGATION_ACTION, navigationAction)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val navigationAction = arguments?.getInt(ARG_NAVIGATION_ACTION) ?: R.id.action_mainFragment_to_testFragment
+
+        // Set up the result listener
+        parentFragmentManager.setFragmentResultListener(
+            MainFragment.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE.toString(),
+            this
+        ) { _, result ->
+            val activity = requireActivity() as MainActivity
+            activity.isSubjectDFopening = false
+
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.SUBJECT_PARCEL)
+            if (subj != null) {
+                // Use MainFragment's static method to start the test with the appropriate navigation action
+                MainFragment.startTest(subj, requireActivity().findViewById(R.id.my_nav_host_fragment), navigationAction)
+            }
+            // Remove this temporary fragment
+            parentFragmentManager.beginTransaction().remove(this).commit()
+        }
     }
 }
