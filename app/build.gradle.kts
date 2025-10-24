@@ -83,6 +83,12 @@ android {
         viewBinding = true
     }
 
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
 }
 
 dependencies {
@@ -98,4 +104,9 @@ dependencies {
     implementation("androidx.test:monitor:1.7.1")
     implementation("androidx.test.ext:junit-ktx:1.2.1")
     implementation("androidx.navigation:navigation-testing:2.7.7")
+    
+    // Exclude problematic dependencies
+    configurations.all {
+        exclude(group = "androidx.profileinstaller", module = "profileinstaller")
+    }
 }

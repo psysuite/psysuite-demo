@@ -9,6 +9,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.navigation.findNavController
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.TestResult
@@ -21,9 +22,6 @@ import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.mail.EMailAccount
 import org.albaspazio.core.mail.Mail
 import org.albaspazio.core.mail.MailIntent
-//import org.albaspazio.core.mail.EMailAccount
-//import org.albaspazio.core.mail.Mail
-//import org.albaspazio.core.mail.MailIntent
 import org.albaspazio.core.ui.show1MethodDialog
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
@@ -58,6 +56,8 @@ class ResultsManager private constructor(private var activity: Activity) {
 
     private var maxRetryAttempts: Int       = prefs.getInt("max_retry_attempts", 3)
     private var retryDelayMs: Long          = prefs.getLong("retry_delay_ms", 5000)
+
+    private val HTTP_ERROR_SUBMISSION_NOT_ALLOWED = 423
 
     // Simple properties - no SecureStorage needed
     var webApiUrl: String = BuildConfig.API_URL
@@ -239,14 +239,6 @@ class ResultsManager private constructor(private var activity: Activity) {
     }
 
     // region Web upload methods
-
-    /**
-     * Checks if a result with the given unique ID has already been submitted
-     */
-    fun checkIfAlreadySubmitted(exp_uid: String): Boolean {
-        return fileSystemManager.isAlreadySubmitted(exp_uid)
-    }
-
     /**
      * Uploads multiple selected result files
      */
@@ -272,7 +264,7 @@ class ResultsManager private constructor(private var activity: Activity) {
 
                     try {
                         // Check if already submitted
-                        if (checkIfAlreadySubmitted(item.exp_uid)) {
+                        if (fileSystemManager.isAlreadySubmitted(item.exp_uid)) {
                             Log.i("ResultsManager", "Skipping already submitted file: ${item.displayName}")
                             withContext(Dispatchers.Main) {
                                 onProgress(item, true, "Already submitted")
@@ -437,13 +429,12 @@ class ResultsManager private constructor(private var activity: Activity) {
     
     private fun filterJson(configJson: JSONObject): JSONObject {
         val validFields = listOf(
-            "label", "age", "gender", "population", "session", "type",
+            "label", "age", "gender", "population", "session", "type", "project",
             "device", "vercode", "stimuliDelays", "whitenoise",
             "trman_type", "showResult", "canRepeat", "doTraining", "date"
         )
 
         val validJson  = JSONObject()
-
         validFields.forEach { field ->
             if (configJson.has(field))
                 validJson.put(field, configJson.get(field))
@@ -480,7 +471,6 @@ class ResultsManager private constructor(private var activity: Activity) {
                             else -> value
                         }
                     }
-                    
                     trials.add(TrialData(i, trialData))
                 }
             }
@@ -514,11 +504,17 @@ class ResultsManager private constructor(private var activity: Activity) {
                     testConnection.getInputStream().close()
                     Log.d("ResultsManager", "Server connectivity test passed")
                 } catch (e: Exception) {
-                    Log.w("ResultsManager", "Server connectivity test failed: ${e.message}")
-                    // Continue anyway, but log the issue
-                }
+                    Log.w("ResultsManager", "Server connectivity test failed: ${e.message}, move to next attempt")
+                    // Abort this attempt and retry
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(activity,"Connection problems, I will make another attempt in few ms",Toast.LENGTH_SHORT).show()
+                    }
+                    delay(delay)
+                    delay = min(delay * 2, 60000)
+                    attempt++
+                    continue                }
                 
-                val fullUrl = "$webApiUrl/upload/experiment"
+                val fullUrl = "$webApiUrl/api/upload/experiment"
                 Log.d("ResultsManager", "Attempting connection to: $fullUrl")
                 
                 val url = URL(fullUrl)
@@ -527,9 +523,7 @@ class ResultsManager private constructor(private var activity: Activity) {
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json")
                 connection.setRequestProperty("Accept", "application/json")
-                if (webApiKey.isNotEmpty()) {
-                    connection.setRequestProperty("Authorization", "Bearer $webApiKey")
-                }
+                connection.setRequestProperty("Authorization", "Bearer $webApiKey")
                 connection.doOutput = true
                 connection.connectTimeout = 30000
                 connection.readTimeout = 60000
@@ -575,21 +569,29 @@ class ResultsManager private constructor(private var activity: Activity) {
                 
                 val responseCode = connection.responseCode
                 Log.d("ResultsManager", "Received response code: $responseCode")
-                
-                if (responseCode == HttpURLConnection.HTTP_CREATED) {
-                    Log.i("ResultsManager", "Experiment uploaded successfully")
-                    return@withContext true
-                } else if (responseCode == HttpURLConnection.HTTP_CONFLICT) {
-                    // Duplicate experiment - consider it successful
-                    Log.i("ResultsManager", "Experiment already exists on server")
-                    return@withContext true
-                } else {
-                    val errorMessage = try {
-                        connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
-                    } catch (_: Exception) {
-                        "HTTP $responseCode"
+
+                when (responseCode) {
+                    HttpURLConnection.HTTP_CREATED -> {
+                        Log.i("ResultsManager", "Experiment uploaded successfully")
+                        return@withContext true
                     }
-                    Log.w("ResultsManager", "Upload failed with code $responseCode: $errorMessage")
+                    HttpURLConnection.HTTP_CONFLICT -> {
+                        // Duplicate experiment - consider it successful
+                        Log.i("ResultsManager", "Experiment already exists on server")
+                        return@withContext true
+                    }
+                    HTTP_ERROR_SUBMISSION_NOT_ALLOWED -> {
+                        // submission was ok, but test is finalized or do not accept submissions
+                        return@withContext false
+                    }
+                    else -> {
+                        val errorMessage = try {
+                            connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
+                        } catch (_: Exception) {
+                            "HTTP $responseCode"
+                        }
+                        Log.w("ResultsManager", "Upload failed with code $responseCode: $errorMessage")
+                    }
                 }
                 
             } catch (e: IOException) {

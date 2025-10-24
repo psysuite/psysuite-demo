@@ -37,6 +37,7 @@ import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.filesystem.FileSystemManager
 import iit.uvip.psysuite.view.MainFragment
+import iit.uvip.psysuite.project.ProjectManagementDialog
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import java.util.*
@@ -87,12 +88,11 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
         try {
             // Initialize managers
-            deviceManager = DeviceIdentificationManager.getInstance(this)
-            fileSystemManager = FileSystemManager.getInstance()
-            resultsManager = ResultsManager.getInstance(this)
+            deviceManager       = DeviceIdentificationManager.getInstance(this)
+            fileSystemManager   = FileSystemManager.getInstance()
+            resultsManager      = ResultsManager.getInstance(this)
             resultsManager.updateContext(this)
 
-            // Start the initialization flow
             startInitializationFlow()
         }
         catch (e: Exception) {
@@ -100,6 +100,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         }
     }
 
+    // region SYSTEM MENU
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
@@ -133,28 +134,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 handleSampleTestFromMenu()
                 true
             }
+            R.id.menu_manage_projects -> {
+                showProjectManagementDialog()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-    override fun onPause() {
-        super.onPause()
-        // Unregister since the activity is paused.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
-    }
-
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-        dialog?.dismiss()
-        findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
-        super.onDestroy()
-    }
+    // endregion
 
     // region NAVIGATION
     override fun onSupportNavigateUp() = findNavController(R.id.my_nav_host_fragment).navigateUp()
@@ -284,6 +271,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
     // endregion
 
+    // region PROJECT MANAGEMENT
+    private fun showProjectManagementDialog() {
+        val dialog = ProjectManagementDialog.newInstance()
+        dialog.show(supportFragmentManager, ProjectManagementDialog.TAG)
+    }
+    // endregion
+
     override fun onBackPressed() {
 
         val currentFragment = supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment)?.childFragmentManager?.fragments?.firstOrNull()  as? BaseFragment
@@ -319,6 +313,24 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             })
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Unregister since the activity is paused.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        dialog?.dismiss()
+        findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
+        super.onDestroy()
+    }
+
 }
 
 /**
@@ -351,7 +363,7 @@ class SampleTestDialogFragment : androidx.fragment.app.Fragment() {
             val activity = requireActivity() as MainActivity
             activity.isSubjectDFopening = false
 
-            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.SUBJECT_PARCEL)
             if (subj != null) {
                 // Use MainFragment's static method to start the test with the appropriate navigation action
                 MainFragment.startTest(subj, requireActivity().findViewById(R.id.my_nav_host_fragment), navigationAction)

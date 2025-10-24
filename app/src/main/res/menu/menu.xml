@@ -9,6 +9,12 @@
         android:orderInCategory="90"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_manage_projects"
+        android:title="Manage Projects"
+        android:orderInCategory="92"
+        app:showAsAction="never" />
+
     <item android:id="@+id/menu_send_results"
         android:title="@string/send_results"
         android:orderInCategory="95"

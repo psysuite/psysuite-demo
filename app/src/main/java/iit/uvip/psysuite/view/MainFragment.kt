@@ -16,9 +16,12 @@ import iit.uvip.psysuite.R
 import iit.uvip.psysuite.ResultsManager
 import iit.uvip.psysuite.core.model.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment.Companion.PROJECTS_PARCEL
+import iit.uvip.psysuite.core.ui.SubjectBasicDialogFragment.Companion.SUBJECT_PARCEL
 
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.databinding.FragmentMainBinding
+import iit.uvip.psysuite.device.DeviceIdentificationManager
 
 
 class MainFragment : TestLaunchFragment(
@@ -48,7 +51,12 @@ class MainFragment : TestLaunchFragment(
             }
 
             val bundle = Bundle()
-            bundle.putParcelable("subject", subj)
+            bundle.putParcelable(SUBJECT_PARCEL, subj)
+            
+            // Get available projects and pass them to the dialog
+            val projectManager = iit.uvip.psysuite.project.ProjectManager.getInstance(frg.requireContext())
+            val availableProjects = projectManager.getAllProjects()
+            bundle.putStringArrayList(PROJECTS_PARCEL, ArrayList(availableProjects))
 
             df.arguments    = bundle
             df.setTargetFragment(frg, rc)
@@ -76,21 +84,6 @@ class MainFragment : TestLaunchFragment(
         _binding = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // MainFragment has additional logic to remove the result after processing
-        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
-
-        resultLiveData?.observe(viewLifecycleOwner) { result ->
-            if (result != null) {
-                ResultsManager.getInstance(requireActivity()).onTestFinished(result)
-                savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
-            }
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     override fun onResume(){
         super.onResume()
@@ -99,6 +92,7 @@ class MainFragment : TestLaunchFragment(
 
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 
+        binding.labRegName.text = DeviceIdentificationManager.getInstance(requireContext()).deviceId
         binding.labVersion.text = "ver. ${BuildConfig.VERSION_NAME}"
 
         binding.btStartTemporalTest.setOnClickListener {

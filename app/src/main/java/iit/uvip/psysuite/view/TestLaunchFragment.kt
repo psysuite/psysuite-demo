@@ -43,19 +43,22 @@ abstract class TestLaunchFragment(
      * Observes test results coming back from TestFragment
      */
     private fun setupTestResultObserver() {
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)?.
-            observe(viewLifecycleOwner) { result ->
-                if (result != null) {
 
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
 
+        resultLiveData?.observe(viewLifecycleOwner) { result ->
+            if (result != null) {
 //                    subject.device = Device().setRam(requireContext())
 //                    subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
 //                    subject.stimuliDelays = MainApplication.delaysAligner
 //                    subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
 
-                    ResultsManager.getInstance(requireActivity()).onTestFinished(result)
-                }
+                ResultsManager.getInstance(requireActivity()).onTestFinished(result)
+                savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
             }
+        }
+
     }
 
     /**
@@ -67,7 +70,7 @@ abstract class TestLaunchFragment(
             viewLifecycleOwner
         ) { _, result ->
             isSubjectDFopening = false
-            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.EVENT_SUBJECT)
+            val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.SUBJECT_PARCEL)
             if (subj == null) return@setFragmentResultListener
 
             subject = subj
