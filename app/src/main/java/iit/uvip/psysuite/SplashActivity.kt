@@ -14,27 +14,26 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val url = "https://api.allspeak.eu/psysuitestableupdate.xml"
-//        val url = "http://192.168.1.14:8095/psysuitestableupdate.xml"     // localhost @home
+        val url = "${BuildConfig.API_URL}/api/psysuitestableupdate.xml"
 
-//        UpdateManager(this, url,
-//            {
-//                // onSuccess
-//                when(it){
-//                    Constants.VERSION_UP_TO_UPDATE,
-//                    Constants.UPDATE_CANCELLED,
-//                    Constants.NETWORK_ABSENT          -> go2main()
-//                }
-//            },
-//            {
-//                // onError
-//                show1MethodDialog(this, resources.getString(R.string.error), resources.getString(R.string.update_error_message, it), "OK"){
-//                    go2main()
-//                }
-//
-//            }
-//        ).checkUpdate()
-        Handler().postDelayed({go2main()},0L)
+        UpdateManager(this, url,
+            {
+                // onSuccess
+                when(it){
+                    Constants.VERSION_UP_TO_UPDATE,
+                    Constants.UPDATE_CANCELLED,
+                    Constants.NETWORK_ABSENT          -> go2main()
+                }
+            },
+            {
+                // onError
+                show1MethodDialog(this, resources.getString(R.string.error), resources.getString(R.string.update_error_message, it), "OK"){
+                    go2main()
+                }
+
+            }
+        ).checkUpdate()
+//        Handler().postDelayed({go2main()},0L) // in case u disable updater, comment also 19:35
     }
 
     private fun go2main(){

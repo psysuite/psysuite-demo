@@ -112,6 +112,11 @@ class MainFragment : TestLaunchFragment(
         }
     }
 
+
+    fun setRegistrationName(deviceId: String){
+        binding.labVersion.text = deviceId
+    }
+
     // =====================================================================
     fun debugStart() {
 

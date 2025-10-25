@@ -21,8 +21,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.intentfilter.androidpermissions.PermissionManager
-import com.intentfilter.androidpermissions.models.DeniedPermissions
+
 import iit.uvip.psysuite.settings.SettingsActivity
 import iit.uvip.psysuite.device.DeviceIdentificationManager
 import iit.uvip.psysuite.device.DeviceIdBackupManager
@@ -49,8 +48,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private val TEST_PERMISSIONS_REQUEST_WRITE = 1
     private val TEST_PERMISSIONS_REQUEST_INTERNET = 2
+    private val TEST_PERMISSIONS_REQUEST_AUDIO = 3
 
     private var dialog: AlertDialog? = null
+    
+    // Track permission states
+    private var hasWritePermission = false
+    private var hasInternetPermission = false
+    private var hasAudioPermission = false
 
     private lateinit var deviceManager: DeviceIdentificationManager
     private lateinit var resultsManager: ResultsManager
@@ -73,19 +78,101 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         setupActionBarWithNavController(findNavController(R.id.my_nav_host_fragment))
         findNavController(R.id.my_nav_host_fragment).addOnDestinationChangedListener(this)
 
-        checkPermissions(Manifest.permission.RECORD_AUDIO)
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),TEST_PERMISSIONS_REQUEST_WRITE)
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET),TEST_PERMISSIONS_REQUEST_INTERNET)
-
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         Log.d("BuildConfig", "API_URL: ${BuildConfig.API_URL}")
         Log.d("BuildConfig", "API_KEY: ${BuildConfig.API_KEY}")
-
+        
+        // Check and request all permissions
+        checkAndRequestPermissions()
+    }
+    
+    private fun checkAndRequestPermissions() {
+        // Check current permission states
+        hasWritePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        hasInternetPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED
+        hasAudioPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        
+        val permissionsToRequest = mutableListOf<String>()
+        
+        if (!hasWritePermission) {
+            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (!hasInternetPermission) {
+            permissionsToRequest.add(Manifest.permission.INTERNET)
+        }
+        if (!hasAudioPermission) {
+            permissionsToRequest.add(Manifest.permission.RECORD_AUDIO)
+        }
+        
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toTypedArray(),
+                TEST_PERMISSIONS_REQUEST_WRITE // Use one request code for all
+            )
+        } else {
+            // All permissions already granted
+            onAllPermissionsGranted()
+        }
+    }
+    
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        when (requestCode) {
+            TEST_PERMISSIONS_REQUEST_WRITE -> {
+                // Update permission states based on results
+                for (i in permissions.indices) {
+                    when (permissions[i]) {
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                            hasWritePermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
+                        }
+                        Manifest.permission.INTERNET -> {
+                            hasInternetPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
+                        }
+                        Manifest.permission.RECORD_AUDIO -> {
+                            hasAudioPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
+                            haveAudioRecordPermission = hasAudioPermission
+                        }
+                    }
+                }
+                
+                // Check if all critical permissions are granted
+                if (hasWritePermission && hasInternetPermission) {
+                    onAllPermissionsGranted()
+                } else {
+                    // Show error dialog for critical permissions
+                    showPermissionErrorDialog()
+                }
+            }
+        }
+    }
+    
+    private fun onAllPermissionsGranted() {
+        Log.d("MainActivity", "All permissions granted, starting app initialization")
+        start()
+    }
+    
+    private fun showPermissionErrorDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Permissions Required")
+            .setMessage("This app requires storage and internet permissions to function properly. Please grant the permissions and restart the app.")
+            .setPositiveButton("Retry") { _, _ ->
+                checkAndRequestPermissions()
+            }
+            .setNegativeButton("Exit") { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+    
+    private fun start(){
         try {
             // Initialize managers
             deviceManager       = DeviceIdentificationManager.getInstance(this)
@@ -248,7 +335,16 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 DeviceIdBackupManager(this@MainActivity).backupDeviceId(deviceId)
                 deviceManager.setDeviceId(deviceId)
                 Toast.makeText(this@MainActivity, resources.getString(R.string.device_registered, deviceId), Toast.LENGTH_LONG).show()
-                
+
+                // Update the MainFragment UI if it's visible
+                supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment)
+                    ?.childFragmentManager?.fragments?.firstOrNull()?.let { currentFragment ->
+                        if (currentFragment is MainFragment) {
+                            currentFragment.setRegistrationName(deviceId)
+                        }
+                    }
+
+
                 // After registration, proceed to step 2
                 checkPendingResults()
             }
@@ -298,20 +394,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         }
     }
 
-    private fun checkPermissions(perm: String) {
-        val permissionManager: PermissionManager = PermissionManager.getInstance(applicationContext)
-        permissionManager.checkPermissions(
-            Collections.singleton(perm),
-            object : PermissionManager.PermissionRequestListener {
-                override fun onPermissionGranted() {
-                    haveAudioRecordPermission = true
-                }
 
-                override fun onPermissionDenied(deniedPermissions: DeniedPermissions) {
-                    haveAudioRecordPermission = false
-                }
-            })
-    }
 
     override fun onPause() {
         super.onPause()
