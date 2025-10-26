@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -39,10 +40,17 @@ import iit.uvip.psysuite.view.MainFragment
 import iit.uvip.psysuite.project.ProjectManagementDialog
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
+import org.albaspazio.core.DeviceUtils
+import android.content.pm.ActivityInfo
 import java.util.*
 
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
+
+    companion object {
+        // Track if upload dialog has been shown in this app session
+        private var hasShownUploadDialog = false
+    }
 
     var haveAudioRecordPermission: Boolean = false
 
@@ -73,6 +81,10 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        
+        // Set orientation based on device type
+        setupOrientation()
+        
         setContentView(R.layout.activity_main)
 
         setupActionBarWithNavController(findNavController(R.id.my_nav_host_fragment))
@@ -83,8 +95,94 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         Log.d("BuildConfig", "API_URL: ${BuildConfig.API_URL}")
         Log.d("BuildConfig", "API_KEY: ${BuildConfig.API_KEY}")
         
+        // Log device information for debugging
+        logDeviceInformation()
+        
+        // Log current orientation
+        logCurrentOrientation()
+        
+        // Log upload dialog status
+        Log.i("MainActivity", "Upload dialog already shown: $hasShownUploadDialog")
+        
         // Check and request all permissions
         checkAndRequestPermissions()
+    }
+    
+    private fun logDeviceInformation() {
+        val deviceInfo = DeviceUtils.getDeviceInfo(this)
+        Log.i("MainActivity", "=== DEVICE INFORMATION ===")
+        Log.i("MainActivity", "Screen: ${deviceInfo.screenWidthPixels}x${deviceInfo.screenHeightPixels} pixels")
+        Log.i("MainActivity", "Density: ${deviceInfo.density} (${deviceInfo.densityDpi} dpi)")
+        Log.i("MainActivity", "Diagonal: ${"%.2f".format(deviceInfo.diagonalInches)} inches")
+        Log.i("MainActivity", "Screen Size: ${deviceInfo.screenSize}")
+        Log.i("MainActivity", "Is Tablet: ${deviceInfo.isTablet}")
+        Log.i("MainActivity", "========================")
+    }
+    
+    private fun logCurrentOrientation() {
+        val orientation = resources.configuration.orientation
+        val orientationName = when (orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> "PORTRAIT"
+            Configuration.ORIENTATION_LANDSCAPE -> "LANDSCAPE"
+            else -> "UNDEFINED"
+        }
+        Log.i("MainActivity", "Current orientation: $orientationName ($orientation)")
+    }
+    
+    private fun setupOrientation() {
+        val isTablet = DeviceUtils.isTablet(this)
+        val deviceInfo = DeviceUtils.getDeviceInfo(this)
+        
+        Log.i("MainActivity", "=== ORIENTATION SETUP ===")
+        Log.i("MainActivity", "Device Info: $deviceInfo")
+        Log.i("MainActivity", "Is Tablet: $isTablet")
+        
+        if (isTablet) {
+            // Allow both portrait and landscape on tablets
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            Log.i("MainActivity", "✓ Tablet detected - ALLOWING both orientations")
+            Log.i("MainActivity", "✓ You can now rotate to landscape on this device")
+        } else {
+            // Force portrait on phones
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            Log.i("MainActivity", "✓ Phone detected - FORCING portrait orientation only")
+            Log.i("MainActivity", "✓ Landscape rotation disabled on this device")
+        }
+        Log.i("MainActivity", "========================")
+    }
+    
+    /**
+     * Lock orientation to landscape for tests (tablets only)
+     */
+    fun lockOrientationToLandscape() {
+        val isTablet = DeviceUtils.isTablet(this)
+        if (isTablet) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            Log.i("MainActivity", "🔒 Orientation LOCKED to landscape for test")
+        } else {
+            Log.i("MainActivity", "📱 Phone detected - keeping portrait orientation")
+        }
+    }
+    
+    /**
+     * Restore dynamic orientation (tablets only)
+     */
+    fun restoreDynamicOrientation() {
+        val isTablet = DeviceUtils.isTablet(this)
+        if (isTablet) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            Log.i("MainActivity", "🔓 Orientation RESTORED to dynamic (sensor)")
+        } else {
+            Log.i("MainActivity", "📱 Phone detected - keeping portrait orientation")
+        }
+    }
+    
+    /**
+     * Reset the upload dialog flag - call this when results are actually uploaded
+     */
+    fun resetUploadDialogFlag() {
+        hasShownUploadDialog = false
+        Log.i("MainActivity", "Upload dialog flag reset - will show again if needed")
     }
     
     private fun checkAndRequestPermissions() {
@@ -320,9 +418,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private fun checkPendingResults() {
         // Step 2: Check for valid files and upload capability
-        if (resultsManager.canUpload && resultsManager.existResultsToSend) {
+        // Only show upload dialog once per app session to avoid annoying users on orientation changes
+        if (resultsManager.canUpload && resultsManager.existResultsToSend && !hasShownUploadDialog) {
+            hasShownUploadDialog = true
+            Log.i("MainActivity", "Showing upload dialog for pending results")
             show2ChoisesDialog(this, resources.getString(R.string.warning), "There are pending results to send. do you want to send them?", resources.getString(R.string.yes), resources.getString(R.string.no),
                 { /* pressed YES */ resultsManager.openResultsManager() },{})
+        } else if (hasShownUploadDialog) {
+            Log.i("MainActivity", "Upload dialog already shown in this session - skipping")
         }
         // If no results to send or can't upload or don't want to upload, do nothing (stay on main screen)
     }
@@ -405,12 +508,22 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("NAVIGATION_UPDATE"))
+        
+        // Log orientation on resume (useful for debugging orientation changes)
+        logCurrentOrientation()
     }
 
     override fun onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         dialog?.dismiss()
         findNavController(R.id.my_nav_host_fragment).removeOnDestinationChangedListener(this)
+        
+        // Reset upload dialog flag if the activity is truly finishing (not just orientation change)
+        if (isFinishing) {
+            hasShownUploadDialog = false
+            Log.i("MainActivity", "Activity finishing - reset upload dialog flag")
+        }
+        
         super.onDestroy()
     }
 

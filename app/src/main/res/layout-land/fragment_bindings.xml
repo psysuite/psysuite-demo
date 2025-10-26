@@ -4,57 +4,67 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#FFF3E0"
         tools:context=".view.MainFragment">
 
-
+    <!-- Top row buttons -->
     <Button
-        android:id="@+id/bt_start_tid_test"
+        android:id="@+id/bt_start_atb_test"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="@dimen/main_button_width"
+        android:layout_width="0dp"
         android:layout_height="@dimen/main_button_height"
-        android:layout_marginTop="@dimen/main_button_margin_top"
-        android:enabled="true"
-        android:text="@string/tid_label"
-        android:textSize="@dimen/main_button_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_start_bindings" />
-
-    <Button
-        android:id="@+id/bt_start_bindings"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="@dimen/main_button_width"
-        android:layout_height="@dimen/main_button_height"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
         android:enabled="true"
-        android:text="@string/label_bindings"
+        android:text="@string/start_atb"
         android:textSize="@dimen/main_button_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/bt_start_tvb_test"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <Button
-        android:id="@+id/bt_start_tir_test"
+        android:id="@+id/bt_start_tvb_test"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="@dimen/main_button_width"
+        android:layout_width="0dp"
         android:layout_height="@dimen/main_button_height"
-        android:layout_marginTop="@dimen/main_button_margin_top"
-        android:text="@string/tir_label"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        android:enabled="true"
+        android:text="@string/start_tvb"
         android:textSize="@dimen/main_button_text_size"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/bt_start_atb_test"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Bottom row buttons -->
+    <Button
+        android:id="@+id/bt_start_avb_test"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/main_button_height"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="@dimen/main_button_margin_top"
+        android:layout_marginEnd="8dp"
+        android:text="@string/start_avb"
+        android:textSize="@dimen/main_button_text_size"
+        app:layout_constraintEnd_toStartOf="@+id/bt_start_atvb_test"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_start_bis" />
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_atb_test" />
 
     <Button
-        android:id="@+id/bt_start_bis"
+        android:id="@+id/bt_start_atvb_test"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="@dimen/main_button_width"
+        android:layout_width="0dp"
         android:layout_height="@dimen/main_button_height"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="@dimen/main_button_margin_top"
-        android:text="@string/start_bisection"
+        android:layout_marginEnd="16dp"
+        android:text="@string/start_atvb"
         android:textSize="@dimen/main_button_text_size"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_start_tid_test" />
+        app:layout_constraintStart_toEndOf="@+id/bt_start_avb_test"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start_tvb_test" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
