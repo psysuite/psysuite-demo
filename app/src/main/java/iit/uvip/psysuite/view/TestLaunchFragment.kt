@@ -3,6 +3,7 @@ package iit.uvip.psysuite.view
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import iit.uvip.psysuite.MainActivity
 import iit.uvip.psysuite.MainApplication
 import iit.uvip.psysuite.ResultsManager
 import iit.uvip.psysuite.core.model.SubjectBasicParcel
@@ -54,6 +55,9 @@ abstract class TestLaunchFragment(
 //                    subject.stimuliDelays = MainApplication.delaysAligner
 //                    subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
 
+                // Restore dynamic orientation when test finishes (tablets only)
+                (requireActivity() as MainActivity).restoreDynamicOrientation()
+
                 ResultsManager.getInstance(requireActivity()).onTestFinished(result)
                 savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
             }
@@ -78,6 +82,9 @@ abstract class TestLaunchFragment(
             subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
             subject.stimuliDelays = MainApplication.delaysAligner
             subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
+            
+            // Lock orientation to landscape for tests (tablets only)
+            (requireActivity() as MainActivity).lockOrientationToLandscape()
             
             // Navigate to TestFragment with the specific action for this fragment
             MainFragment.startTest(subject, requireView(), getTestFragmentNavigationAction())

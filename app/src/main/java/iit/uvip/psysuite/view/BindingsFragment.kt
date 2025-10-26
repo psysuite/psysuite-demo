@@ -40,9 +40,9 @@ class BindingsFragment  : TestLaunchFragment(
 
         val hasVibrator = VibrationManager.sysHasVibrator(requireContext())
         if(!hasVibrator){
-            binding.btStartAtbTest.visibility    = View.INVISIBLE
-            binding.btStartAtvbTest.visibility   = View.INVISIBLE
-            binding.btStartTvbTest.visibility    = View.INVISIBLE
+            binding.btStartAtbTest.visibility    = View.GONE
+            binding.btStartAtvbTest.visibility   = View.GONE
+            binding.btStartTvbTest.visibility    = View.GONE
         }
     }
 
