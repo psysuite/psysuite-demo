@@ -2,7 +2,7 @@ object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
     const val versionCode       = 64
-    const val versionName       = "2.5.0.${versionCode}"
+    const val versionName       = "2.5.1.${versionCode}"
 
     // iit.uvip.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
@@ -44,7 +44,7 @@ object Versions {
     const val recycleView       = "1.2.1"
 
     // org.albaspazio.core
-    const val kotlin = "1.6.10"
+    const val kotlin = "1.9.0"
     const val ktxCore = "1.13.1"
     const val appCompat = "1.5.1"
     const val androidLibrary = "7.2.0"

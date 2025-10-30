@@ -1,6 +1,7 @@
 package iit.uvip.psysuite
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -28,6 +29,9 @@ import iit.uvip.psysuite.device.DeviceIdentificationManager
 import iit.uvip.psysuite.device.DeviceIdBackupManager
 import iit.uvip.psysuite.device.DeviceRegistrationDialog
 import android.widget.Toast
+import org.albaspazio.core.ui.show1MethodDialog
+import org.albaspazio.core.updater.Constants
+import org.albaspazio.core.updater.UpdateManager
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.pdf.PdfViewActivity
 
@@ -42,7 +46,6 @@ import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.DeviceUtils
 import android.content.pm.ActivityInfo
-import java.util.*
 
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
@@ -129,6 +132,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         Log.i("MainActivity", "Current orientation: $orientationName ($orientation)")
     }
     
+    @SuppressLint("SourceLockedOrientationActivity")
     private fun setupOrientation() {
         val isTablet = DeviceUtils.isTablet(this)
         val deviceInfo = DeviceUtils.getDeviceInfo(this)
@@ -252,8 +256,35 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
     
     private fun onAllPermissionsGranted() {
-        Log.d("MainActivity", "All permissions granted, starting app initialization")
-        start()
+        Log.d("MainActivity", "All permissions granted, checking for updates...")
+        checkForUpdates()
+    }
+    
+    private fun checkForUpdates() {
+        val url = "${BuildConfig.API_URL}/api/psysuitestableupdate.xml"
+        
+        UpdateManager(this, url,
+            { result ->
+                // onSuccess
+                Log.d("MainActivity", "Update check completed with result: $result")
+                when(result) {
+                    Constants.VERSION_UP_TO_UPDATE,
+                    Constants.UPDATE_CANCELLED,
+                    Constants.NETWORK_ABSENT -> {
+                        Log.d("MainActivity", "No update needed or cancelled, starting app")
+                        start()
+                    }
+                }
+            },
+            { error ->
+                // onError
+                Log.w("MainActivity", "Update check failed: $error")
+                show1MethodDialog(this, resources.getString(R.string.error), 
+                    resources.getString(org.albaspazio.core.R.string.update_error_message, error), "OK") {
+                    start() // Continue with app even if update check fails
+                }
+            }
+        ).checkUpdate()
     }
     
     private fun showPermissionErrorDialog() {

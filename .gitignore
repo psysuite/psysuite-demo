@@ -25,5 +25,11 @@ local.properties
 /OT
 /.vscode
 
+.kiro/
+
 *.keystore
-/psysuite_web/
+web_app/
+web_app/.git/
+web_app/**
+web_app/.git
+
