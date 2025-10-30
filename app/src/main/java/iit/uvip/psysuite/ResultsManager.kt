@@ -34,6 +34,7 @@ import java.net.URL
 import java.util.*
 import kotlin.math.min
 import androidx.core.content.edit
+import iit.uvip.psysuite.network.ApiClient
 
 /*
     RULES:
@@ -495,16 +496,9 @@ class ResultsManager private constructor(private var activity: Activity) {
                     continue
                 }
                 
-                // Additional connectivity check
-                try {
-                    val testUrl = URL(webApiUrl)
-                    val testConnection = testUrl.openConnection()
-                    testConnection.connectTimeout = 5000
-                    testConnection.connect()
-                    testConnection.getInputStream().close()
-                    Log.d("ResultsManager", "Server connectivity test passed")
-                } catch (e: Exception) {
-                    Log.w("ResultsManager", "Server connectivity test failed: ${e.message}, move to next attempt")
+                // Additional connectivity check using centralized client
+                if (!ApiClient.testConnectivity("/api/health")) {
+                    Log.w("ResultsManager", "Server connectivity test failed, move to next attempt")
                     // Abort this attempt and retry
                     withContext(Dispatchers.Main) {
                         Toast.makeText(activity,"Connection problems, I will make another attempt in few ms",Toast.LENGTH_SHORT).show()
@@ -512,21 +506,12 @@ class ResultsManager private constructor(private var activity: Activity) {
                     delay(delay)
                     delay = min(delay * 2, 60000)
                     attempt++
-                    continue                }
+                    continue
+                }
                 
-                val fullUrl = "$webApiUrl/api/upload/experiment"
-                Log.d("ResultsManager", "Attempting connection to: $fullUrl")
+                Log.d("ResultsManager", "Attempting connection to: ${ApiClient.getBaseUrl()}/api/upload/experiment")
                 
-                val url = URL(fullUrl)
-                val connection = url.openConnection() as HttpURLConnection
-                
-                connection.requestMethod = "POST"
-                connection.setRequestProperty("Content-Type", "application/json")
-                connection.setRequestProperty("Accept", "application/json")
-                connection.setRequestProperty("Authorization", "Bearer $webApiKey")
-                connection.doOutput = true
-                connection.connectTimeout = 30000
-                connection.readTimeout = 60000
+                val connection = ApiClient.createPostConnection("/api/upload/experiment")
                 
                 // Create JSON payload matching web app expectations
                 val payload = JSONObject().apply {

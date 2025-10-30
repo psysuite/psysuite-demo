@@ -39,5 +39,6 @@
     <string name="device_not_registered">device not registered</string>
     <string name="register_device_then_send_results">Register the device and then send result by the top-right menu</string>
     <string name="sample_test">Test device</string>
+    <string name="update_error_message">Si è verificato un errore durante l\\\'aggiornamento:\\n%1$s\n</string>
 
 </resources>

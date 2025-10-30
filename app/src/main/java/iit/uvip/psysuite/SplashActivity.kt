@@ -14,26 +14,10 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val url = "${BuildConfig.API_URL}/api/psysuitestableupdate.xml"
-
-        UpdateManager(this, url,
-            {
-                // onSuccess
-                when(it){
-                    Constants.VERSION_UP_TO_UPDATE,
-                    Constants.UPDATE_CANCELLED,
-                    Constants.NETWORK_ABSENT          -> go2main()
-                }
-            },
-            {
-                // onError
-                show1MethodDialog(this, resources.getString(R.string.error), resources.getString(R.string.update_error_message, it), "OK"){
-                    go2main()
-                }
-
-            }
-        ).checkUpdate()
-//        Handler().postDelayed({go2main()},0L) // in case u disable updater, comment also 19:35
+        // Simple splash - just show and move to MainActivity
+        Handler().postDelayed({
+            go2main()
+        }, 2000L) // 1.5 second splash
     }
 
     private fun go2main(){
