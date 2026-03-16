@@ -1,8 +1,8 @@
 object Configs {
 
     const val applicationId     = "iit.uvip.psysuite"
-    const val versionCode       = 64
-    const val versionName       = "2.5.1.${versionCode}"
+    const val versionCode       = 65
+    const val versionName       = "2.5.2.${versionCode}"
 
     // iit.uvip.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
@@ -42,6 +42,8 @@ object Versions {
     const val legacySupport     = "1.0.0"
     const val preference        = "1.2.0"
     const val recycleView       = "1.2.1"
+    const val coroutines        = "1.6.4"
+
 
     // org.albaspazio.core
     const val kotlin = "1.9.0"
@@ -98,6 +100,8 @@ object Dependencies {
     object Kotlin {
         const val stdLib    = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
         const val reflect   = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
+        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+        const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
     }
 
     object Moshi {

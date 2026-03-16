@@ -33,9 +33,9 @@ android {
 
         create("release") {
             storeFile       = file("../${folder}/psysuite_keystore.jks")
-            keyAlias        = props.getProperty("keyAlias") //"psysuite_key"
-            storePassword   = props.getProperty("storePassword") //"qwas_QWAS_72"
-            keyPassword     = props.getProperty("keyPassword") //"qwas_QWAS_72"
+            keyAlias        = props.getProperty("keyAlias")
+            storePassword   = props.getProperty("storePassword")
+            keyPassword     = props.getProperty("keyPassword")
         }
     }
 

@@ -32,4 +32,4 @@ web_app/
 web_app/.git/
 web_app/**
 web_app/.git
-
+/psysuite.code-workspace

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import iit.uvip.psysuite.R
 import iit.uvip.psysuite.core.tests.mmd.SubjectMMDParcel
+import iit.uvip.psysuite.core.tests.rt.SubjectRTParcel
 import iit.uvip.psysuite.databinding.FragmentVarioustestsBinding
 
 class VariousTestsFragment  :  TestLaunchFragment(
@@ -33,5 +34,6 @@ class VariousTestsFragment  :  TestLaunchFragment(
     override fun onResume() {
         super.onResume()
         binding.btStartMusicalmeter.setOnClickListener{     showSubjectDialog(SubjectMMDParcel())   }
+        binding.btStartRt.setOnClickListener{               showSubjectDialog(SubjectRTParcel())    }
     }
 }

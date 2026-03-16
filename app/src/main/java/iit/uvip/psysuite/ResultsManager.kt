@@ -437,10 +437,57 @@ class ResultsManager private constructor(private var activity: Activity) {
 
         val validJson  = JSONObject()
         validFields.forEach { field ->
-            if (configJson.has(field))
-                validJson.put(field, configJson.get(field))
+            if (configJson.has(field)) {
+                var value = configJson.get(field)
+                
+                // Normalize date format to ISO standard (YYYY-MM-DD)
+                if (field == "date" && value is String) {
+                    value = normalizeDateFormat(value)
+                }
+                
+                validJson.put(field, value)
+            }
         }
         return validJson
+    }
+    
+    private fun normalizeDateFormat(dateString: String): String {
+        return try {
+            // Try to parse common date formats and convert to ISO datetime format
+            val formats = listOf(
+                "yyyy-MM-dd HH:mm:ss",  // Timestamp format (most common)
+                "dd/MM/yyyy",           // Italian format
+                "dd-MM-yyyy",
+                "yyyy-MM-dd",           // ISO date format
+                "yyyy/MM/dd",
+                "dd.MM.yyyy",
+                "MM/dd/yyyy",           // US format
+                "MM-dd-yyyy"
+            )
+            
+            // Output format: ISO datetime with seconds
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
+            
+            for (format in formats) {
+                try {
+                    val parser = java.text.SimpleDateFormat(format, java.util.Locale.US)
+                    val date = parser.parse(dateString)
+                    val normalizedDate = sdf.format(date)
+                    Log.d("ResultsManager", "Date normalized from '$dateString' (format: $format) to '$normalizedDate'")
+                    return normalizedDate
+                } catch (e: Exception) {
+                    // Try next format
+                    continue
+                }
+            }
+            
+            // If no format matches, return as-is
+            Log.w("ResultsManager", "Could not parse date format: $dateString, returning as-is")
+            dateString
+        } catch (e: Exception) {
+            Log.e("ResultsManager", "Error normalizing date format", e)
+            dateString
+        }
     }
 
     private fun parseTrialResults(resultFile: File): List<TrialData> {
@@ -497,7 +544,7 @@ class ResultsManager private constructor(private var activity: Activity) {
                 }
                 
                 // Additional connectivity check using centralized client
-                if (!ApiClient.testConnectivity("/api/health")) {
+                if (!ApiClient.testConnectivity("/health")) {
                     Log.w("ResultsManager", "Server connectivity test failed, move to next attempt")
                     // Abort this attempt and retry
                     withContext(Dispatchers.Main) {
@@ -535,7 +582,8 @@ class ResultsManager private constructor(private var activity: Activity) {
                 Log.d("ResultsManager", "Upload payload - Device ID: ${experimentData.deviceId}")
                 Log.d("ResultsManager", "Upload payload - Trials count: ${experimentData.trials.size}")
                 Log.d("ResultsManager", "Upload payload - Configuration keys: ${experimentData.configuration.keys().asSequence().toList()}")
-                
+                Log.d("ResultsManager", "Upload payload - Date being sent: ${experimentData.configuration.get("date")}")
+
                 // Send request
                 Log.d("ResultsManager", "Sending request to: ${connection.url}")
                 Log.d("ResultsManager", "Request method: ${connection.requestMethod}")
