@@ -96,11 +96,12 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":psysuitepython"))
     implementation(project(":psysuitecore"))
+    implementation(project(":psysuitetests"))
 
     implementation(Dependencies.permissions)
     implementation(Dependencies.AndroidX.legacy_support)
     implementation(Dependencies.AndroidX.fragment)
-    implementation(Dependencies.AndroidX.livecycleviewmodel)
+    implementation(Dependencies.AndroidX.lifecycleviewmodel)
     implementation("androidx.test:monitor:1.7.1")
     implementation("androidx.test.ext:junit-ktx:1.2.1")
     implementation("androidx.navigation:navigation-testing:2.7.7")

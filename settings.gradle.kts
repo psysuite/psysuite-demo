@@ -24,6 +24,9 @@ project(":psysuitepython").projectDir = File(settingsDir, "../modules/psysuitepy
 include(":psysuitecore")
 project(":psysuitecore").projectDir = File(settingsDir, "../modules/psysuitecore/psysuitecore")
 
+include(":psysuitetests")
+project(":psysuitetests").projectDir = File(settingsDir, "../modules/psysuitetests/psysuitetests")
+
 include(":core")
 project(":core").projectDir = File(settingsDir, "../modules/core/core")
 

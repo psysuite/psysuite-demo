@@ -35,7 +35,7 @@ import org.albaspazio.core.updater.UpdateManager
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.pdf.PdfViewActivity
 
-import org.albaspazio.psysuite.model.SubjectBasicParcel
+import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.sample.SubjectSampleDialogFragment
 import org.albaspazio.psysuite.tests.sample.SubjectSampleParcel
 import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment

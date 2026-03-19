@@ -6,7 +6,7 @@ import androidx.navigation.fragment.findNavController
 import org.albaspazio.psysuite.MainActivity
 import org.albaspazio.psysuite.MainApplication
 import org.albaspazio.psysuite.ResultsManager
-import org.albaspazio.psysuite.model.SubjectBasicParcel
+import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment
 import org.albaspazio.psysuite.utility.TestResult

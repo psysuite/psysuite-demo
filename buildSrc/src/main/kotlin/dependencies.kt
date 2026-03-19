@@ -1,8 +1,8 @@
 object Configs {
 
     const val applicationId     = "org.albaspazio.psysuite"
-    const val versionCode       = 65
-    const val versionName       = "2.5.2.${versionCode}"
+    const val versionCode       = 66
+    const val versionName       = "2.5.3.${versionCode}"
 
     // org.albaspazio.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "org.albaspazio.psysuite.core"
@@ -82,7 +82,7 @@ object Dependencies {
         const val legacySupport     = "androidx.legacy:legacy-support-v4:${Versions.legacySupport}"
 
         // org.albaspazio.core
-        const val livecycleviewmodel= "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
+        const val lifecycleviewmodel= "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
         const val navFragment       = "androidx.navigation:navigation-fragment-ktx:${Versions.navFragment}"
         const val navUi             = "androidx.navigation:navigation-ui-ktx:${Versions.navFragment}"
         const val ktxCore           = "androidx.core:core-ktx:${Versions.ktxCore}"
@@ -90,8 +90,8 @@ object Dependencies {
         const val constraintLayout  = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
         const val material          = "com.google.android.material:material:${Versions.material}"
 
-        const val livecycledataKtx  = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
-        const val livecyclecommon   = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
+        const val lifecycledataKtx  = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
+        const val lifecyclecommon   = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
 
         const val testRunner        = "androidx.test:runner:${Versions.testRunner}"
         const val testEspressoCore  = "androidx.test.espresso:espresso-core:${Versions.testEspressoCore}"

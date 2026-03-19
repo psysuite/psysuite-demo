@@ -9,19 +9,15 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
 import org.albaspazio.psysuite.BuildConfig
 import org.albaspazio.psysuite.MainApplication
 import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.ResultsManager
-import org.albaspazio.psysuite.model.SubjectBasicParcel
+import org.albaspazio.psysuite.databinding.FragmentMainBinding
+import org.albaspazio.psysuite.device.DeviceIdentificationManager
+import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment.Companion.PROJECTS_PARCEL
 import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment.Companion.SUBJECT_PARCEL
-
-import org.albaspazio.psysuite.utility.TestResult
-import org.albaspazio.psysuite.databinding.FragmentMainBinding
-import org.albaspazio.psysuite.device.DeviceIdentificationManager
 
 
 class MainFragment : TestLaunchFragment(
