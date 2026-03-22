@@ -4,10 +4,10 @@ package org.albaspazio.psysuite
 import android.app.Application
 import android.os.Build
 import android.util.Log
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.model.preferences.ProjectPreferencesManager
-import org.albaspazio.psysuite.model.preferences.ProjectPreferences
-import org.albaspazio.psysuite.stimuli.DelaysAligner
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.models.preferences.ProjectPreferencesManager
+import org.albaspazio.psysuite.core.models.preferences.ProjectPreferences
+import org.albaspazio.psysuite.core.stimuli.DelaysAligner
 import org.albaspazio.psysuite.python.SPython
 
 // this is called before any activity onCreate
@@ -42,7 +42,8 @@ class MainApplication : Application(){
         super.onCreate()
 
         // create preference file (if not exist), init preferences
-        ProjectPreferencesManager.init(applicationContext, ProjectPreferences(defaultDelays, resources.getString(org.albaspazio.psysuite.core.R.string.main_email)), overwrite = true)
+        ProjectPreferencesManager.init(applicationContext, ProjectPreferences(defaultDelays, resources.getString(
+            R.string.main_email)), overwrite = true)
         delaysAligner = ProjectPreferencesManager.preferences.delaysAligner
 
         SPython.getInstance(applicationContext)   // init python here that we have a context. in Test Classes we get the instance created here

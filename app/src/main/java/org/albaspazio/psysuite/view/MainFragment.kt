@@ -13,11 +13,11 @@ import org.albaspazio.psysuite.BuildConfig
 import org.albaspazio.psysuite.MainApplication
 import org.albaspazio.psysuite.R
 import org.albaspazio.psysuite.databinding.FragmentMainBinding
-import org.albaspazio.psysuite.device.DeviceIdentificationManager
+import org.albaspazio.psysuite.core.managers.DeviceIdentificationManager
 import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.TestBasic
-import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment.Companion.PROJECTS_PARCEL
-import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment.Companion.SUBJECT_PARCEL
+import org.albaspazio.psysuite.core.ui.dialogs.SubjectBasicDialogFragment.Companion.PROJECTS_PARCEL
+import org.albaspazio.psysuite.core.ui.dialogs.SubjectBasicDialogFragment.Companion.SUBJECT_PARCEL
 
 
 class MainFragment : TestLaunchFragment(
@@ -50,7 +50,7 @@ class MainFragment : TestLaunchFragment(
             bundle.putParcelable(SUBJECT_PARCEL, subj)
             
             // Get available projects and pass them to the dialog
-            val projectManager = org.albaspazio.psysuite.project.ProjectManager.getInstance(frg.requireContext())
+            val projectManager = org.albaspazio.psysuite.core.managers.ProjectManager.getInstance(frg.requireContext())
             val availableProjects = projectManager.getAllProjects()
             bundle.putStringArrayList(PROJECTS_PARCEL, ArrayList(availableProjects))
 

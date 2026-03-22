@@ -7,6 +7,7 @@ object Configs {
     // org.albaspazio.psysuite.core & org.albaspazio.core
     const val psysuitecorenamespace     = "org.albaspazio.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
+    const val psysuitepythonnamespace   = "org.albaspazio.psysuite.python"
 
     const val compileSdkVersion = 34
     const val minSdkVersion     = 26
@@ -38,7 +39,7 @@ object Versions {
 
 
     // org.albaspazio.psysuite.core
-    const val chaquopy          = "16.0.0"
+    const val chaquopy          = "17.0.0"
     const val legacySupport     = "1.0.0"
     const val preference        = "1.2.0"
     const val recycleView       = "1.2.1"
@@ -46,14 +47,14 @@ object Versions {
 
 
     // org.albaspazio.core
-    const val kotlin = "1.9.0"
+    const val kotlin = "1.9.24"
+    const val kparcelablePlugin = "1.9.24"
     const val ktxCore = "1.13.1"
-    const val appCompat = "1.5.1"
+    const val appCompat = "1.6.1"
     const val androidLibrary = "7.2.0"
-    const val kparcelablePlugin = "1.7.0"
     const val constraintLayout = "2.1.4"
     const val material = "1.12.0"
-    const val lifecycle = "2.5.1"
+    const val lifecycle = "2.6.1"
     const val localbroadcastmanager = "1.1.0"
     const val navFragment = "2.3.5"
     const val moshi = "1.12.0"
@@ -113,6 +114,11 @@ object Dependencies {
         const val rxandroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxandroid}"
         const val rxrelay   = "com.jakewharton.rxrelay2:rxrelay:${Versions.rxandroid}"
         const val rxkotlin  = "io.reactivex.rxjava2:rxkotlin:${Versions.rxkotlin}"
+    }
+
+    object network {
+        const val okhttp    = "com.squareup.okhttp3:okhttp:4.11.0"
+        const val gson      = "com.google.code.gson:gson:2.10.1"
     }
 
 //    object sunmail {

@@ -25,9 +25,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 
 import org.albaspazio.psysuite.settings.SettingsActivity
-import org.albaspazio.psysuite.device.DeviceIdentificationManager
-import org.albaspazio.psysuite.device.DeviceIdBackupManager
-import org.albaspazio.psysuite.device.DeviceRegistrationDialog
+import org.albaspazio.psysuite.core.managers.DeviceIdentificationManager
+import org.albaspazio.psysuite.core.managers.DeviceIdBackupManager
+import org.albaspazio.psysuite.core.ui.dialogs.DeviceRegistrationDialog
 import android.widget.Toast
 import org.albaspazio.core.ui.show1MethodDialog
 import org.albaspazio.core.updater.Constants
@@ -38,10 +38,11 @@ import org.albaspazio.core.pdf.PdfViewActivity
 import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.sample.SubjectSampleDialogFragment
 import org.albaspazio.psysuite.tests.sample.SubjectSampleParcel
-import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment
-import org.albaspazio.psysuite.utility.filesystem.FileSystemManager
+import org.albaspazio.psysuite.core.ui.dialogs.SubjectBasicDialogFragment
+import org.albaspazio.psysuite.core.utils.filesystem.FileSystemManager
 import org.albaspazio.psysuite.view.MainFragment
-import org.albaspazio.psysuite.project.ProjectManagementDialog
+import org.albaspazio.psysuite.core.ui.dialogs.ProjectManagementDialog
+import org.albaspazio.psysuite.core.managers.ResultsManager
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.DeviceUtils
@@ -326,7 +327,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     // automatically handle clicks on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        //TODO hide menu_action_results when already in resultsFragment
         return when(item.itemId) {
 
             R.id.action_settings -> {
@@ -335,7 +335,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 true
             }
             R.id.menu_send_results -> {
-                resultsManager.openResultsManager()
+                findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsManagerFragment)
                 true
             }
             R.id.menu_action_manual ->{
@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             deviceManager.isRegistrationSkipped ->  checkPendingResults()
             deviceManager.isFirstLaunch         -> {
                                                     // First launch and not registered, try to restore from backup
-                                                    val backupManager = DeviceIdBackupManager(this)
+                                                    val backupManager = DeviceIdBackupManager.getInstance(this)
                                                     val restoredId = backupManager.restoreDeviceId()
 
                                                     if (restoredId != null) {
@@ -454,7 +454,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             hasShownUploadDialog = true
             Log.i("MainActivity", "Showing upload dialog for pending results")
             show2ChoisesDialog(this, resources.getString(R.string.warning), "There are pending results to send. do you want to send them?", resources.getString(R.string.yes), resources.getString(R.string.no),
-                { /* pressed YES */ resultsManager.openResultsManager() },{})
+                { /* pressed YES */ findNavController(R.id.my_nav_host_fragment).navigate(R.id.action_mainFragment_to_resultsManagerFragment) },{})
         } else if (hasShownUploadDialog) {
             Log.i("MainActivity", "Upload dialog already shown in this session - skipping")
         }
@@ -466,7 +466,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         dialog.setOnDeviceRegisteredListener(object : DeviceRegistrationDialog.OnDeviceRegisteredListener {
 
             override fun onDeviceRegistered(deviceId: String) {
-                DeviceIdBackupManager(this@MainActivity).backupDeviceId(deviceId)
+                DeviceIdBackupManager.getInstance(this@MainActivity).backupDeviceId(deviceId)
                 deviceManager.setDeviceId(deviceId)
                 Toast.makeText(this@MainActivity, resources.getString(R.string.device_registered, deviceId), Toast.LENGTH_LONG).show()
 

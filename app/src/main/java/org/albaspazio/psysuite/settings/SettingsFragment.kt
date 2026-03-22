@@ -8,10 +8,10 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.ResultsManager
-import org.albaspazio.psysuite.device.DeviceIdentificationManager
-import org.albaspazio.psysuite.device.DeviceIdBackupManager
-import org.albaspazio.psysuite.device.DeviceRegistrationDialog
+import org.albaspazio.psysuite.core.managers.ResultsManager
+import org.albaspazio.psysuite.core.managers.DeviceIdentificationManager
+import org.albaspazio.psysuite.core.managers.DeviceIdBackupManager
+import org.albaspazio.psysuite.core.ui.dialogs.DeviceRegistrationDialog
 import androidx.core.content.edit
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
@@ -120,7 +120,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         dialog.setOnDeviceRegisteredListener(object : DeviceRegistrationDialog.OnDeviceRegisteredListener {
 
             override fun onDeviceRegistered(deviceId: String) {
-                DeviceIdBackupManager(requireContext()).backupDeviceId(deviceId)
+                DeviceIdBackupManager.getInstance(requireContext()).backupDeviceId(deviceId)
                 updateDevicePreferences()
                 Toast.makeText(context, "Device registered as: $deviceId", Toast.LENGTH_LONG).show()
             }
@@ -138,7 +138,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             .setMessage("Are you sure you want to clear the device registration? This will remove the device identifier from future experiment uploads.")
             .setPositiveButton("Clear") { _, _ ->
                 deviceManager.clearRegistration()
-                DeviceIdBackupManager(requireContext()).clearBackup()
+                DeviceIdBackupManager.getInstance(requireContext()).clearBackup()
                 updateDevicePreferences()
                 Toast.makeText(context, "Device registration cleared", Toast.LENGTH_SHORT).show()
             }

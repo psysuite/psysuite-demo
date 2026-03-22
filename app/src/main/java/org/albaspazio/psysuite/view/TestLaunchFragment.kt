@@ -5,11 +5,11 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import org.albaspazio.psysuite.MainActivity
 import org.albaspazio.psysuite.MainApplication
-import org.albaspazio.psysuite.ResultsManager
+import org.albaspazio.psysuite.core.managers.ResultsManager
 import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.TestBasic
-import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment
-import org.albaspazio.psysuite.utility.TestResult
+import org.albaspazio.psysuite.core.ui.dialogs.SubjectBasicDialogFragment
+import org.albaspazio.psysuite.core.utils.TestResult
 import org.albaspazio.psysuite.view.MainFragment.Companion.TARGET_FRAGMENT_SUBJECT_REQUEST_CODE
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.setRam

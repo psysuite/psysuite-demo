@@ -25,9 +25,6 @@
             android:id="@+id/action_mainFragment_to_varioustestsFragment"
             app:destination="@id/variousTestsFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_resultsFragment"
-            app:destination="@id/resultsFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_resultsManagerFragment"
             app:destination="@id/resultsManagerFragment" />
     </fragment>
@@ -35,7 +32,7 @@
 
     <fragment
         android:id="@+id/testFragment"
-        android:name="org.albaspazio.psysuite.ui.fragments.TestFragment"
+        android:name="org.albaspazio.psysuite.core.ui.fragments.TestFragment"
         android:label="@string/run_test">
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>
     </fragment>
@@ -55,13 +52,8 @@
 
 
     <fragment
-        android:id="@+id/resultsFragment"
-        android:name="org.albaspazio.psysuite.ui.fragments.ResultsFragment"
-        android:label="Manage Test Results" />
-
-    <fragment
         android:id="@+id/resultsManagerFragment"
-        android:name="org.albaspazio.psysuite.view.ResultsManagerFragment"
+        android:name="org.albaspazio.psysuite.core.ui.fragments.ResultsManagerFragment"
         android:label="@string/send_results">
         <action
             android:id="@+id/action_resultsManagerFragment_to_mainFragment"
