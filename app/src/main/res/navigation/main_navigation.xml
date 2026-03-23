@@ -13,22 +13,9 @@
                 android:id="@+id/action_mainFragment_to_testFragment"
                 app:destination="@id/testFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_temporaltestsFragment"
-            app:destination="@id/temporalTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_illusiontestsFragment"
-            app:destination="@id/illusionTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_predictiontestsFragment"
-            app:destination="@id/predictionTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_varioustestsFragment"
-            app:destination="@id/variousTestsFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_resultsManagerFragment"
             app:destination="@id/resultsManagerFragment" />
     </fragment>
-
 
     <fragment
         android:id="@+id/testFragment"
@@ -37,20 +24,6 @@
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>
     </fragment>
 
-
-    <fragment
-        android:id="@+id/bindingsFragment"
-        android:name="org.albaspazio.psysuite.view.BindingsFragment"
-        android:label="@string/label_bindings" >
-        <action
-            android:id="@+id/action_bindingsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_bindingsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-
     <fragment
         android:id="@+id/resultsManagerFragment"
         android:name="org.albaspazio.psysuite.core.ui.fragments.ResultsManagerFragment"
@@ -58,60 +31,6 @@
         <action
             android:id="@+id/action_resultsManagerFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/temporalTestsFragment"
-        android:name="org.albaspazio.psysuite.view.TemporalTestsFragment"
-        android:label="@string/label_temporal_tests" >
-        <action
-            android:id="@+id/action_temporalTestsFragment_to_bindingsFragment"
-            app:destination="@id/bindingsFragment" />
-        <action
-            android:id="@+id/action_temporalTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_temporalTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/illusionTestsFragment"
-        android:name="org.albaspazio.psysuite.view.IllusionTestsFragment"
-        android:label="@string/label_illusion_tests" >
-        <action
-            android:id="@+id/action_illusionTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_illusionTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/variousTestsFragment"
-        android:name="org.albaspazio.psysuite.view.VariousTestsFragment"
-        android:label="@string/label_miscellaneous_tests" >
-        <action
-            android:id="@+id/action_variousTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_variousTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/predictionTestsFragment"
-        android:name="org.albaspazio.psysuite.view.PredictionTestsFragment"
-        android:label="@string/label_prediction_tests">
-        <action
-            android:id="@+id/action_predictionTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_predictionTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 </navigation>
