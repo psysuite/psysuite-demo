@@ -41,5 +41,10 @@
     <string name="register_device_then_send_results">Registra il dispositivo e poi manda i risultati tramite il menu in alto a destra</string>
     <string name="sample_test">Testa il dispositivo</string>
     <string name="update_error_message">Si è verificato un errore durante l\\\'aggiornamento:\\n%1$s\n</string>
+    
+    <!-- Dynamic Test Navigation -->
+    <string name="home">Home</string>
+    <string name="back">Back</string>
+    <string name="dynamic_tests">Dynamic Test Navigation</string>
 
 </resources>

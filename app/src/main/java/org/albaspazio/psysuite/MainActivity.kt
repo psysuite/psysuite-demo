@@ -47,6 +47,7 @@ import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.DeviceUtils
 import android.content.pm.ActivityInfo
+import org.albaspazio.psysuite.navigation.manager.XFragmentsNavigationManager
 
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
@@ -111,85 +112,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         // Check and request all permissions
         checkAndRequestPermissions()
     }
-    
-    private fun logDeviceInformation() {
-        val deviceInfo = DeviceUtils.getDeviceInfo(this)
-        Log.i("MainActivity", "=== DEVICE INFORMATION ===")
-        Log.i("MainActivity", "Screen: ${deviceInfo.screenWidthPixels}x${deviceInfo.screenHeightPixels} pixels")
-        Log.i("MainActivity", "Density: ${deviceInfo.density} (${deviceInfo.densityDpi} dpi)")
-        Log.i("MainActivity", "Diagonal: ${"%.2f".format(deviceInfo.diagonalInches)} inches")
-        Log.i("MainActivity", "Screen Size: ${deviceInfo.screenSize}")
-        Log.i("MainActivity", "Is Tablet: ${deviceInfo.isTablet}")
-        Log.i("MainActivity", "========================")
-    }
-    
-    private fun logCurrentOrientation() {
-        val orientation = resources.configuration.orientation
-        val orientationName = when (orientation) {
-            Configuration.ORIENTATION_PORTRAIT -> "PORTRAIT"
-            Configuration.ORIENTATION_LANDSCAPE -> "LANDSCAPE"
-            else -> "UNDEFINED"
-        }
-        Log.i("MainActivity", "Current orientation: $orientationName ($orientation)")
-    }
-    
-    @SuppressLint("SourceLockedOrientationActivity")
-    private fun setupOrientation() {
-        val isTablet = DeviceUtils.isTablet(this)
-        val deviceInfo = DeviceUtils.getDeviceInfo(this)
-        
-        Log.i("MainActivity", "=== ORIENTATION SETUP ===")
-        Log.i("MainActivity", "Device Info: $deviceInfo")
-        Log.i("MainActivity", "Is Tablet: $isTablet")
-        
-        if (isTablet) {
-            // Allow both portrait and landscape on tablets
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-            Log.i("MainActivity", "✓ Tablet detected - ALLOWING both orientations")
-            Log.i("MainActivity", "✓ You can now rotate to landscape on this device")
-        } else {
-            // Force portrait on phones
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            Log.i("MainActivity", "✓ Phone detected - FORCING portrait orientation only")
-            Log.i("MainActivity", "✓ Landscape rotation disabled on this device")
-        }
-        Log.i("MainActivity", "========================")
-    }
-    
-    /**
-     * Lock orientation to landscape for tests (tablets only)
-     */
-    fun lockOrientationToLandscape() {
-        val isTablet = DeviceUtils.isTablet(this)
-        if (isTablet) {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            Log.i("MainActivity", "🔒 Orientation LOCKED to landscape for test")
-        } else {
-            Log.i("MainActivity", "📱 Phone detected - keeping portrait orientation")
-        }
-    }
-    
-    /**
-     * Restore dynamic orientation (tablets only)
-     */
-    fun restoreDynamicOrientation() {
-        val isTablet = DeviceUtils.isTablet(this)
-        if (isTablet) {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-            Log.i("MainActivity", "🔓 Orientation RESTORED to dynamic (sensor)")
-        } else {
-            Log.i("MainActivity", "📱 Phone detected - keeping portrait orientation")
-        }
-    }
-    
-    /**
-     * Reset the upload dialog flag - call this when results are actually uploaded
-     */
-    fun resetUploadDialogFlag() {
-        hasShownUploadDialog = false
-        Log.i("MainActivity", "Upload dialog flag reset - will show again if needed")
-    }
-    
+
+    // region PERMISSIONS
     private fun checkAndRequestPermissions() {
         // Check current permission states
         hasWritePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -255,7 +179,24 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             }
         }
     }
-    
+
+
+    private fun showPermissionErrorDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Permissions Required")
+            .setMessage("This app requires storage and internet permissions to function properly. Please grant the permissions and restart the app.")
+            .setPositiveButton("Retry") { _, _ ->
+                checkAndRequestPermissions()
+            }
+            .setNegativeButton("Exit") { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    // endregion
+
     private fun onAllPermissionsGranted() {
         Log.d("MainActivity", "All permissions granted, checking for updates...")
         checkForUpdates()
@@ -287,21 +228,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             }
         ).checkUpdate()
     }
-    
-    private fun showPermissionErrorDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Permissions Required")
-            .setMessage("This app requires storage and internet permissions to function properly. Please grant the permissions and restart the app.")
-            .setPositiveButton("Retry") { _, _ ->
-                checkAndRequestPermissions()
-            }
-            .setNegativeButton("Exit") { _, _ ->
-                finish()
-            }
-            .setCancelable(false)
-            .show()
-    }
-    
+
     private fun start(){
         try {
             // Initialize managers
@@ -317,7 +244,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         }
     }
 
-    // region SYSTEM MENU
+    // region create SYSTEM MENU
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
@@ -391,15 +318,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private fun handleSampleTestFromMenu() {
         if (!isSubjectDFopening) {
             isSubjectDFopening = true
-            val navigationAction = NavigationActionManager.resolveNavigationAction(this, NavigationActionManager.NavigationDestination.TEST_FRAGMENT) ?: R.id.action_mainFragment_to_testFragment
             
             // Create a temporary fragment to act as the target for the dialog
-            val tempFragment = SampleTestDialogFragment.newInstance(navigationAction)
+            val tempFragment = SampleTestDialogFragment.newInstance()
             
-            // Add the temporary fragment
+            // Add the temporary fragment and commit immediately so it's attached
             supportFragmentManager.beginTransaction()
                 .add(tempFragment, "temp_sample_test_fragment")
-                .commit()
+                .commitNow()
             
             // Create subject parcel and show dialog using MainFragment's method
             val subjectParcel = SubjectSampleParcel()
@@ -422,6 +348,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         checkDeviceRegistration()
     }
 
+    // Step 1:
     private fun checkDeviceRegistration() {
         when {
             deviceManager.isDeviceRegistered    ->  checkPendingResults()
@@ -447,9 +374,9 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         }
     }
 
+    // Step 2: Check for valid files and upload capability
+    // Only show upload dialog once per app session to avoid annoying users on orientation changes
     private fun checkPendingResults() {
-        // Step 2: Check for valid files and upload capability
-        // Only show upload dialog once per app session to avoid annoying users on orientation changes
         if (resultsManager.canUpload && resultsManager.existResultsToSend && !hasShownUploadDialog) {
             hasShownUploadDialog = true
             Log.i("MainActivity", "Showing upload dialog for pending results")
@@ -501,13 +428,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
     // endregion
 
-    // region PROJECT MANAGEMENT
-    private fun showProjectManagementDialog() {
-        val dialog = ProjectManagementDialog.newInstance()
-        dialog.show(supportFragmentManager, ProjectManagementDialog.TAG)
-    }
-    // endregion
-
+    // region LIFECYCLE
     override fun onBackPressed() {
 
         val currentFragment = supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment)?.childFragmentManager?.fragments?.firstOrNull()  as? BaseFragment
@@ -515,20 +436,26 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         when(currentFragment?.LOG_TAG){
             "AnswerDialogFragment", "TestFragment"  -> {}
             "MainFragment"      -> {
-                AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(resources.getString(R.string.warning))
-                    .setMessage(resources.getString(R.string.want_to_quit_app))
-                    .setCancelable(false)
-                    .setPositiveButton(resources.getString(R.string.yes)){ _, _ -> finish() }
-                    .setNegativeButton(resources.getString(R.string.no), null)
-                    .show()
+                // MainFragment has dynamic menu navigation
+                val mainFragment = currentFragment as? MainFragment
+                if (mainFragment?.canGoBackInMenu() == true) {
+                    // Go back in the dynamic menu
+                    mainFragment.goBackInMenu()
+                } else {
+                    // At root menu, ask to exit app
+                    AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(resources.getString(R.string.warning))
+                        .setMessage(resources.getString(R.string.want_to_quit_app))
+                        .setCancelable(false)
+                        .setPositiveButton(resources.getString(R.string.yes)){ _, _ -> finish() }
+                        .setNegativeButton(resources.getString(R.string.no), null)
+                        .show()
+                }
             }
             else                -> super.onBackPressed()
         }
     }
-
-
 
     override fun onPause() {
         super.onPause()
@@ -557,7 +484,95 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         
         super.onDestroy()
     }
+    // endregion
 
+    // region PROJECT MANAGEMENT
+    private fun showProjectManagementDialog() {
+        val dialog = ProjectManagementDialog.newInstance()
+        dialog.show(supportFragmentManager, ProjectManagementDialog.TAG)
+    }
+    // endregion
+
+    // region ORIENTATION
+    private fun logCurrentOrientation() {
+        val orientation = resources.configuration.orientation
+        val orientationName = when (orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> "PORTRAIT"
+            Configuration.ORIENTATION_LANDSCAPE -> "LANDSCAPE"
+            else -> "UNDEFINED"
+        }
+        Log.i("MainActivity", "Current orientation: $orientationName ($orientation)")
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun setupOrientation() {
+        val isTablet = DeviceUtils.isTablet(this)
+        val deviceInfo = DeviceUtils.getDeviceInfo(this)
+
+        Log.i("MainActivity", "=== ORIENTATION SETUP ===")
+        Log.i("MainActivity", "Device Info: $deviceInfo")
+        Log.i("MainActivity", "Is Tablet: $isTablet")
+
+        if (isTablet) {
+            // Allow both portrait and landscape on tablets
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            Log.i("MainActivity", "✓ Tablet detected - ALLOWING both orientations")
+            Log.i("MainActivity", "✓ You can now rotate to landscape on this device")
+        } else {
+            // Force portrait on phones
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            Log.i("MainActivity", "✓ Phone detected - FORCING portrait orientation only")
+            Log.i("MainActivity", "✓ Landscape rotation disabled on this device")
+        }
+        Log.i("MainActivity", "========================")
+    }
+
+    /**
+     * Lock orientation to landscape for tests (tablets only)
+     */
+    fun lockOrientationToLandscape() {
+        val isTablet = DeviceUtils.isTablet(this)
+        if (isTablet) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            Log.i("MainActivity", "🔒 Orientation LOCKED to landscape for test")
+        } else {
+            Log.i("MainActivity", "📱 Phone detected - keeping portrait orientation")
+        }
+    }
+
+    /**
+     * Restore dynamic orientation (tablets only)
+     */
+    fun restoreDynamicOrientation() {
+        val isTablet = DeviceUtils.isTablet(this)
+        if (isTablet) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            Log.i("MainActivity", "🔓 Orientation RESTORED to dynamic (sensor)")
+        } else {
+            Log.i("MainActivity", "📱 Phone detected - keeping portrait orientation")
+        }
+    }
+
+    //endregion
+
+    /**
+     * Reset the upload dialog flag - call this when results are actually uploaded
+     */
+    fun resetUploadDialogFlag() {
+        hasShownUploadDialog = false
+        Log.i("MainActivity", "Upload dialog flag reset - will show again if needed")
+    }
+
+    private fun logDeviceInformation() {
+        val deviceInfo = DeviceUtils.getDeviceInfo(this)
+        Log.i("MainActivity", "=== DEVICE INFORMATION ===")
+        Log.i("MainActivity", "Screen: ${deviceInfo.screenWidthPixels}x${deviceInfo.screenHeightPixels} pixels")
+        Log.i("MainActivity", "Density: ${deviceInfo.density} (${deviceInfo.densityDpi} dpi)")
+        Log.i("MainActivity", "Diagonal: ${"%.2f".format(deviceInfo.diagonalInches)} inches")
+        Log.i("MainActivity", "Screen Size: ${deviceInfo.screenSize}")
+        Log.i("MainActivity", "Is Tablet: ${deviceInfo.isTablet}")
+        Log.i("MainActivity", "========================")
+    }
 }
 
 /**
@@ -566,21 +581,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 class SampleTestDialogFragment : androidx.fragment.app.Fragment() {
 
     companion object {
-        private const val ARG_NAVIGATION_ACTION = "navigation_action"
-
-        fun newInstance(navigationAction: Int): SampleTestDialogFragment {
-            val fragment = SampleTestDialogFragment()
-            val args = Bundle()
-            args.putInt(ARG_NAVIGATION_ACTION, navigationAction)
-            fragment.arguments = args
-            return fragment
+        fun newInstance(): SampleTestDialogFragment {
+            return SampleTestDialogFragment()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val navigationAction = arguments?.getInt(ARG_NAVIGATION_ACTION) ?: R.id.action_mainFragment_to_testFragment
 
         // Set up the result listener
         parentFragmentManager.setFragmentResultListener(
@@ -592,8 +599,8 @@ class SampleTestDialogFragment : androidx.fragment.app.Fragment() {
 
             val subj = result.getParcelable<SubjectBasicParcel>(SubjectBasicDialogFragment.SUBJECT_PARCEL)
             if (subj != null) {
-                // Use MainFragment's static method to start the test with the appropriate navigation action
-                MainFragment.startTest(subj, requireActivity().findViewById(R.id.my_nav_host_fragment), navigationAction)
+                // Use MainFragment's static method to start the test
+                MainFragment.startTest(subj, requireActivity().findViewById(R.id.my_nav_host_fragment), R.id.action_mainFragment_to_testFragment)
             }
             // Remove this temporary fragment
             parentFragmentManager.beginTransaction().remove(this).commit()

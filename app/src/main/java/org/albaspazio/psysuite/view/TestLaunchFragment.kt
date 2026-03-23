@@ -44,25 +44,28 @@ abstract class TestLaunchFragment(
      * Observes test results coming back from TestFragment
      */
     private fun setupTestResultObserver() {
+        try {
+            val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+            val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
 
-        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        val resultLiveData = savedStateHandle?.getLiveData<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
-
-        resultLiveData?.observe(viewLifecycleOwner) { result ->
-            if (result != null) {
+            resultLiveData?.observe(viewLifecycleOwner) { result ->
+                if (result != null) {
 //                    subject.device = Device().setRam(requireContext())
 //                    subject.vercode = UpdateManager.getVersionCodeLocal(requireContext()).first
 //                    subject.stimuliDelays = MainApplication.delaysAligner
 //                    subject.writeJson(requireContext()) // is NOT block-aware, always writes without block info
 
-                // Restore dynamic orientation when test finishes (tablets only)
-                (requireActivity() as MainActivity).restoreDynamicOrientation()
+                    // Restore dynamic orientation when test finishes (tablets only)
+                    (requireActivity() as MainActivity).restoreDynamicOrientation()
 
-                ResultsManager.getInstance(requireActivity()).onTestFinished(result)
-                savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
+                    ResultsManager.getInstance(requireActivity()).onTestFinished(result)
+                    savedStateHandle.remove<TestResult>(TestBasic.TEST_BUNDLE_RESULT_LABEL)
+                }
             }
+        } catch (e: IllegalStateException) {
+            // Fragment is not part of a navigation graph, skip observer setup
+            // This is expected for menu-only fragments like MainFragment
         }
-
     }
 
     /**
