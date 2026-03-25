@@ -2,77 +2,11 @@
   "label": "@string/home",
   "type": "menu",
   "value": [
-    {
-      "label": "@string/label_temporal_tests",
-      "type": "menu",
-      "value": [
-        {
-          "label": "@string/label_bindings",
-          "type": "menu",
-          "value": [
-            {
-              "label": "@string/start_atb",
-              "type": "test",
-              "value": "org.albaspazio.psysuite.tests.temporalbinding.atb.SubjectATBParcel"
-            },
-            {
-              "label": "@string/start_tvb",
-              "type": "test",
-              "value": "org.albaspazio.psysuite.tests.temporalbinding.tvb.SubjectTVBParcel"
-            },
-            {
-              "label": "@string/start_avb",
-              "type": "test",
-              "value": "org.albaspazio.psysuite.tests.temporalbinding.avb.SubjectAVBParcel"
-            },
-            {
-              "label": "@string/start_atvb",
-              "type": "test",
-              "value": "org.albaspazio.psysuite.tests.temporalbinding.atvb.SubjectATVBParcel"
-            }
-          ]
-        },
-        {
-          "label": "@string/tid_label",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.tid.SubjectTIDParcel"
-        },
+
         {
           "label": "@string/start_bisection",
           "type": "test",
           "value": "org.albaspazio.psysuite.tests.bis.SubjectBISParcel"
-        },
-        {
-          "label": "@string/tir_label",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.tir.SubjectTIRParcel"
-        }
-      ]
-    },
-    {
-      "label": "@string/label_prediction_tests",
-      "type": "menu",
-      "value": [
-        {
-          "label": "@string/label_ttc",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.ttc.SubjectTTCParcel"
-        },
-        {
-          "label": "@string/label_tsp",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.tsp.SubjectTSPParcel"
-        }
-      ]
-    },
-    {
-      "label": "@string/label_illusion_tests",
-      "type": "menu",
-      "value": [
-        {
-          "label": "@string/label_fgi",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.fgi.SubjectFGIParcel"
         },
         {
           "label": "@string/tfi_label",
@@ -80,32 +14,9 @@
           "value": "org.albaspazio.psysuite.tests.tfi.SubjectTFIParcel"
         },
         {
-          "label": "@string/label_rivgrp",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.rivgrpSubjectRIVGRPParcel"
-        }
-      ]
-    },
-    {
-      "label": "@string/label_miscellaneous_tests",
-      "type": "menu",
-      "value": [
-        {
           "label": "@string/start_reactiontimes",
           "type": "test",
           "value": "org.albaspazio.psysuite.tests.rt.SubjectRTParcel"
-        },
-        {
-          "label": "@string/start_musicalmeter",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.mmd.SubjectMMDParcel"
-        },
-        {
-          "label": "@string/label_beads",
-          "type": "test",
-          "value": "org.albaspazio.psysuite.tests.beads.SubjectBeadsParcel"
         }
       ]
-    }
-  ]
 }
