@@ -6,120 +6,31 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="iit.uvip.psysuite.view.MainFragment"
+        android:name="org.albaspazio.psysuite.view.MainFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_main">
         <action
                 android:id="@+id/action_mainFragment_to_testFragment"
                 app:destination="@id/testFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_temporaltestsFragment"
-            app:destination="@id/temporalTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_illusiontestsFragment"
-            app:destination="@id/illusionTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_predictiontestsFragment"
-            app:destination="@id/predictionTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_varioustestsFragment"
-            app:destination="@id/variousTestsFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_resultsFragment"
-            app:destination="@id/resultsFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_resultsManagerFragment"
             app:destination="@id/resultsManagerFragment" />
     </fragment>
 
-
     <fragment
         android:id="@+id/testFragment"
-        android:name="iit.uvip.psysuite.core.ui.fragments.TestFragment"
+        android:name="org.albaspazio.psysuite.core.ui.fragments.TestFragment"
         android:label="@string/run_test">
         <action android:id="@+id/action_testFragment_to_mainFragment" app:destination="@id/mainFragment"/>
     </fragment>
 
-
-    <fragment
-        android:id="@+id/bindingsFragment"
-        android:name="iit.uvip.psysuite.view.BindingsFragment"
-        android:label="@string/label_bindings" >
-        <action
-            android:id="@+id/action_bindingsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_bindingsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/resultsFragment"
-        android:name="iit.uvip.psysuite.core.ui.fragments.ResultsFragment"
-        android:label="Manage Test Results" />
-
     <fragment
         android:id="@+id/resultsManagerFragment"
-        android:name="iit.uvip.psysuite.view.ResultsManagerFragment"
+        android:name="org.albaspazio.psysuite.core.ui.fragments.ResultsManagerFragment"
         android:label="@string/send_results">
         <action
             android:id="@+id/action_resultsManagerFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/temporalTestsFragment"
-        android:name="iit.uvip.psysuite.view.TemporalTestsFragment"
-        android:label="@string/label_temporal_tests" >
-        <action
-            android:id="@+id/action_temporalTestsFragment_to_bindingsFragment"
-            app:destination="@id/bindingsFragment" />
-        <action
-            android:id="@+id/action_temporalTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_temporalTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/illusionTestsFragment"
-        android:name="iit.uvip.psysuite.view.IllusionTestsFragment"
-        android:label="@string/label_illusion_tests" >
-        <action
-            android:id="@+id/action_illusionTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_illusionTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/variousTestsFragment"
-        android:name="iit.uvip.psysuite.view.VariousTestsFragment"
-        android:label="@string/label_miscellaneous_tests" >
-        <action
-            android:id="@+id/action_variousTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_variousTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
-    </fragment>
-
-
-    <fragment
-        android:id="@+id/predictionTestsFragment"
-        android:name="iit.uvip.psysuite.view.PredictionTestsFragment"
-        android:label="@string/label_prediction_tests">
-        <action
-            android:id="@+id/action_predictionTestsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
-        <action
-            android:id="@+id/action_predictionTestsFragment_to_resultsManagerFragment"
-            app:destination="@id/resultsManagerFragment" />
     </fragment>
 
 </navigation>

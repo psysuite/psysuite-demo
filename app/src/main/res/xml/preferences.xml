@@ -61,22 +61,22 @@
             
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Email Results">
+<!--    <PreferenceCategory android:title="Email Results">-->
 
-        <SwitchPreferenceCompat
-            android:key="email_enabled"
-            android:title="Enable Email Sending"
-            android:summary="Allow sending results via email"
-            android:defaultValue="false" />
+<!--        <SwitchPreferenceCompat-->
+<!--            android:key="email_enabled"-->
+<!--            android:title="Enable Email Sending"-->
+<!--            android:summary="Allow sending results via email"-->
+<!--            android:defaultValue="false" />-->
 
-        <EditTextPreference
-            android:defaultValue="@string/main_email"
-            android:key="pref_main_email"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="Main e-mail address"
-            android:dependency="email_enabled" />
-    </PreferenceCategory>
+<!--        <EditTextPreference-->
+<!--            android:defaultValue="@string/main_email"-->
+<!--            android:key="pref_main_email"-->
+<!--            android:selectAllOnFocus="true"-->
+<!--            android:singleLine="true"-->
+<!--            android:title="Main e-mail address"-->
+<!--            android:dependency="email_enabled" />-->
+<!--    </PreferenceCategory>-->
 
     <PreferenceCategory android:title="Stimuli reciprocal delays">
 
