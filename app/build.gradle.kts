@@ -39,17 +39,24 @@ android {
         }
     }
 
-    namespace = Configs.applicationId
-    compileSdkVersion(Configs.compileSdkVersion)
+    namespace           = Configs.psysuitenamespace
+    compileSdk          = Configs.compileSdkVersion
+
     defaultConfig {
 
-        applicationId = Configs.applicationId
-        versionCode = Configs.versionCode
-        versionName = Configs.versionName
+        applicationId   = Configs.applicationId
+        versionCode     = Configs.versionCode
+        versionName     = Configs.versionName
 
-        minSdkVersion(Configs.minSdkVersion)
-        targetSdkVersion(Configs.targetSdkVersion)
+        minSdk          = Configs.minSdkVersion
+        targetSdk       = Configs.targetSdkVersion
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Enable 16 KB page alignment for native libraries
+        ndk {
+            abiFilters.add("arm64-v8a")
+        }
     }
 
     buildTypes {
@@ -60,13 +67,22 @@ android {
             signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "API_URL", "\"${getLocalProperty("PSYSUITE_API_URL_RELEASE", "https://your-server.com/api")}\"")
             buildConfigField("String", "API_KEY", "\"${getLocalProperty("PSYSUITE_API_KEY_RELEASE", "release-key-not-configured")}\"")
-
+            
+            // Enable 16 KB page alignment
+            packagingOptions {
+                doNotStrip.add("lib/arm64-v8a/libnativeaudio.so")
+            }
         }
 
         getByName("debug") {
             isDebuggable = true
             buildConfigField("String", "API_URL", "\"${getLocalProperty("PSYSUITE_API_URL_DEBUG", "http://localhost:5000/api")}\"")
             buildConfigField("String", "API_KEY", "\"${getLocalProperty("PSYSUITE_API_KEY_DEBUG", "debug-key-not-configured")}\"")
+            
+            // Enable 16 KB page alignment
+            packagingOptions {
+                doNotStrip.add("lib/arm64-v8a/libnativeaudio.so")
+            }
         }
     }
 
@@ -92,6 +108,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    // Configure native library alignment
+    ndkVersion = "28.0.13004108"
 
 }
 

@@ -82,7 +82,32 @@ class MainFragment : TestLaunchFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setVersionText(view)
+        setDeviceIdText(view)
         initializeDynamicMenu(view, savedInstanceState)
+    }
+
+    private fun setVersionText(view: View) {
+        try {
+            val tvVersion = view.findViewById<TextView>(R.id.tv_version)
+            if (tvVersion != null) {
+                tvVersion.text = "v${requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName}"
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error setting version", e)
+        }
+    }
+
+    private fun setDeviceIdText(view: View) {
+        try {
+            val tvDeviceId = view.findViewById<TextView>(R.id.tv_device_id)
+            if (tvDeviceId != null) {
+                val deviceManager = org.albaspazio.psysuite.core.managers.DeviceIdentificationManager.getInstance(requireActivity())
+                tvDeviceId.text = deviceManager.deviceId ?: "N/A"
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error setting device ID", e)
+        }
     }
 
     private fun initializeDynamicMenu(view: View, savedInstanceState: Bundle?) {
@@ -204,6 +229,7 @@ class MainFragment : TestLaunchFragment(
         // This method is called from MainActivity when device is registered
         // We can optionally display it in the menu if needed
         Log.d(LOG_TAG, "Device registered: $deviceId")
+        setDeviceIdText(requireView())
     }
 
     /**

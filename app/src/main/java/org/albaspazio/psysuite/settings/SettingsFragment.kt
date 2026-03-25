@@ -36,7 +36,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         
         setupDevicePreferences()
         setupWebUploadPreferences()
-        setupEmailPreferences()
     }
     
     private fun clearProblematicPreferences() {
@@ -147,67 +146,54 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     }
     
     private fun setupWebUploadPreferences() {
-//        // Web API URL preference
-//        val webApiUrlPreference = findPreference<EditTextPreference>("web_api_url")
-//        webApiUrlPreference?.apply {
-//            text = resultsManager.webApiUrl
-//            summary = if (text.isNullOrBlank() || text == "https://your-server.com/api") {
-//                "Not configured - tap to set server URL"
-//            } else {
-//                "Current URL: $text"
-//            }
-//
-//            setOnPreferenceChangeListener { _, newValue ->
-//                val newUrl = newValue.toString().trim()
-//                resultsManager.webApiUrl = newUrl
-//                updateWebUploadStatus()
-//                summary =   if (newUrl.isBlank() || newUrl == "https://your-server.com/api")    "Not configured - tap to set server URL"
-//                            else                                                                "Current URL: $newUrl"
-//                true
-//            }
-//        }
-//
-//        // Web API Key preference
-//        val webApiKeyPreference = findPreference<EditTextPreference>("web_api_key")
-//        webApiKeyPreference?.apply {
-//            text = resultsManager.webApiKey
-//            summary = if (text.isNullOrBlank()) {
-//                "Not configured - tap to set API key"
-//            } else {
-//                "API key configured (${text?.length} characters)"
-//            }
-//
-//            setOnPreferenceChangeListener { _, newValue ->
-//                val newKey = newValue.toString().trim()
-//                resultsManager.webApiKey = newKey
-//                updateWebUploadStatus()
-//                summary = if (newKey.isBlank()) {
-//                    "Not configured - tap to set API key"
-//                } else {
-//                    "API key configured (${newKey.length} characters)"
-//                }
-//                true
-//            }
-//        }
+        // Web API URL preference
+        val webApiUrlPreference = findPreference<EditTextPreference>("web_api_url")
+        webApiUrlPreference?.apply {
+            text = resultsManager.webApiUrl
+            summary = if (text.isNullOrBlank() || text == "https://your-server.com/api") {
+                "Not configured - tap to set server URL"
+            } else {
+                "Current URL: $text"
+            }
+
+            setOnPreferenceChangeListener { _, newValue ->
+                val newUrl = newValue.toString().trim()
+                resultsManager.webApiUrl = newUrl
+                updateWebUploadStatus()
+                summary =   if (newUrl.isBlank() || newUrl == "https://your-server.com/api")    "Not configured - tap to set server URL"
+                            else                                                                "Current URL: $newUrl"
+                true
+            }
+        }
+
+        // Web API Key preference
+        val webApiKeyPreference = findPreference<EditTextPreference>("web_api_key")
+        webApiKeyPreference?.apply {
+            text = resultsManager.webApiKey
+            summary = if (text.isNullOrBlank()) {
+                "Not configured - tap to set API key"
+            } else {
+                "API key configured (${text?.length} characters)"
+            }
+
+            setOnPreferenceChangeListener { _, newValue ->
+                val newKey = newValue.toString().trim()
+                resultsManager.webApiKey = newKey
+                updateWebUploadStatus()
+                summary = if (newKey.isBlank()) {
+                    "Not configured - tap to set API key"
+                } else {
+                    "API key configured (${newKey.length} characters)"
+                }
+                true
+            }
+        }
         
         // Web upload status preference (read-only)
         webUploadStatusPreference = findPreference("web_upload_status")
         updateWebUploadStatus()
     }
-    
-    private fun setupEmailPreferences() {
-        // Email enabled switch
-        val emailEnabledPreference = findPreference<SwitchPreferenceCompat>("email_enabled")
-        emailEnabledPreference?.apply {
-            isChecked = resultsManager.isEmailEnabled
-            setOnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as Boolean
-                resultsManager.isEmailEnabled = enabled
-                true
-            }
-        }
-    }
-    
+
     private fun updateWebUploadStatus() {
         webUploadStatusPreference?.apply {
             val isConfigured = resultsManager.isWebUploadEnabled

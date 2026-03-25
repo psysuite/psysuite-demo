@@ -1,6 +1,7 @@
 object Configs {
 
-    const val applicationId     = "org.albaspazio.psysuite"
+    const val applicationId     = "org.albaspazio.psysuite" //  Play Store package name
+    const val psysuitenamespace = "org.albaspazio.psysuite" //  Internal code identifier
     const val versionCode       = 66
     const val versionName       = "2.5.3.${versionCode}"
 
@@ -8,6 +9,7 @@ object Configs {
     const val psysuitecorenamespace     = "org.albaspazio.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
     const val psysuitepythonnamespace   = "org.albaspazio.psysuite.python"
+    const val psysuitetestsnamespace    = "org.albaspazio.psysuite.tests"
 
     const val compileSdkVersion = 34
     const val minSdkVersion     = 26
@@ -29,9 +31,6 @@ object Plugins {
 object Versions {
 
     const val androidApplication = "7.4.2"
-    const val gradlePlugin = "4.1.1"
-    const val navVersion = "2.3.5"
-    const val navSafeArgsGradlePlugin = "1.0.0"
     const val fragment = "1.4.0"
 
     const val permissions = "2.0.54"
@@ -80,7 +79,6 @@ object Dependencies {
         // org.albaspazio.psysuite.core
         const val preference        = "androidx.preference:preference-ktx:${Versions.preference}"
         const val recycleView       = "androidx.recyclerview:recyclerview:${Versions.recycleView}"
-        const val legacySupport     = "androidx.legacy:legacy-support-v4:${Versions.legacySupport}"
 
         // org.albaspazio.core
         const val lifecycleviewmodel= "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"

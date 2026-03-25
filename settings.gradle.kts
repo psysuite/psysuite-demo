@@ -17,6 +17,7 @@ dependencyResolutionManagement {
 
 
 include(":nativeaudio")
+project(":nativeaudio").projectDir = File(settingsDir, "../modules/psysuitecore/nativeaudio")
 
 include(":psysuitepython")
 project(":psysuitepython").projectDir = File(settingsDir, "../modules/psysuitepython/psysuitepython")

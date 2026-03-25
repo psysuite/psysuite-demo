@@ -47,7 +47,6 @@ import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.DeviceUtils
 import android.content.pm.ActivityInfo
-import org.albaspazio.psysuite.navigation.manager.XFragmentsNavigationManager
 
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener{
@@ -100,6 +99,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         Log.d("BuildConfig", "API_URL: ${BuildConfig.API_URL}")
         Log.d("BuildConfig", "API_KEY: ${BuildConfig.API_KEY}")
         
+        // Initialize ResultsManager with BuildConfig values
+        resultsManager = ResultsManager.getInstance(this)
+        resultsManager.webApiUrl = BuildConfig.API_URL
+        resultsManager.webApiKey = BuildConfig.API_KEY
+        Log.d("MainActivity", "ResultsManager initialized with API_URL: ${resultsManager.webApiUrl}, API_KEY: ${resultsManager.webApiKey}")
+        
         // Log device information for debugging
         logDeviceInformation()
         
@@ -144,13 +149,19 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         }
     }
     
+    private fun onAllPermissionsGranted() {
+        // Check for updates
+        checkForUpdates()
+    }
+
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        
+
         when (requestCode) {
             TEST_PERMISSIONS_REQUEST_WRITE -> {
                 // Update permission states based on results
@@ -168,7 +179,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                         }
                     }
                 }
-                
+
                 // Check if all critical permissions are granted
                 if (hasWritePermission && hasInternetPermission) {
                     onAllPermissionsGranted()
@@ -179,7 +190,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             }
         }
     }
-
 
     private fun showPermissionErrorDialog() {
         AlertDialog.Builder(this)
@@ -194,17 +204,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             .setCancelable(false)
             .show()
     }
-
     // endregion
 
-    private fun onAllPermissionsGranted() {
-        Log.d("MainActivity", "All permissions granted, checking for updates...")
-        checkForUpdates()
-    }
-    
+
     private fun checkForUpdates() {
         val url = "${BuildConfig.API_URL}/api/psysuitestableupdate.xml"
-        
+
         UpdateManager(this, url,
             { result ->
                 // onSuccess
@@ -221,7 +226,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             { error ->
                 // onError
                 Log.w("MainActivity", "Update check failed: $error")
-                show1MethodDialog(this, resources.getString(R.string.error), 
+                show1MethodDialog(this, resources.getString(R.string.error),
                     resources.getString(org.albaspazio.core.R.string.update_error_message, error), "OK") {
                     start() // Continue with app even if update check fails
                 }
@@ -404,8 +409,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                             currentFragment.setRegistrationName(deviceId)
                         }
                     }
-
-
                 // After registration, proceed to step 2
                 checkPendingResults()
             }
